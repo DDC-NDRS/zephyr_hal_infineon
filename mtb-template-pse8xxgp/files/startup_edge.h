@@ -36,7 +36,7 @@
 #define VECTORTABLE_SIZE        (MXCM33_SYSTEM_INT_NR + ARMV8M_FIXED_EXP_NR + 1u) /* +1 is for Stack pointer */
 #endif /* COMPONENT_CM55 */
 
-#define VECTORTABLE_ALIGN       (1024) /* CM33 alignment for 195 entries (195x4=780) is 1024 bytes */
+#define VECTORTABLE_ALIGN       1024        /* CM33 alignment for 195 entries (195x4=780) is 1024 bytes */
 
 #if defined(__llvm__) && !defined(__ARMCC_VERSION)
     __STATIC_FORCEINLINE void __llvm_init_data(void)
@@ -89,6 +89,11 @@
     typedef void(* ExecFuncPtrRw)(void) ;
     extern ExecFuncPtrRw __s_vector_table_rw[VECTORTABLE_SIZE]   __attribute__( ( section(".intvec_ram"))) __attribute__((aligned(VECTORTABLE_ALIGN))); /**< Secure vector table in flash/ROM */
     extern ExecFuncPtrRw __ns_vector_table_rw[VECTORTABLE_SIZE]   __attribute__( ( section(".intvec_ram"))) __attribute__((aligned(VECTORTABLE_ALIGN))); /**< Secure vector table in flash/ROM */
+#elif defined (_MSC_VER) /* #CUSTOM@NDRS */
+    typedef void(* ExecFuncPtr)(void) ;           /* typedef for the function pointers in the vector table */
+    typedef void(* ExecFuncPtrRw)(void);
+    __declspec(align(VECTORTABLE_ALIGN)) extern ExecFuncPtrRw __s_vector_table_rw[VECTORTABLE_SIZE] ; /**< secure vector table in secure SRAM */
+    __declspec(align(VECTORTABLE_ALIGN)) extern ExecFuncPtrRw __ns_vector_table_rw[VECTORTABLE_SIZE]; /**< non-secure vector table in secure SRAM */
 #endif
 extern ExecFuncPtr __s_vector_table[] ; /**< secure vector table in secure SRAM */
 

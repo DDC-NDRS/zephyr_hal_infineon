@@ -446,6 +446,9 @@
 #elif defined (__ICCARM__)
     #define CY_IPC_SECTION_BEGIN    _Pragma("default_function_attributes = @\".text.cy_ipc\"")
     #define CY_IPC_SECTION_END      _Pragma("default_function_attributes = ")
+#elif defined (_MSC_VER) /* #CUSTOM@NDRS */
+    #define CY_IPC_SECTION_BEGIN    __declspec(allocate(".text.cy_ipc"))
+    #define CY_IPC_SECTION_END
 #else // if defined(__ARMCC_VERSION)
     #error "An unsupported toolchain"
 #endif // (__ARMCC_VERSION)

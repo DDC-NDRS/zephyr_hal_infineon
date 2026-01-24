@@ -75,7 +75,7 @@ void CY_ASSERT_HANDLER(void);
 
 /** Utility macro when neither NDEBUG or CY_NO_ASSERT is not declared to check a condition and, if
    false, trigger a breakpoint */
-#if defined(NDEBUG) || defined(CY_NO_ASSERT)
+#if defined(NDEBUG) || defined(CY_NO_ASSERT) || defined(_MSC_VER) /* #CUSTOM@NDRS */
 /** Assert an argument is true, else call assert handler */
     #define CY_ASSERT(x)    do {                        \
                             } while(false)
@@ -205,6 +205,14 @@ void CY_ASSERT_HANDLER(void);
     #else
         #define CY_ALIGN(align) __ALIGNED(align)
     #endif // (__VER__ < 8010001)
+#elif defined (_MSC_VER) /* #CUSTOM@NDRS */
+    #define CY_NOINIT
+    #define CY_SECTION(name)
+    #define CY_UNUSED
+    #define CY_NOINLINE
+    #define CY_RAMFUNC_BEGIN
+    #define CY_RAMFUNC_END
+    #define CY_ALIGN(size)      __declspec(align(size))
 #else // if defined(__ARMCC_VERSION)
     #error "An unsupported toolchain"
 #endif // (__ARMCC_VERSION)

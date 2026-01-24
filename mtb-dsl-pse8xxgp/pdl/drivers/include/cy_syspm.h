@@ -2802,7 +2802,7 @@ typedef struct cy_stc_syspm_callback
                                                             should be equal to zero. Skipping unneeded callback modes speeds up
                                                             power mode transitions by skipping unneeded operations. */
 
-    cy_stc_syspm_callback_params_t *callbackParams;    /**< The address of a cy_stc_syspm_callback_params_t,
+    const cy_stc_syspm_callback_params_t *callbackParams; /**< The address of a cy_stc_syspm_callback_params_t,
                                                             the callback is executed with these parameters. */
 
     struct cy_stc_syspm_callback *prevItm;             /**< The previous list item. This element should not be
