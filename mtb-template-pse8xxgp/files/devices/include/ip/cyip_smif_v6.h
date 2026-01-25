@@ -329,11 +329,11 @@ typedef struct {
   * \brief GPIO port registers (SMIF_CORE_SMIF_GPIO_SMIF_PRT)
   */
 typedef struct {
-  __IOM uint32_t OUT;                           /*!< 0x00000000 Port output data register */
+  __IOM uint32_t OUTx;                          /*!< 0x00000000 Port output data register */
   __IOM uint32_t OUT_CLR;                       /*!< 0x00000004 Port output data clear register */
   __IOM uint32_t OUT_SET;                       /*!< 0x00000008 Port output data set register */
   __IOM uint32_t OUT_INV;                       /*!< 0x0000000C Port output data invert register */
-   __IM uint32_t IN;                            /*!< 0x00000010 Port input state register */
+   __IM uint32_t INx;                           /*!< 0x00000010 Port input state register */
   __IOM uint32_t INTR;                          /*!< 0x00000014 Port interrupt status register */
   __IOM uint32_t INTR_MASK;                     /*!< 0x00000018 Port interrupt mask register */
    __IM uint32_t INTR_MASKED;                   /*!< 0x0000001C Port interrupt masked status register */

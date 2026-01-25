@@ -83,7 +83,7 @@ cy_en_ipcsema_status_t Cy_IPC_Sema_Init(uint32_t ipcChannel,
     /* Structure containing semaphores control data */
     CY_SECTION_SHAREDMEM
 #if (CY_IPC_DRV_CACHE_PRESENT)
-    static cy_stc_ipc_sema_t       cy_semaData CY_ALIGN(__SCB_DCACHE_LINE_SIZE);
+    CY_ALIGN(__SCB_DCACHE_LINE_SIZE) static cy_stc_ipc_sema_t cy_semaData;
 #else
     static cy_stc_ipc_sema_t       cy_semaData;
 #endif

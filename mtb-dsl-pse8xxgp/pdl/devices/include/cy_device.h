@@ -872,11 +872,11 @@ typedef CRYPTO_V2_Type CRYPTO_Type;
 #define GPIO_INTR_CAUSE3                   ((GPIO)->INTR_CAUSE3)
 #define GPIO_VDD_MODE_SEL                  ((GPIO)->VDD_MODE_SEL)
 
-#define GPIO_PRT_OUT(base)                 (((GPIO_PRT_Type*)(base))->OUT)
+#define GPIO_PRT_OUT(base)                 (((GPIO_PRT_Type*)(base))->OUTx)
 #define GPIO_PRT_OUT_CLR(base)             (((GPIO_PRT_Type*)(base))->OUT_CLR)
 #define GPIO_PRT_OUT_SET(base)             (((GPIO_PRT_Type*)(base))->OUT_SET)
 #define GPIO_PRT_OUT_INV(base)             (((GPIO_PRT_Type*)(base))->OUT_INV)
-#define GPIO_PRT_IN(base)                  (((GPIO_PRT_Type*)(base))->IN)
+#define GPIO_PRT_IN(base)                  (((GPIO_PRT_Type*)(base))->INx)
 #define GPIO_PRT_INTR(base)                (((GPIO_PRT_Type*)(base))->INTR)
 #define GPIO_PRT_INTR_MASK(base)           (((GPIO_PRT_Type*)(base))->INTR_MASK)
 #define GPIO_PRT_INTR_MASKED(base)         (((GPIO_PRT_Type*)(base))->INTR_MASKED)
