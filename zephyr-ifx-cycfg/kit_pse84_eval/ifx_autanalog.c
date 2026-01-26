@@ -46,8 +46,9 @@ LOG_MODULE_REGISTER(ifx_autanalog, CONFIG_ADC_LOG_LEVEL);
 /* Get the interrupt information from the devicetree */
 #define AUTANALOG_NODE DT_NODELABEL(autanalog)
 
-static const IRQn_Type AUTANALOG_IRQ_NUM = (IRQn_Type)DT_IRQN(AUTANALOG_NODE);
-static const uint8_t AUTANALOG_IRQ_PRIO = (uint8_t)DT_IRQ(AUTANALOG_NODE, priority);
+/* #CUSTOM@NDRS */
+#define AUTANALOG_IRQ_NUM   (IRQn_Type)DT_IRQN(AUTANALOG_NODE)
+#define AUTANALOG_IRQ_PRIO  DT_IRQ(AUTANALOG_NODE, priority)
 
 /* PDL Configuration Structures */
 cy_en_autanalog_ac_out_trigger_mask_t CYBSP_AUTONOMOUS_CONTROLLER_out_trig_mask[] = {
