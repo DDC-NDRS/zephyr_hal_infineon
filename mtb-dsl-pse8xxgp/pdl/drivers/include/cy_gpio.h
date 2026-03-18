@@ -2,12 +2,14 @@
 * \file cy_gpio.h
 * \version 1.140
 *
+* \brief
 * Provides an API declaration of the GPIO driver
 *
 ********************************************************************************
 * \copyright
-* Copyright (c) (2016-2025), Cypress Semiconductor Corporation (an Infineon company) or
-* an affiliate of Cypress Semiconductor Corporation.
+* Copyright(c) 2016-2025 Infineon Technologies AG or an affiliate of
+* Infineon Technologies AG
+*
 * SPDX-License-Identifier: Apache-2.0
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +24,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *******************************************************************************/
+
 
 /**
 * \addtogroup group_gpio
@@ -97,138 +100,6 @@
 * \section group_gpio_more_information More Information
 *
 * Refer to the technical reference manual (TRM) and the device datasheet.
-*
-* \section group_gpio_changelog Changelog
-* <table class="doxtable">
-*   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
-*   <tr>
-*     <td>1.140</td>
-*     <td>Updated APIs \ref Cy_GPIO_Port_Init, \ref Cy_GPIO_WritePort.</td>
-*     <td>Defect fix.</td>
-*   </tr>
-*   <tr>
-*     <td>1.130</td>
-*     <td>Added new APIs to support new devices (particularly Traveo II Cluster) with Drive Trim features: \ref Cy_GPIO_SetDriveSelTrim, \ref Cy_GPIO_GetDriveSelTrim.</td>
-*     <td>New functionality.</td>
-*   </tr>
-*   <tr>
-*     <td rowspan="2">1.120</td>
-*     <td>Added new APIs: \ref Cy_GPIO_WritePort.</td>
-*     <td>New functionality.</td>
-*   </tr>
-*   <tr>
-*     <td>Reworked API structure to support new devices.</td>
-*     <td>Code enhancement.</td>
-*   </tr>
-*   <tr>
-*     <td>1.110</td>
-*     <td>Added support for SMIF GPIO PORT1 and PORT2 and reverted to GPIO inline functions.</td>
-*     <td>Code enhancement and support for new GPIO port for SMIF.</td>
-*   </tr>
-*   <tr>
-*     <td>1.100</td>
-*     <td>Added support for TRAVEO&trade; II Body Entry devices.<br>
-*       Updated pre-processor checks to check for GPIO auto-leveling capability rather than rely on IOSS version.</td>
-*     <td>Code enhancement and support for new devices.</td>
-*   </tr>
-*   <tr>
-*     <td>1.90</td>
-*     <td>Updated APIs \ref Cy_GPIO_Port_Init, \ref Cy_GPIO_Port_Deinit, \ref Cy_GPIO_GetDrivemode.</td>
-*     <td>Fixed coverity defects.</td>
-*   </tr>
-*   <tr>
-*     <td rowspan="2">1.80</td>
-*     <td>Updated \ref Cy_GPIO_SetDrivemode and \ref Cy_GPIO_GetDrivemode APIs.</td>
-*     <td>Updated drive mode configuration for PSE8 devices.</td>
-*   </tr>
-*   <tr>
-*     <td>Fixed MISRA 2012 violations.</td>
-*     <td>MISRA 2012 compliance.</td>
-*   </tr>
-*   <tr>
-*     <td>1.70</td>
-*     <td>Updated driver to support the PSE8 family of devices.</td>
-*     <td>Added new family of devices.</td>
-*   </tr>
-*   <tr>
-*     <td rowspan="2">1.60</td>
-*     <td>Added \ref Cy_GPIO_SetVtripAuto and \ref Cy_GPIO_GetVtripAuto APIs for
-*         configuring    GPIO input buffer voltage for automotive compatible or not,
-*         for CAT1C devices.</td>
-*     <td>New   APIs support for CAT1C devices.</td>
-*   </tr>
-*   <tr>
-*     <td>Fixed unused variables error.</td>
-*     <td>Minor error fixes.</td>
-*   </tr>
-*   <tr>
-*     <td>1.50.1</td>
-*     <td>Updated doxygen for External clock source to HF0.</td>
-*     <td>Documentation enhancement.</td>
-*   </tr>
-*   <tr>
-*     <td>1.50</td>
-*     <td>Modified \ref Cy_GPIO_Pin_Init, \ref Cy_GPIO_Pin_FastInit, and
-*         \ref Cy_GPIO_SetDrivemode APIs to catch wrong drive modes.</td>
-*     <td>Defect fix.</td>
-*   </tr>
-*   <tr>
-*     <td rowspan="2">1.40</td>
-*     <td>Changes in Support of the new family of devices</td>
-*     <td>Added new family of devices</td>
-*   </tr>
-*   <tr>
-*     <td>Changes in support of Secure pins used for External clocks on Secure devices</td>
-*     <td>Added support for accessing External clocks protected pins</td>
-*   </tr>
-*   <tr>
-*     <td>1.30</td>
-*     <td>Fixed/documented MISRA 2012 violations.</td>
-*     <td>MISRA 2012 compliance.</td>
-*   </tr>
-*   <tr>
-*     <td>1.20.1</td>
-*     <td>Minor documentation updates.</td>
-*     <td>Documentation enhancement.</td>
-*   </tr>
-*   <tr>
-*     <td rowspan="3">1.20</td>
-*     <td>Flattened the organization of the driver source code into the single source directory and the single include directory.</td>
-*     <td>Driver library directory-structure simplification.</td>
-*   </tr>
-*   <tr>
-*     <td>Added the functions for configuring the AMux bus splitter switch cells:
-*     - \ref Cy_GPIO_SetAmuxSplit
-*     - \ref Cy_GPIO_GetAmuxSplit
-*     </td>
-*     <td>Added a new functionality related to AMux bus.</td>
-*   </tr>
-*   <tr>
-*     <td>Added register access layer. Use register access macros instead
-*         of direct register access using dereferenced pointers.</td>
-*     <td>Makes register access device-independent, so that the PDL does
-*         not need to be recompiled for each supported part number.</td>
-*   </tr>
-*   <tr>
-*     <td>1.10.1</td>
-*     <td>Updated description for the functions: \ref Cy_GPIO_GetInterruptStatus,
-*         \ref Cy_GPIO_GetInterruptMask, \ref Cy_GPIO_GetInterruptStatusMasked.
-*
-*         Minor documentation edits.
-*     </td>
-*     <td>Documentation update and clarification</td>
-*   </tr>
-*   <tr>
-*     <td>1.10</td>
-*     <td>Added input parameter validation to the API functions</td>
-*     <td></td>
-*   </tr>
-*   <tr>
-*     <td>1.0</td>
-*     <td>Initial version</td>
-*     <td></td>
-*   </tr>
-* </table>
 *
 * \defgroup group_gpio_macros Macros
 * \defgroup group_gpio_functions Functions
