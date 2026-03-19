@@ -2006,9 +2006,9 @@ typedef enum {
 *******************************************************************************/
 
 #define FAULT_BASE                              0x522B0000UL
-#define FAULT                                   ((FAULT_Type*) FAULT_BASE)                                        /* 0x522B0000 */
-#define FAULT_STRUCT0                           ((FAULT_STRUCT_Type*) &FAULT->STRUCT[0])                          /* 0x522B0000 */
-#define FAULT_STRUCT1                           ((FAULT_STRUCT_Type*) &FAULT->STRUCT[1])                          /* 0x522B0100 */
+#define FAULTx                                  ((FAULT_Type*) FAULT_BASE)                                        /* 0x522B0000 */
+#define FAULT_STRUCT0                           ((FAULT_STRUCT_Type*) &FAULTx->STRUCT[0])                         /* 0x522B0000 */
+#define FAULT_STRUCT1                           ((FAULT_STRUCT_Type*) &FAULTx->STRUCT[1])                         /* 0x522B0100 */
 
 /*******************************************************************************
 *                                     SRSS
