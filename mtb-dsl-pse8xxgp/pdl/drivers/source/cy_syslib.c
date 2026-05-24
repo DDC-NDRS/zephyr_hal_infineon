@@ -144,6 +144,8 @@ __NO_RETURN void Cy_SysLib_Halt(uint32_t reason)
         CY_HALT();
     #elif defined (__ICCARM__)
         CY_HALT();
+    #elif defined (_MSC_VER) /* #CUSTOM@NDRS */
+        /* pass */
     #else
         #error "An unsupported toolchain"
     #endif  /* (__ARMCC_VERSION) */

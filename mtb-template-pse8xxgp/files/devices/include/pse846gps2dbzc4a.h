@@ -1781,9 +1781,18 @@ typedef enum {
 /*******************************************************************************
 *                                  PERI_PCLK
 *******************************************************************************/
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#include "mcu_reg_stub.h"
+#endif
 
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#define PERI_PCLK0_BASE                         ((PERI_PCLK_Type*)ut_mcu_peri_pclk0_ptr)
+#define PERI_PCLK1_BASE                         ((PERI_PCLK_Type*)ut_mcu_peri_pclk1_ptr)
+#else
 #define PERI_PCLK0_BASE                         0x42040000UL
 #define PERI_PCLK1_BASE                         0x44040000UL
+#endif
+
 #define PERI_PCLK0                              ((PERI_PCLK_Type*) PERI_PCLK0_BASE)                               /* 0x42040000 */
 #define PERI_PCLK1                              ((PERI_PCLK_Type*) PERI_PCLK1_BASE)                               /* 0x44040000 */
 #define PERI_PCLK0_GR0                          ((PERI_PCLK_GR_Type*) &PERI_PCLK0->GR[0])                         /* 0x42040000 */
@@ -2009,8 +2018,12 @@ typedef enum {
 /*******************************************************************************
 *                                     SRSS
 *******************************************************************************/
-
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#define SRSS_BASE                               ((SRSS_Type*)ut_mcu_srss_ptr)
+#else
 #define SRSS_BASE                               0x42400000UL
+#endif
+
 #define SRSS                                    ((SRSS_Type*) SRSS_BASE)                                          /* 0x42400000 */
 #define CLK_ECO                                 ((CLK_ECO_Type*) &SRSS->CLK_ECO_STRUCT)                           /* 0x42401360 */
 #define CSV_HF                                  ((CSV_HF_Type*) &SRSS->CSV_HF_STRUCT)                             /* 0x42401400 */

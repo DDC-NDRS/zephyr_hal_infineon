@@ -90,11 +90,17 @@
     extern ExecFuncPtrRw __s_vector_table_rw[VECTORTABLE_SIZE]   __attribute__( ( section(".intvec_ram"))) __attribute__((aligned(VECTORTABLE_ALIGN))); /**< Secure vector table in flash/ROM */
     extern ExecFuncPtrRw __ns_vector_table_rw[VECTORTABLE_SIZE]   __attribute__( ( section(".intvec_ram"))) __attribute__((aligned(VECTORTABLE_ALIGN))); /**< Secure vector table in flash/ROM */
 #elif defined (_MSC_VER) /* #CUSTOM@NDRS */
+#if defined(__cplusplus)
+extern "C" {
+#endif
     typedef void(* ExecFuncPtr)(void) ;           /* typedef for the function pointers in the vector table */
     typedef void(* ExecFuncPtrRw)(void);
-    __declspec(align(VECTORTABLE_ALIGN)) extern ExecFuncPtrRw __s_vector_table_rw[VECTORTABLE_SIZE] ; /**< secure vector table in secure SRAM */
+    __declspec(align(VECTORTABLE_ALIGN)) extern ExecFuncPtrRw __s_vector_table_rw[VECTORTABLE_SIZE];  /**< secure vector table in secure SRAM */
     __declspec(align(VECTORTABLE_ALIGN)) extern ExecFuncPtrRw __ns_vector_table_rw[VECTORTABLE_SIZE]; /**< non-secure vector table in secure SRAM */
+#if defined(__cplusplus)
+}
 #endif
+#endif /* (_MSC_VER) */
 extern ExecFuncPtr __s_vector_table[] ; /**< secure vector table in secure SRAM */
 
 #endif /* defined (CY_DOXYGEN) || defined (CY_DEVICE_PSE84_A0) || defined (CY_DEVICE_PSE84)  */

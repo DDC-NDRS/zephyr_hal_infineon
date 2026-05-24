@@ -105,7 +105,11 @@ typedef enum
 /**
   \brief CMSE void function pointer
 */
-typedef void (*cy_cmse_funcptr) (void) __attribute__((cmse_nonsecure_call));
+#if !defined(_MSC_VER) /* #CUSTOM@NDRS */
+typedef void (*cy_cmse_funcptr)(void) __attribute__((cmse_nonsecure_call));
+#else
+typedef void (*cy_cmse_funcptr)(void);
+#endif
 #endif // (CY_SYSTEM_CPU_M33) && defined(COMPONENT_SECURE_DEVICE) && defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
 
 /**

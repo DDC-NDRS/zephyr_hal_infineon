@@ -1782,9 +1782,16 @@ typedef enum {
 /*******************************************************************************
 *                                  PERI_PCLK
 *******************************************************************************/
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#include "mcu_reg_stub.h"
 
+#define PERI_PCLK0_BASE                         ((PERI_PCLK_Type*)ut_mcu_peri_pclk0_ptr)
+#define PERI_PCLK1_BASE                         ((PERI_PCLK_Type*)ut_mcu_peri_pclk1_ptr)
+#else
 #define PERI_PCLK0_BASE                         0x52040000UL
 #define PERI_PCLK1_BASE                         0x54040000UL
+#endif
+
 #define PERI_PCLK0                              ((PERI_PCLK_Type*) PERI_PCLK0_BASE)                               /* 0x52040000 */
 #define PERI_PCLK1                              ((PERI_PCLK_Type*) PERI_PCLK1_BASE)                               /* 0x54040000 */
 #define PERI_PCLK0_GR0                          ((PERI_PCLK_GR_Type*) &PERI_PCLK0->GR[0])                         /* 0x52040000 */

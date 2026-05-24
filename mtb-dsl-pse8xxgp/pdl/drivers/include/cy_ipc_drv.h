@@ -293,8 +293,12 @@
     #define CY_IPC_SECTION_BEGIN    _Pragma("default_function_attributes = @\".text.cy_ipc\"")
     #define CY_IPC_SECTION_END      _Pragma("default_function_attributes = ")
 #elif defined (_MSC_VER) /* #CUSTOM@NDRS */
-    #define CY_IPC_SECTION_BEGIN    __declspec(allocate(".text.cy_ipc"))
-    #define CY_IPC_SECTION_END
+    /* Place IPC functions in the .text.cy_ipc section when compiling with
+     * MSVC. Use __pragma(code_seg(...)) so the macros can be used inline
+     * around function definitions. __declspec(allocate) is only valid for
+     * static data and causes C2479/C2341 when applied to functions. */
+    #define CY_IPC_SECTION_BEGIN __pragma(code_seg(push, ".text.cy_ipc"))
+    #define CY_IPC_SECTION_END   __pragma(code_seg(pop))
 #else // if defined(__ARMCC_VERSION)
     #error "An unsupported toolchain"
 #endif // (__ARMCC_VERSION)

@@ -147,8 +147,6 @@ cy_en_autanalog_status_t Cy_AutAnalog_GetControllerState(cy_stc_autanalog_state_
 {
     cy_en_autanalog_status_t result = CY_AUTANALOG_BAD_PARAM;
 
-    uint8_t cntIdx;
-
     if (NULL != ctrlState)
     {
         /* The Autonomous Controller status and state */
@@ -159,12 +157,12 @@ cy_en_autanalog_status_t Cy_AutAnalog_GetControllerState(cy_stc_autanalog_state_
         ctrlState->lpModeEnabled = _FLD2BOOL(ACTRLR_STATUS_MODE, AUTANALOG_AC_STATUS(ACTRLR_BASE));
 
         /* The Timer/Counter[] state */
-        for (cntIdx = 0U; cntIdx < CY_AUTANALOG_TC_NUM; cntIdx++)
+        for (size_t cntIdx = 0U; cntIdx < CY_AUTANALOG_TC_NUM; cntIdx++)
         {
             CY_MISRA_DEVIATE_LINE('MISRA C-2012 Rule 10.3','Review shows that type conversion from uint32_t to uint8_t does not have any negative drawbacks');
             ctrlState->tc[cntIdx].state = _FLD2VAL(ACTRLR_CNTR_STATUS_CUR_STATE, AUTANALOG_AC_CNTR_STATUS(ACTRLR_BASE, cntIdx));
             CY_MISRA_DEVIATE_LINE('MISRA C-2012 Rule 10.3','Review shows that type conversion from uint32_t to uint16_t does not have any negative drawbacks');
-            ctrlState->tc[cntIdx].val = _FLD2VAL(ACTRLR_CNTR_STATUS_CUR_CNT, AUTANALOG_AC_CNTR_STATUS(ACTRLR_BASE, cntIdx));
+            ctrlState->tc[cntIdx].val = (uint16_t)_FLD2VAL(ACTRLR_CNTR_STATUS_CUR_CNT, AUTANALOG_AC_CNTR_STATUS(ACTRLR_BASE, cntIdx));
             CY_MISRA_DEVIATE_LINE('MISRA C-2012 Rule 10.3','Review shows that type conversion from uint32_t to boolean does not have any negative drawbacks');
             ctrlState->tc[cntIdx].busy = _FLD2VAL(ACTRLR_CNTR_STATUS_BUSY, AUTANALOG_AC_CNTR_STATUS(ACTRLR_BASE, cntIdx));
         }
