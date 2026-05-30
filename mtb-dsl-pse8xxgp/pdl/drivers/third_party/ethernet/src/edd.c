@@ -386,8 +386,9 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
         return 0;
     }
 
+    CEDI_Callbacks const* cb = CEDI_PdVar(cb);
     if ((selection & (CEDI_EV_TX_COMPLETE | CEDI_EV_TX_USED_READ)) &&
-        ((CEDI_PdVar(cb).txEvent) == NULL)) {
+        (cb->txEvent == NULL)) {
         nullCbEvents |= (selection & (CEDI_EV_TX_COMPLETE | CEDI_EV_TX_USED_READ));
         selection &= ~(CEDI_EV_TX_COMPLETE | CEDI_EV_TX_USED_READ);
         if (!selection) {
@@ -396,7 +397,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & CEDI_EV_RX_COMPLETE) &&
-        ((CEDI_PdVar(cb).rxFrame) == NULL)) {
+        (cb->rxFrame == NULL)) {
         nullCbEvents |= (selection & CEDI_EV_RX_COMPLETE);
         selection ^= ~selection & CEDI_EV_RX_COMPLETE;
         if (!selection) {
@@ -405,7 +406,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & (CEDI_EV_TX_UNDERRUN | CEDI_EV_TX_RETRY_EX_LATE_COLL | CEDI_EV_TX_FR_CORRUPT)) &&
-        ((CEDI_PdVar(cb).txError) == NULL)) {
+        (cb->txError == NULL)) {
         nullCbEvents |= (selection & (CEDI_EV_TX_UNDERRUN | CEDI_EV_TX_RETRY_EX_LATE_COLL | CEDI_EV_TX_FR_CORRUPT));
         selection &= ~(CEDI_EV_TX_UNDERRUN | CEDI_EV_TX_RETRY_EX_LATE_COLL | CEDI_EV_TX_FR_CORRUPT);
         if (!selection) {
@@ -414,7 +415,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & (CEDI_EV_RX_USED_READ | CEDI_EV_RX_OVERRUN)) &&
-        ((((CEDI_PrivateData*)pD)->cb.rxError) == NULL)) {
+        (cb->rxError == NULL)) {
         nullCbEvents |= (selection & (CEDI_EV_RX_USED_READ | CEDI_EV_RX_OVERRUN));
         selection &= ~(CEDI_EV_RX_USED_READ | CEDI_EV_RX_OVERRUN);
         if (!selection) {
@@ -423,7 +424,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & CEDI_EV_MAN_FRAME) &&
-        ((CEDI_PdVar(cb).phyManComplete) == NULL)) {
+        (cb->phyManComplete == NULL)) {
         nullCbEvents |= CEDI_EV_MAN_FRAME;
         selection &= ~CEDI_EV_MAN_FRAME;
         if (!selection) {
@@ -432,7 +433,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & CEDI_EV_HRESP_NOT_OK) &&
-        ((CEDI_PdVar(cb).hrespError) == NULL)) {
+        (cb->hrespError == NULL)) {
         nullCbEvents |= CEDI_EV_HRESP_NOT_OK;
         selection &= ~CEDI_EV_HRESP_NOT_OK;
         if (!selection) {
@@ -441,7 +442,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & CEDI_EV_PCS_LP_PAGE_RX) &&
-        ((CEDI_PdVar(cb).lpPageRx) == NULL)) {
+        (cb->lpPageRx == NULL)) {
         nullCbEvents |= CEDI_EV_PCS_LP_PAGE_RX;
         selection &= ~CEDI_EV_PCS_LP_PAGE_RX;
         if (!selection) {
@@ -450,7 +451,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & CEDI_EV_PCS_AN_COMPLETE) &&
-        ((CEDI_PdVar(cb).anComplete) == NULL)) {
+        (cb->anComplete == NULL)) {
         nullCbEvents |= CEDI_EV_PCS_AN_COMPLETE;
         selection &= ~CEDI_EV_PCS_AN_COMPLETE;
         if (!selection) {
@@ -459,7 +460,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & CEDI_EV_PCS_LINK_CHANGE_DET) &&
-        ((CEDI_PdVar(cb).linkChange) == NULL)) {
+        (cb->linkChange == NULL)) {
         nullCbEvents |= CEDI_EV_PCS_LINK_CHANGE_DET;
         selection &= ~CEDI_EV_PCS_LINK_CHANGE_DET;
         if (!selection) {
@@ -468,7 +469,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & (CEDI_EV_TSU_SEC_INC | CEDI_EV_TSU_TIME_MATCH)) &&
-        ((CEDI_PdVar(cb).tsuEvent) == NULL)) {
+        (cb->tsuEvent == NULL)) {
         nullCbEvents |= (selection & (CEDI_EV_TSU_SEC_INC | CEDI_EV_TSU_TIME_MATCH));
         selection &= ~(CEDI_EV_TSU_SEC_INC | CEDI_EV_TSU_TIME_MATCH);
         if (!selection) {
@@ -477,7 +478,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & (CEDI_EV_PAUSE_FRAME_TX | CEDI_EV_PAUSE_TIME_ZERO | CEDI_EV_PAUSE_NZ_QU_RX)) &&
-        ((CEDI_PdVar(cb).pauseEvent) == NULL)) {
+        (cb->pauseEvent == NULL)) {
         nullCbEvents |=
             (selection & (CEDI_EV_PAUSE_FRAME_TX | CEDI_EV_PAUSE_TIME_ZERO | CEDI_EV_PAUSE_NZ_QU_RX));
         selection &= ~(CEDI_EV_PAUSE_FRAME_TX | CEDI_EV_PAUSE_TIME_ZERO | CEDI_EV_PAUSE_NZ_QU_RX);
@@ -487,7 +488,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & (CEDI_EV_PTP_TX_DLY_REQ | CEDI_EV_PTP_TX_SYNC)) &&
-        ((CEDI_PdVar(cb).ptpPriFrameTx) == NULL)) {
+        (cb->ptpPriFrameTx == NULL)) {
         nullCbEvents |= (selection & (CEDI_EV_PTP_TX_DLY_REQ | CEDI_EV_PTP_TX_SYNC));
         selection &= ~(CEDI_EV_PTP_TX_DLY_REQ | CEDI_EV_PTP_TX_SYNC);
         if (!selection) {
@@ -496,7 +497,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & (CEDI_EV_PTP_TX_PDLY_REQ | CEDI_EV_PTP_TX_PDLY_RSP)) &&
-        ((CEDI_PdVar(cb).ptpPeerFrameTx) == NULL)) {
+        (cb->ptpPeerFrameTx == NULL)) {
         nullCbEvents |= (selection & (CEDI_EV_PTP_TX_PDLY_REQ | CEDI_EV_PTP_TX_PDLY_RSP));
         selection &= ~(CEDI_EV_PTP_TX_PDLY_REQ | CEDI_EV_PTP_TX_PDLY_RSP);
         if (!selection) {
@@ -505,7 +506,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & (CEDI_EV_PTP_RX_DLY_REQ | CEDI_EV_PTP_RX_SYNC)) &&
-        ((CEDI_PdVar(cb).ptpPriFrameRx) == NULL)) {
+        (cb->ptpPriFrameRx == NULL)) {
         nullCbEvents |= (selection & (CEDI_EV_PTP_RX_DLY_REQ | CEDI_EV_PTP_RX_SYNC));
         selection &= ~(CEDI_EV_PTP_RX_DLY_REQ | CEDI_EV_PTP_RX_SYNC);
         if (!selection) {
@@ -514,7 +515,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
     }
 
     if ((selection & (CEDI_EV_PTP_RX_PDLY_REQ | CEDI_EV_PTP_RX_PDLY_RSP)) &&
-        ((CEDI_PdVar(cb).ptpPeerFrameRx) == NULL)) {
+        (cb->ptpPeerFrameRx == NULL)) {
         nullCbEvents |= (selection & (CEDI_EV_PTP_RX_PDLY_REQ | CEDI_EV_PTP_RX_PDLY_RSP));
         selection &= ~(CEDI_EV_PTP_RX_PDLY_REQ | CEDI_EV_PTP_RX_PDLY_RSP);
         if (!selection) {
@@ -522,7 +523,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
         }
     }
 
-    if ((selection & CEDI_EV_LPI_CH_RX) && ((CEDI_PdVar(cb).lpiStatus) == NULL)) {
+    if ((selection & CEDI_EV_LPI_CH_RX) && (cb->lpiStatus == NULL)) {
         nullCbEvents |= CEDI_EV_LPI_CH_RX;
         selection &= ~CEDI_EV_LPI_CH_RX;
         if (!selection) {
@@ -530,7 +531,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
         }
     }
 
-    if ((selection & CEDI_EV_WOL_RX) && ((CEDI_PdVar(cb).wolEvent) == NULL)) {
+    if ((selection & CEDI_EV_WOL_RX) && (cb->wolEvent == NULL)) {
         nullCbEvents |= CEDI_EV_WOL_RX;
         selection &= ~CEDI_EV_WOL_RX;
         if (!selection) {
@@ -538,7 +539,7 @@ static uint32_t callbacksNullCheck(void* pD, uint32_t selection) {
         }
     }
 
-    if ((selection & CEDI_EV_EXT_INTR) && ((CEDI_PdVar(cb).extInpIntr) == NULL)) {
+    if ((selection & CEDI_EV_EXT_INTR) && (cb->extInpIntr == NULL)) {
         nullCbEvents |= CEDI_EV_EXT_INTR;
         selection &= ~CEDI_EV_EXT_INTR;
     }
@@ -1185,7 +1186,7 @@ uint32_t emacProbe(CEDI_Config* config, CEDI_SysReq* sysReq) {
 }
 
 uint32_t emacInit(void* pD, CEDI_Config const* config,
-                  CEDI_Callbacks* callbacks) {
+                  CEDI_Callbacks const* callbacks) {
     #define CEDI_ADD_TX_PBUF_SEGS(Q) \
     if (CEDI_PdVar(numQs) > Q)       \
         numQSegs += 1 << CEDI_PdVar(hwCfg).tx_pbuf_num_segments_q##Q;
@@ -1209,10 +1210,9 @@ uint32_t emacInit(void* pD, CEDI_Config const* config,
     if (!paramErr) {
         /* Copy config & callbacks into private data */
         ((CEDI_PrivateData*)pD)->cfg = *config;
-        ((CEDI_PrivateData*)pD)->cb  = *callbacks;
+        ((CEDI_PrivateData*)pD)->cb  = callbacks;
 
         paramErr = callbacksNullCheck(pD, config->intrEnable);
-
         if (paramErr) {
             /**/
             vDbgMsg(DBG_GEN_MSG, 5,
@@ -1704,7 +1704,7 @@ uint32_t emacIsr(void* pD) {
                         EMAC_REGS__PHY_MANAGEMENT__REGISTER_ADDRESS__READ(regVal),
                         cond1 ? "read" : "write", dat16);
 
-                (*(CEDI_PdVar(cb).phyManComplete))(pD, cond1, dat16);
+                CEDI_PdVar(cb)->phyManComplete(pD, cond1, dat16);
             }
 
             /****************************** TxEvent ****************************/
@@ -1726,7 +1726,7 @@ uint32_t emacIsr(void* pD) {
                         "EMAC (0x%08X) Tx Event:0x%08X queue:%u\n",
                         (uint32_t)CEDI_PdVar(cfg).regBase, events, qNum);*/
 
-                (*(CEDI_PdVar(cb).txEvent))(pD, events, qNum);
+                CEDI_PdVar(cb)->txEvent(pD, events, qNum);
             }
 
             /****************************** TxError ****************************/
@@ -1821,7 +1821,7 @@ uint32_t emacIsr(void* pD) {
                         events, qNum, regVal, isrReg);
                 #endif
 
-                (*(CEDI_PdVar(cb).txError))(pD, events, qNum);
+                CEDI_PdVar(cb)->txError(pD, events, qNum);
             }
 
             /*************************** RxFrame *******************************/
@@ -1830,7 +1830,7 @@ uint32_t emacIsr(void* pD) {
                 /*vDbgMsg(DBG_GEN_MSG, 10,
                         "EMAC (0x%08X) Rx Frame Complete, queue:%u\n",
                         (uint32_t)CEDI_PdVar(cfg).regBase, qNum);*/
-                (*(CEDI_PdVar(cb).rxFrame))(pD, qNum);
+                CEDI_PdVar(cb)->rxFrame(pD, qNum);
             }
 
             /*************************** RxError *******************************/
@@ -1849,7 +1849,7 @@ uint32_t emacIsr(void* pD) {
 
                 vDbgMsg(DBG_GEN_MSG, 10, "EMAC (0x%08X) Rx Error:0x%08X queue:%u\n", (uint32_t)CEDI_PdVar(cfg).regBase,
                         events, qNum);
-                (*(CEDI_PdVar(cb).rxError))(pD, events, qNum);
+                CEDI_PdVar(cb)->rxError(pD, events, qNum);
             }
 
             /************************ HResp not OK Event ***********************/
@@ -1859,7 +1859,7 @@ uint32_t emacIsr(void* pD) {
                         "EMAC (0x%08X) HResp not OK, queue:%u\n",
                         (uint32_t)CEDI_PdVar(cfg).regBase, qNum);
 
-                (*(CEDI_PdVar(cb).hrespError))(pD, qNum);
+                CEDI_PdVar(cb)->hrespError(pD, qNum);
             }
 
             /************************* AN LP Page Rx ***************************/
@@ -1897,7 +1897,7 @@ uint32_t emacIsr(void* pD) {
                 nullNp.np      = 0;
                 emacSetNextPageTx(pD, &nullNp);
 
-                (*(CEDI_PdVar(cb).lpPageRx))(pD, &CEDI_PdVar(lpPageRx));
+                CEDI_PdVar(cb)->lpPageRx(pD, &CEDI_PdVar(lpPageRx));
 
                 CEDI_PdVar(basePageExp) = 0;
             }
@@ -1917,7 +1917,7 @@ uint32_t emacIsr(void* pD) {
                 vDbgMsg(DBG_GEN_MSG, 10, "EMAC (0x%08X) Auto-negotiation Complete\n",
                         (uint32_t)CEDI_PdVar(cfg).regBase);
 
-                (*(CEDI_PdVar(cb).anComplete))(pD, &CEDI_PdVar(anStatus));
+                CEDI_PdVar(cb)->anComplete(pD, &CEDI_PdVar(anStatus));
             }
 
             /*********************** Link State Change *************************/
@@ -1933,7 +1933,7 @@ uint32_t emacIsr(void* pD) {
                 vDbgMsg(DBG_GEN_MSG, 10, "EMAC (0x%08X) Link State changed - state = %u\n",
                         (uint32_t)CEDI_PdVar(cfg).regBase, linkState);
 
-                (*(CEDI_PdVar(cb).linkChange))(pD, linkState);
+                CEDI_PdVar(cb)->linkChange(pD, linkState);
             }
 
             /************************ Pause Event ******************************/
@@ -1950,7 +1950,7 @@ uint32_t emacIsr(void* pD) {
                     vDbgMsg(DBG_GEN_MSG, 10, "EMAC (0x%08X) Pause Event, type:0x%08X\n",
                             (uint32_t)CEDI_PdVar(cfg).regBase, events);
 
-                    (*(CEDI_PdVar(cb).pauseEvent))(pD, events);
+                    CEDI_PdVar(cb)->pauseEvent(pD, events);
                 }
             }
 
@@ -1971,7 +1971,8 @@ uint32_t emacIsr(void* pD) {
                         CEDI_PdVar(ptpTime).secsLower = 0;
                         CEDI_PdVar(ptpTime).nanosecs  = 0;
                     }
-                    (*(CEDI_PdVar(cb).ptpPriFrameTx))(pD, events, &CEDI_PdVar(ptpTime));
+
+                    CEDI_PdVar(cb)->ptpPriFrameTx(pD, events, &CEDI_PdVar(ptpTime));
                 }
             }
 
@@ -1992,7 +1993,8 @@ uint32_t emacIsr(void* pD) {
                         CEDI_PdVar(ptpTime).secsLower = 0;
                         CEDI_PdVar(ptpTime).nanosecs  = 0;
                     }
-                    (*(CEDI_PdVar(cb).ptpPeerFrameTx))(pD, events, &CEDI_PdVar(ptpTime));
+
+                    CEDI_PdVar(cb)->ptpPeerFrameTx(pD, events, &CEDI_PdVar(ptpTime));
                 }
             }
 
@@ -2013,7 +2015,8 @@ uint32_t emacIsr(void* pD) {
                         CEDI_PdVar(ptpTime).secsLower = 0;
                         CEDI_PdVar(ptpTime).nanosecs  = 0;
                     }
-                    (*(CEDI_PdVar(cb).ptpPriFrameRx))(pD, events, &CEDI_PdVar(ptpTime));
+
+                    CEDI_PdVar(cb)->ptpPriFrameRx(pD, events, &CEDI_PdVar(ptpTime));
                 }
             }
 
@@ -2034,7 +2037,8 @@ uint32_t emacIsr(void* pD) {
                         CEDI_PdVar(ptpTime).secsLower = 0;
                         CEDI_PdVar(ptpTime).nanosecs  = 0;
                     }
-                    (*(CEDI_PdVar(cb).ptpPeerFrameRx))(pD, events, &CEDI_PdVar(ptpTime));
+
+                    CEDI_PdVar(cb)->ptpPeerFrameRx(pD, events, &CEDI_PdVar(ptpTime));
                 }
             }
 
@@ -2050,7 +2054,7 @@ uint32_t emacIsr(void* pD) {
                     vDbgMsg(DBG_GEN_MSG, 10, "EMAC (0x%08X) TSU Event, type:0x%08X\n",
                             (uint32_t)CEDI_PdVar(cfg).regBase, events);
 
-                    (*(CEDI_PdVar(cb).tsuEvent))(pD, events);
+                    CEDI_PdVar(cb)->tsuEvent(pD, events);
                 }
             }
 
@@ -2060,21 +2064,21 @@ uint32_t emacIsr(void* pD) {
 
                         (uint32_t)CEDI_PdVar(cfg).regBase);
 
-                (*(CEDI_PdVar(cb).lpiStatus))(pD);
+                CEDI_PdVar(cb)->lpiStatus(pD);
             }
 
             /************************* Wake On LAN Event ***********************/
             if ((qNum == 0) && EMAC_REGS__INT_STATUS__WOL_INTERRUPT__READ(isrReg)) {
                 vDbgMsg(DBG_GEN_MSG, 10, "EMAC (0x%08X) Wake on LAN Event\n", (uint32_t)CEDI_PdVar(cfg).regBase);
 
-                (*(CEDI_PdVar(cb).wolEvent))(pD);
+                CEDI_PdVar(cb)->wolEvent(pD);
             }
 
             /****************** External Input Interrupt Event *****************/
             if ((qNum == 0) && EMAC_REGS__INT_STATUS__EXTERNAL_INTERRUPT__READ(isrReg)) {
                 vDbgMsg(DBG_GEN_MSG, 10, "EMAC (0x%08X) External Input Interrupt\n", (uint32_t)CEDI_PdVar(cfg).regBase);
 
-                (*(CEDI_PdVar(cb).extInpIntr))(pD);
+                CEDI_PdVar(cb)->extInpIntr(pD);
             }
 
         } /* for qNum */

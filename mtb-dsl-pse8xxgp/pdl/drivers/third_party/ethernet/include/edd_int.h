@@ -146,7 +146,7 @@
  *****************************************************************************/
 
 /* access a privateData field, via the local void *pD parameter */
-#define CEDI_PdVar(var) (((CEDI_PrivateData *)pD)->var)
+#define CEDI_PdVar(var) ((CEDI_PrivateData *)pD)->var
 /* get register address via the privateDat->cfg.regBase field */
 #define CEDI_RegAddr(reg) (&(((struct emac_regs *)(CEDI_PdVar(cfg).regBase))->reg))
 
@@ -200,7 +200,7 @@ typedef struct {
  * (with these included in privateData memory requirement) */
 typedef struct {
     CEDI_Config      cfg;            // copy of CEDI_Config info supplied to init
-    CEDI_Callbacks   cb;             // pointers to callback functions
+    CEDI_Callbacks const* cb;        // pointers to callback functions
     CEDI_DesignCfg   hwCfg;          // copy of DesignCfg Debug registers
     uint8_t         numQs;          // number of Qs in this h/w config.
     txQueue_t txQueue[CEDI_MAX_TX_QUEUES];   // tx queue info

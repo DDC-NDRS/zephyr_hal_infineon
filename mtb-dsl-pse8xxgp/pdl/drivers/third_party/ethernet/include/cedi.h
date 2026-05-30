@@ -1430,7 +1430,7 @@ typedef struct CEDI_OBJ
      * @return EIO if driver encountered an error accessing hardware
      * @return EINVAL if illegal/inconsistent values in 'config'
      */
-    uint32_t (*init)(void* pD, const CEDI_Config* config, CEDI_Callbacks* callbacks);
+    uint32_t (*init)(void* pD, const CEDI_Config* config, CEDI_Callbacks const* callbacks);
 
     /**
      * Destroy the driver (automatically performs a stop)
