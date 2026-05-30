@@ -275,7 +275,7 @@ void emacGetTxDescStat(void *pD, uint32_t txDStatWord, CEDI_TxDescStat *txDStat)
 
 void emacGetTxDescSize(void *pD, uint32_t *txDescSize);
 
-uint32_t emacResetTxQ(void *pD, uint8_t queueNum);
+uint32_t emacResetTxQ(void *pD, size_t queueNum);
 
 uint32_t emacStartTx(void *pD);
 

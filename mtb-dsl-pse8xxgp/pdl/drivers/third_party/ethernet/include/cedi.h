@@ -1957,7 +1957,7 @@ typedef struct CEDI_OBJ
      * @return EOK if successful
      * @return EINVAL if invalid parameter
      */
-    uint32_t (*resetTxQ)(void* pD, uint8_t queueNum);
+    uint32_t (*resetTxQ)(void* pD, size_t queueNum);
 
     /**
      * Enable & start the transmit circuit. Not required during normal
@@ -3551,7 +3551,7 @@ typedef struct CEDI_OBJ
  * this global function to obtain the pointer to the driver object.
  * @return CEDI_OBJ* Driver Object Pointer
  */
-extern CEDI_OBJ *CEDI_GetInstance(void);
+extern CEDI_OBJ const* CEDI_GetInstance(void);
 
 /**
  *  @}
