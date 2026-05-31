@@ -597,8 +597,8 @@ typedef struct cy_stc_scb_uart_context
 * \addtogroup group_scb_uart_general_functions
 * \{
 */
-cy_en_scb_uart_status_t Cy_SCB_UART_Init(CySCB_Type *base, cy_stc_scb_uart_config_t const *config,
-                                         cy_stc_scb_uart_context_t *context);
+void Cy_SCB_UART_Init(CySCB_Type *base, cy_stc_scb_uart_config_t const *config,
+                      cy_stc_scb_uart_context_t *context);
 void Cy_SCB_UART_DeInit (CySCB_Type *base);
 __STATIC_INLINE void Cy_SCB_UART_Enable(CySCB_Type *base);
 void Cy_SCB_UART_Disable(CySCB_Type *base, cy_stc_scb_uart_context_t *context);
@@ -624,6 +624,14 @@ void     Cy_SCB_UART_StartRingBuffer   (CySCB_Type *base, void *buffer, uint32_t
                                         cy_stc_scb_uart_context_t *context);
 void     Cy_SCB_UART_StopRingBuffer    (CySCB_Type *base, cy_stc_scb_uart_context_t *context);
 uint32_t Cy_SCB_UART_GetNumInRingBuffer(CySCB_Type const *base, cy_stc_scb_uart_context_t const *context);
+__STATIC_INLINE uint32_t Cy_SCB_UART_GetNumInRingBufferFast(cy_stc_scb_uart_context_t const* context) {
+    uint32_t locHead = context->rxRingBufHead;
+    uint32_t locTail = context->rxRingBufTail;
+
+    return (locHead >= locTail) ? (locHead - locTail)
+                                : (locHead + (context->rxRingBufSize - locTail));
+}
+
 void     Cy_SCB_UART_ClearRingBuffer   (CySCB_Type const *base, cy_stc_scb_uart_context_t *context);
 
 cy_en_scb_uart_status_t Cy_SCB_UART_Receive(CySCB_Type *base, void *buffer, uint32_t size,
