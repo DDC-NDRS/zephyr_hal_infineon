@@ -219,10 +219,10 @@ cy_en_ethif_status_t Cy_ETHIF_MdioInit(ETH_Type* base, cy_stc_ethif_mac_config_t
         Cy_ETHIF_AssignMemory(u8EthIfInstance);
 
         void* pd = cyp_ethif_pd[u8EthIfInstance];
-        CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+        CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
 
         /* Initialization EMAC registers */
-        u32RetValue = obj->init(pd, &cy_ethif_cfg[u8EthIfInstance], &Cy_ETHIF_Callbacks);
+        u32RetValue = ctx->init(pd, &cy_ethif_cfg[u8EthIfInstance], &Cy_ETHIF_Callbacks);
         if (u32RetValue == ((uint32_t)EINVAL) ||
             u32RetValue == ((uint32_t)ENOTSUP)) {
             Cy_ETHIF_IPDisable(base);
@@ -230,7 +230,7 @@ cy_en_ethif_status_t Cy_ETHIF_MdioInit(ETH_Type* base, cy_stc_ethif_mac_config_t
         }
 
         /* Enable MDIO */
-        obj->setMdioEnable(pd, CY_ETH_ENABLE_1);
+        ctx->setMdioEnable(pd, CY_ETH_ENABLE_1);
     }
 
     return status;
@@ -329,10 +329,10 @@ cy_en_ethif_status_t Cy_ETHIF_Init(ETH_Type* base, cy_stc_ethif_mac_config_t* ps
     Cy_ETHIF_IPEnable(base);
 
     void* pd = cyp_ethif_pd[u8EthIfInstance];
-    CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+    CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
 
     /* Probe for checking configuration parameters and calculating memory size */
-    (void) obj->probe(&cy_ethif_cfg[u8EthIfInstance], &cy_ethif_sysreq);
+    (void) ctx->probe(&cy_ethif_cfg[u8EthIfInstance], &cy_ethif_sysreq);
 
     /* Check for assigned memory and required memory match */
     u16SysReqTxBDLength = (uint16_t)((cy_ethif_sysreq.txDescListSize / CY_ETH_DEFINE_NUM_TXQS) /
@@ -354,7 +354,7 @@ cy_en_ethif_status_t Cy_ETHIF_Init(ETH_Type* base, cy_stc_ethif_mac_config_t* ps
     }
 
     /* Initialization EMAC registers */
-    u32RetValue = obj->init(pd, &cy_ethif_cfg[u8EthIfInstance], &Cy_ETHIF_Callbacks);
+    u32RetValue = ctx->init(pd, &cy_ethif_cfg[u8EthIfInstance], &Cy_ETHIF_Callbacks);
     if (u32RetValue == ((uint32_t)EINVAL) || u32RetValue == ((uint32_t)ENOTSUP)) {
         Cy_ETHIF_IPDisable(base);
         return CY_ETHIF_BAD_PARAM;
@@ -385,17 +385,17 @@ cy_en_ethif_status_t Cy_ETHIF_Init(ETH_Type* base, cy_stc_ethif_mac_config_t* ps
                  tmpintrcntr++) {
                 rx_buff_addr.vAddr = (uintptr_t)((*pstcEthIfConfig->pRxQbuffPool)[tmpcounter][tmpintrcntr]);
                 rx_buff_addr.pAddr = rx_buff_addr.vAddr;
-                (void) obj->addRxBuf(pd, tmpcounter, (CEDI_BuffAddr*)&rx_buff_addr, 0);
+                (void) ctx->addRxBuf(pd, tmpcounter, (CEDI_BuffAddr*)&rx_buff_addr, 0);
             }
         }
     }
 
     /* additional Receive configurations */
-    obj->setCopyAllFrames(pd, CY_ETH_ENABLE_1);
-    obj->setRxBadPreamble(pd, CY_ETH_ENABLE_1);
+    ctx->setCopyAllFrames(pd, CY_ETH_ENABLE_1);
+    ctx->setRxBadPreamble(pd, CY_ETH_ENABLE_1);
 
     /* Do not drop frames with CRC error */
-    obj->setIgnoreFcsRx(pd, CY_ETH_ENABLE_1);
+    ctx->setIgnoreFcsRx(pd, CY_ETH_ENABLE_1);
 
     // Optional: Setting Filter configuration
     // Optional: setting screen registers
@@ -416,10 +416,10 @@ cy_en_ethif_status_t Cy_ETHIF_Init(ETH_Type* base, cy_stc_ethif_mac_config_t* ps
     (void) Cy_SysPm_RegisterCallback(cb);
 
     /* Enable MDIO */
-    obj->setMdioEnable(pd, CY_ETH_ENABLE_1);
+    ctx->setMdioEnable(pd, CY_ETH_ENABLE_1);
 
     /* driver start */
-    obj->start(pd);
+    ctx->start(pd);
 
     return CY_ETHIF_SUCCESS;
 }
@@ -514,10 +514,10 @@ cy_en_ethif_status_t Cy_ETHIF_TransmitFrame(ETH_Type* base, uint8_t* pu8TxBuffer
     }
 
     void* pd = cyp_ethif_pd[u8EthIfInstance];
-    CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+    CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
 
     /* Clear transmit status register before begin to transmit */
-    obj->clearTxStatus(pd, CY_ETHIF_TX_STATUS_CLEAR);
+    ctx->clearTxStatus(pd, CY_ETHIF_TX_STATUS_CLEAR);
 
     g_tx_bdcount[u8EthIfInstance]++;
 
@@ -529,7 +529,7 @@ cy_en_ethif_status_t Cy_ETHIF_TransmitFrame(ETH_Type* base, uint8_t* pu8TxBuffer
 
     CY_MISRA_DEVIATE_BLOCK_START('MISRA C-2012 Rule 11.3', 1, 'Intentional typecast of &tmpBuffAdd to CEDI_BuffAddr* struct type.')
     /* Trigger Internal transmit function  */
-    u32result = obj->queueTxBuf(pd,
+    u32result = ctx->queueTxBuf(pd,
                                 u8QueueIndex,
                                 (CEDI_BuffAddr*)&tmpBuffAdd,
                                 u16Length,
@@ -572,14 +572,14 @@ cy_en_ethif_status_t Cy_ETHIF_TxPauseFrame(ETH_Type* base, bool bZeroTQ) {
     u8EthIfInstance = CY_ETHIF_IP_INSTANCE(base);
 
     void* pd = cyp_ethif_pd[u8EthIfInstance];
-    CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+    CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
 
     if (bZeroTQ == true) {
         /* trigger Pause frame with Zero Time Quanta */
-        obj->txZeroQPause(pd);
+        ctx->txZeroQPause(pd);
     }
     else {
-        obj->txPauseFrame(pd);
+        ctx->txPauseFrame(pd);
     }
 
     return CY_ETHIF_SUCCESS;
@@ -609,20 +609,20 @@ cy_en_ethif_status_t Cy_ETHIF_ConfigPause(ETH_Type* base, uint16_t u16PauseQuant
 
     u8EthIfInstance = CY_ETHIF_IP_INSTANCE(base);
     void* pd = cyp_ethif_pd[u8EthIfInstance];
-    CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+    CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
 
     /* Set Tx Pause Quanta for Priority 0   */
-    if (((uint32_t)EOK) != obj->setTxPauseQuantum(pd,
+    if (((uint32_t)EOK) != ctx->setTxPauseQuantum(pd,
                                                   u16PauseQuanta,
                                                   CY_ETHIF_PAUSE_P0)) {
         return CY_ETHIF_BAD_PARAM;
     }
 
     /* Enable Receive Pause Frames */
-    obj->setCopyPauseDisable(pd, CY_ETH_DISABLE_0);
+    ctx->setCopyPauseDisable(pd, CY_ETH_DISABLE_0);
 
     /* Enable Pause Frames */
-    obj->setPauseEnable(pd, CY_ETH_ENABLE_1);
+    ctx->setPauseEnable(pd, CY_ETH_ENABLE_1);
 
     return CY_ETHIF_SUCCESS;
 }
@@ -761,18 +761,18 @@ uint32_t Cy_ETHIF_PhyRegRead(ETH_Type* base, uint8_t u8RegNo, uint8_t u8PHYAddr)
 
     u8EthIfInstance = CY_ETHIF_IP_INSTANCE(base);
     void* pd = cyp_ethif_pd[u8EthIfInstance];
-    CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+    CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
 
-    obj->phyStartMdioRead(pd, CY_ETHIF_PHY_FLAG, u8PHYAddr, u8RegNo);
+    ctx->phyStartMdioRead(pd, CY_ETHIF_PHY_FLAG, u8PHYAddr, u8RegNo);
 
-    while (obj->getMdioIdle(pd) != CY_ETH_MDIO_BUSY_0) {
+    while (ctx->getMdioIdle(pd) != CY_ETH_MDIO_BUSY_0) {
         /* poll till operation completes */
     }
 
     /* Additional wait before read data */
     Cy_SysLib_DelayUs(800);
 
-    u32result = obj->getMdioReadData(pd, &u16ReadData);
+    u32result = ctx->getMdioReadData(pd, &u16ReadData);
     if (0UL != u32result) {
         u16ReadData = 0;
         CY_ASSERT(0UL);
@@ -810,12 +810,12 @@ cy_en_ethif_status_t Cy_ETHIF_PhyRegWrite(ETH_Type* base, uint8_t u8RegNo, uint1
 
     u8EthIfInstance = CY_ETHIF_IP_INSTANCE(base);
     void* pd = cyp_ethif_pd[u8EthIfInstance];
-    CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+    CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
 
-    obj->phyStartMdioWrite(pd, CY_ETHIF_PHY_FLAG, u8PHYAddr, u8RegNo, u16Data);
+    ctx->phyStartMdioWrite(pd, CY_ETHIF_PHY_FLAG, u8PHYAddr, u8RegNo, u16Data);
 
     /* Poll till operation completes */
-    while (obj->getMdioIdle(pd) != CY_ETH_MDIO_BUSY_0) {
+    while (ctx->getMdioIdle(pd) != CY_ETH_MDIO_BUSY_0) {
         /* pass */
     }
 
@@ -1464,11 +1464,11 @@ static cy_en_ethif_status_t Cy_ETHIF_TSUInit(uint8_t u8EthIfInstance, cy_stc_eth
     /* set 1588 timer value */
     /* Load Timer Value */
     void* pd = cyp_ethif_pd[u8EthIfInstance];
-    CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+    CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
     uint32_t result;
 
     CY_MISRA_DEVIATE_LINE('MISRA C-2012 Rule 11.3', 'Intentional typecast of pstcTSUConfig->pstcTimerValue to CEDI_1588TimerVal* struct type.');
-    result = obj->set1588Timer(pd, (CEDI_1588TimerVal*)pstcTSUConfig->pstcTimerValue);
+    result = ctx->set1588Timer(pd, (CEDI_1588TimerVal*)pstcTSUConfig->pstcTimerValue);
     if (((uint32_t)EOK) != result) {
         /* Reason could be Null pointer, hardware does not support TSU or pstcTimerValue.nanosecs>0x3FFFFFFF */
         return CY_ETHIF_BAD_PARAM;
@@ -1476,21 +1476,21 @@ static cy_en_ethif_status_t Cy_ETHIF_TSUInit(uint8_t u8EthIfInstance, cy_stc_eth
 
     /* Timer increment register to achieve 1 second as precise as possible */
     CY_MISRA_DEVIATE_LINE('MISRA C-2012 Rule 11.3', 'Intentional typecast of pstcTSUConfig->pstcTimerIncValue to CEDI_TimerIncrement* struct type.');
-    result = obj->set1588TimerInc(pd, (CEDI_TimerIncrement*)pstcTSUConfig->pstcTimerIncValue);
+    result = ctx->set1588TimerInc(pd, (CEDI_TimerIncrement*)pstcTSUConfig->pstcTimerIncValue);
     if (((uint32_t)EOK) != result) {
         /* Reason could be Null pointer, hardware does not support TSU */
         return CY_ETHIF_BAD_PARAM;
     }
 
     /* one step sync enabled */
-    result = obj->set1588OneStepTxSyncEnable(pd, (uint8_t)pstcTSUConfig->bOneStepTxSyncEnable);
+    result = ctx->set1588OneStepTxSyncEnable(pd, (uint8_t)pstcTSUConfig->bOneStepTxSyncEnable);
     if (((uint32_t)EOK) != result) {
         /* Reason could be Null pointer, hardware does not support TSU or bOneStepTxSyncEnable > 1 */
         return CY_ETHIF_BAD_PARAM;
     }
 
     /* Set the descriptor time stamp Mode */
-    result = obj->setDescTimeStampMode(pd,
+    result = ctx->setDescTimeStampMode(pd,
                                        (CEDI_TxTsMode)pstcTSUConfig->enTxDescStoreTimeStamp,
                                        (CEDI_RxTsMode)pstcTSUConfig->enRxDescStoreTimeStamp);
     if (((uint32_t)EOK) != result) {
@@ -1500,7 +1500,7 @@ static cy_en_ethif_status_t Cy_ETHIF_TSUInit(uint8_t u8EthIfInstance, cy_stc_eth
     }
 
     /* disabled storing nanosecond in CRC field of received frame */
-    result = obj->setStoreRxTimeStamp(pd, (uint8_t)pstcTSUConfig->bStoreNSinRxDesc);
+    result = ctx->setStoreRxTimeStamp(pd, (uint8_t)pstcTSUConfig->bStoreNSinRxDesc);
     if (((uint32_t)EOK) != result) {
         /* Reason could be Null pointer, hardware does not support TSU or bStoreNSinRxDesc > 1 */
         return CY_ETHIF_BAD_PARAM;
@@ -1652,38 +1652,39 @@ static void Cy_ETHIF_EventRxFrame(void* pcy_privatedata, uint8_t u8qnum) {
     /* Derive the instance */
     u8EthIfInstance = Cy_ETHIF_GetEthIfInstance(pcy_privatedata);
     void* pd = cyp_ethif_pd[u8EthIfInstance];
-    CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+    CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
 
     base = CY_ETHIF_IP_ADDR_REGBASE(u8EthIfInstance);
 
     /* number of used buffers */
-    u32RxNum = obj->numRxUsed(pd, u8qnum);
+    u32RxNum = ctx->numRxUsed(pd, u8qnum);
 
     /** read receive queue */
+    cy_stc_ethif_cb_t* const cbs = &stccallbackfunctions[u8EthIfInstance];
     while (0UL != u32RxNum) {
         tmpBufAddr.pAddr = 0;
         tmpBufAddr.vAddr = tmpBufAddr.pAddr;
 
         bufLen = 0;
-        if (stccallbackfunctions[u8EthIfInstance].rxgetbuff != NULL) {
-            stccallbackfunctions[u8EthIfInstance].rxgetbuff(base, (uint8_t**)&rxBufAddr, &bufLen);
+        if (cbs->rxgetbuff != NULL) {
+            cbs->rxgetbuff(base, (uint8_t**)&rxBufAddr, &bufLen);
             tmpBufAddr.pAddr = (uintptr_t)rxBufAddr;
             tmpBufAddr.vAddr = tmpBufAddr.pAddr;
         }
 
-        (void) obj->readRxBuf(pd, u8qnum, &tmpBufAddr,
+        (void) ctx->readRxBuf(pd, u8qnum, &tmpBufAddr,
                               CY_ETHIF_BUFFER_CLEARED_0, &Rx_DescData);
 
         switch ((CEDI_RxRdStat)Rx_DescData.status) {
             case CEDI_RXDATA_SOF_EOF : // 0
                 /* receive start and end frame */
-                obj->getRxDescStat(pd, Rx_DescData.rxDescStat,
+                ctx->getRxDescStat(pd, Rx_DescData.rxDescStat,
                                    &Rx_DescStat);
 
                 /* application callback function */
-                if (stccallbackfunctions[u8EthIfInstance].rxframecb != NULL) {
-                    stccallbackfunctions[u8EthIfInstance].rxframecb(base, (uint8_t*)tmpBufAddr.pAddr,
-                                                                    Rx_DescStat.bufLen);
+                if (cbs->rxframecb != NULL) {
+                    cbs->rxframecb(base, (uint8_t*)tmpBufAddr.pAddr,
+                                   Rx_DescStat.bufLen);
                 }
                 break;
 
@@ -1980,11 +1981,11 @@ Cy_ETHIF_DSCallbackFunc(cy_stc_syspm_callback_params_t* callbackParams,
 
             u8EthIfInstance = CY_ETHIF_IP_INSTANCE(base);
             void* pd = cyp_ethif_pd[u8EthIfInstance];
-            CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+            CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
             cy_stc_ethif_dsreg_t* dsreg = &g_ds_regs[u8EthIfInstance];
 
-            (void) obj->getCopyAllFrames(pd, &dsreg->copy_all_frames);
-            (void) obj->getNoBroadcast(pd, &dsreg->no_broadcast);
+            (void) ctx->getCopyAllFrames(pd, &dsreg->copy_all_frames);
+            (void) ctx->getNoBroadcast(pd, &dsreg->no_broadcast);
 
             CY_MISRA_DEVIATE_BLOCK_START('MISRA C-2012 Rule 11.3', 1, 'Intentional typecast of &config->filterAddr to CEDI_MacAddress* struct type.')
             (void) emacGetSpecificAddr(pd,
@@ -2018,14 +2019,14 @@ Cy_ETHIF_DSCallbackFunc(cy_stc_syspm_callback_params_t* callbackParams,
             u8EthIfInstance = CY_ETHIF_IP_INSTANCE(base);
             void* pd = cyp_ethif_pd[u8EthIfInstance];
             cy_stc_ethif_dsreg_t* dsreg = &g_ds_regs[u8EthIfInstance];
-            CEDI_OBJ const* obj = cyp_ethif_gemgxlobj;
+            CEDI_OBJ const* ctx = cyp_ethif_gemgxlobj;
 
             /* Restore registers */
             /* Enable the IP to access EMAC registers set */
             Cy_ETHIF_IPEnable(base);
 
             /* Initialization EMAC registers */
-            u32RetValue = obj->init(pd, &cy_ethif_cfg[u8EthIfInstance], &Cy_ETHIF_Callbacks);
+            u32RetValue = ctx->init(pd, &cy_ethif_cfg[u8EthIfInstance], &Cy_ETHIF_Callbacks);
             if ((u32RetValue == (uint32_t)EINVAL) || (u32RetValue == (uint32_t)ENOTSUP)) {
                 Cy_ETHIF_IPDisable(base);
                 retVal = CY_SYSPM_BAD_PARAM;
@@ -2040,34 +2041,34 @@ Cy_ETHIF_DSCallbackFunc(cy_stc_syspm_callback_params_t* callbackParams,
                         rx_buff_addr.vAddr =
                             (uintptr_t)((*g_pRxQbuffPool[u8EthIfInstance])[tmpcounter][tmpintrcntr]);
                         rx_buff_addr.pAddr = rx_buff_addr.vAddr;
-                        (void) obj->addRxBuf(pd, tmpintrcntr, (CEDI_BuffAddr*)&rx_buff_addr, 0);
+                        (void) ctx->addRxBuf(pd, tmpintrcntr, (CEDI_BuffAddr*)&rx_buff_addr, 0);
                     }
                 }
             }
 
             /* additional Receive configurations */
-            obj->setCopyAllFrames(pd, CY_ETH_ENABLE_1);
-            obj->setRxBadPreamble(pd, CY_ETH_ENABLE_1);
+            ctx->setCopyAllFrames(pd, CY_ETH_ENABLE_1);
+            ctx->setRxBadPreamble(pd, CY_ETH_ENABLE_1);
 
             /* Do not drop frames with CRC error */
-            obj->setIgnoreFcsRx(pd, CY_ETH_ENABLE_1);
+            ctx->setIgnoreFcsRx(pd, CY_ETH_ENABLE_1);
 
             /* Enable MDIO */
-            obj->setMdioEnable(pd, CY_ETH_ENABLE_1);
+            ctx->setMdioEnable(pd, CY_ETH_ENABLE_1);
 
             /* driver start */
-            obj->start(pd);
+            ctx->start(pd);
 
             /* set config reg */
-            obj->setCopyAllFrames(pd, dsreg->copy_all_frames);
+            ctx->setCopyAllFrames(pd, dsreg->copy_all_frames);
 
             /* Reject Broad cast frames */
-            obj->setNoBroadcast(pd, dsreg->no_broadcast);
+            ctx->setNoBroadcast(pd, dsreg->no_broadcast);
 
             CY_MISRA_DEVIATE_BLOCK_START('MISRA C-2012 Rule 11.3', 1, 'Intentional typecast of &config->filterAddr to CEDI_MacAddress* struct type.')
 
             /* Apply filter */
-            (void) obj->setSpecificAddr(pd,
+            (void) ctx->setSpecificAddr(pd,
                                         CY_ETHIF_FILTER_NUM_1,
                                         (CEDI_MacAddress*)&dsreg->fileter1Config.filterAddr,
                                         dsreg->fileter1Config.typeFilter,

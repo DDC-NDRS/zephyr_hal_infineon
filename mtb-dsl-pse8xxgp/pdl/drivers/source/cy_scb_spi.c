@@ -133,14 +133,15 @@ cy_en_scb_spi_status_t Cy_SCB_SPI_Init(CySCB_Type *base, cy_stc_scb_spi_config_t
 #if((defined (CY_IP_MXSCB_VERSION) && (CY_IP_MXSCB_VERSION>=2)) || defined (CY_IP_MXS22SCB))
     if(config->subMode == CY_SCB_SPI_MOTOROLA)
     {
-        SCB_SPI_CTRL(base) &= ~SCB_SPI_CTRL_SSEL_SETUP_DEL_Msk;
-        SCB_SPI_CTRL(base) |=  _VAL2FLD(SCB_SPI_CTRL_SSEL_SETUP_DEL, config->ssSetupDelay);
+        uint32_t spiCtrl = SCB_SPI_CTRL(base);
 
-        SCB_SPI_CTRL(base) &= ~SCB_SPI_CTRL_SSEL_HOLD_DEL_Msk;
-        SCB_SPI_CTRL(base) |=  _VAL2FLD(SCB_SPI_CTRL_SSEL_HOLD_DEL, config->ssHoldDelay);
-
-        SCB_SPI_CTRL(base) &= ~SCB_SPI_CTRL_SSEL_INTER_FRAME_DEL_Msk;
-        SCB_SPI_CTRL(base) |=  _VAL2FLD(SCB_SPI_CTRL_SSEL_INTER_FRAME_DEL, config->ssInterFrameDelay);
+        spiCtrl &= ~(SCB_SPI_CTRL_SSEL_SETUP_DEL_Msk |
+                     SCB_SPI_CTRL_SSEL_HOLD_DEL_Msk  |
+                     SCB_SPI_CTRL_SSEL_INTER_FRAME_DEL_Msk);
+        spiCtrl |= _VAL2FLD(SCB_SPI_CTRL_SSEL_SETUP_DEL, config->ssSetupDelay) |
+                   _VAL2FLD(SCB_SPI_CTRL_SSEL_HOLD_DEL , config->ssHoldDelay)  |
+                   _VAL2FLD(SCB_SPI_CTRL_SSEL_INTER_FRAME_DEL, config->ssInterFrameDelay);
+        SCB_SPI_CTRL(base) = spiCtrl;
     }
 #endif /* CY_IP_MXSCB_VERSION */
 
@@ -1035,14 +1036,20 @@ void Cy_SCB_SPI_Interrupt(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
 {
      bool locXferErr = false;
 
+    /* Cache interrupt status reads to eliminate volatile register reads */
+    uint32_t rxStatus    = Cy_SCB_GetRxInterruptStatusMasked(base);
+    uint32_t txStatus    = Cy_SCB_GetTxInterruptStatusMasked(base);
+    uint32_t slaveStatus = Cy_SCB_GetSlaveInterruptStatusMasked(base);
+    uint32_t spiStatus   = Cy_SCB_GetSpiInterruptStatusMasked(base);
+
     /* Wake up on the slave select condition */
-    if (0UL != (CY_SCB_SPI_INTR_WAKEUP & Cy_SCB_GetSpiInterruptStatusMasked(base)))
+    if (0UL != (CY_SCB_SPI_INTR_WAKEUP & spiStatus))
     {
         Cy_SCB_ClearSpiInterrupt(base, CY_SCB_SPI_INTR_WAKEUP);
     }
 
     /* The slave error condition */
-    if (0UL != (CY_SCB_SLAVE_INTR_SPI_BUS_ERROR & Cy_SCB_GetSlaveInterruptStatusMasked(base)))
+    if (0UL != (CY_SCB_SLAVE_INTR_SPI_BUS_ERROR & slaveStatus))
     {
         locXferErr       = true;
         context->status |= CY_SCB_SPI_SLAVE_TRANSFER_ERR;
@@ -1051,7 +1058,7 @@ void Cy_SCB_SPI_Interrupt(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
     }
 
     /* The RX overflow error condition */
-    if (0UL != (CY_SCB_RX_INTR_OVERFLOW & Cy_SCB_GetRxInterruptStatusMasked(base)))
+    if (0UL != (CY_SCB_RX_INTR_OVERFLOW & rxStatus))
     {
         locXferErr       = true;
         context->status |= CY_SCB_SPI_TRANSFER_OVERFLOW;
@@ -1060,7 +1067,7 @@ void Cy_SCB_SPI_Interrupt(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
     }
 
     /* The TX underflow error condition or slave complete data transfer */
-    if (0UL != (CY_SCB_TX_INTR_UNDERFLOW & Cy_SCB_GetTxInterruptStatusMasked(base)))
+    if (0UL != (CY_SCB_TX_INTR_UNDERFLOW & txStatus))
     {
         locXferErr       = true;
         context->status |= CY_SCB_SPI_TRANSFER_UNDERFLOW;
@@ -1078,7 +1085,7 @@ void Cy_SCB_SPI_Interrupt(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
     }
 
     /* RX direction */
-    if (0UL != (CY_SCB_RX_INTR_LEVEL & Cy_SCB_GetRxInterruptStatusMasked(base)))
+    if (0UL != (CY_SCB_RX_INTR_LEVEL & rxStatus))
     {
         HandleReceive(base, context);
 
@@ -1086,7 +1093,7 @@ void Cy_SCB_SPI_Interrupt(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
     }
 
     /* TX direction */
-    if (0UL != (CY_SCB_TX_INTR_LEVEL & Cy_SCB_GetTxInterruptStatusMasked(base)))
+    if (0UL != (CY_SCB_TX_INTR_LEVEL & txStatus))
     {
         HandleTransmit(base, context);
 
@@ -1135,12 +1142,12 @@ static void HandleReceive(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
 #endif /* CY_IP_MXSCB_VERSION */
 
     /* Adjust the number to read */
-    if (numToCopy > context->rxBufSize)
+    uint32_t rxRemain = context->rxBufSize;
+    if (numToCopy > rxRemain)
     {
-        numToCopy = context->rxBufSize;
+        numToCopy = rxRemain;
     }
-
-    context->rxBufSize -= numToCopy;
+    rxRemain -= numToCopy;
 
     /* Read data from RX FIFO */
     if (NULL != context->rxBuf)
@@ -1165,7 +1172,7 @@ static void HandleReceive(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
         DiscardArrayNoCheck(base, numToCopy);
     }
 
-    if (0UL == context->rxBufSize)
+    if (0UL == rxRemain)
     {
         if(0UL == context->DiscardRxSize)
         {
@@ -1174,25 +1181,29 @@ static void HandleReceive(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
         }
         else
         {
-            context->rxBuf         = NULL;
-            context->rxBufSize     = context->DiscardRxSize;
+            context->rxBuf = NULL;
+            rxRemain       = context->DiscardRxSize;
             context->DiscardRxSize = 0UL;
 
             uint32_t fifoSize = Cy_SCB_GetFifoSize(base);
 
-            Cy_SCB_SetRxFifoLevel(base, (context->rxBufSize > fifoSize) ? ((fifoSize / 2UL) - 2UL) : (context->rxBufSize - 1UL));
+            Cy_SCB_SetRxFifoLevel(base, (rxRemain > fifoSize) ? ((fifoSize / 2UL) - 2UL) : (rxRemain - 1UL));
         }
     }
     else
     {
+        uint32_t fifoSize = Cy_SCB_GetFifoSize(base);
         uint32_t level = (_FLD2BOOL(SCB_SPI_CTRL_MASTER_MODE, SCB_SPI_CTRL(base))) ?
-                                    Cy_SCB_GetFifoSize(base) : (Cy_SCB_GetFifoSize(base) / 2UL);
+                                    fifoSize : (fifoSize / 2UL);
 
-        if (context->rxBufSize < level)
+        if (rxRemain < level)
         {
-            Cy_SCB_SetRxFifoLevel(base, (context->rxBufSize - 1UL));
+            Cy_SCB_SetRxFifoLevel(base, (rxRemain - 1UL));
         }
     }
+
+    /* Finally write back */
+    context->rxBufSize = rxRemain;
 }
 
 
@@ -1223,12 +1234,12 @@ static void HandleTransmit(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
     numToCopy = fifoSize - Cy_SCB_GetNumInTxFifo(base);
 
     /* Adjust the number to load */
-    if (numToCopy > context->txBufSize)
+    uint32_t txRemain = context->txBufSize;
+    if (numToCopy > txRemain)
     {
-        numToCopy = context->txBufSize;
+        numToCopy = txRemain;
     }
-
-    context->txBufSize -= numToCopy;
+    txRemain -= numToCopy;
 
     /* Load TX FIFO with data */
     if (NULL != context->txBuf)
@@ -1252,7 +1263,7 @@ static void HandleTransmit(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
         Cy_SCB_WriteDefaultArrayNoCheck(base, context->writeFill, numToCopy);
     }
 
-    if (0UL == context->txBufSize)
+    if (0UL == txRemain)
     {
         if(0UL == context->WriteFillSize)
         {
@@ -1269,24 +1280,29 @@ static void HandleTransmit(CySCB_Type *base, cy_stc_scb_spi_context_t *context)
         }
         else
         {
-            numToCopy = fifoSize - Cy_SCB_GetNumInTxFifo(base);
+            uint32_t fillSize   = context->WriteFillSize;
+            uint32_t txFifoUsed = Cy_SCB_GetNumInTxFifo(base);
+            numToCopy = fifoSize - txFifoUsed;
 
-            if (numToCopy > context->WriteFillSize)
+            if (numToCopy > fillSize)
             {
-                numToCopy = context->WriteFillSize;
+                numToCopy = fillSize;
             }
 
             Cy_SCB_WriteDefaultArrayNoCheck(base, context->writeFill, numToCopy);
 
-            uint32_t txFifoLevel = Cy_SCB_GetNumInTxFifo(base)+numToCopy;
+            uint32_t txFifoLevel = txFifoUsed + numToCopy;
 
             Cy_SCB_SetTxFifoLevel(base, ((txFifoLevel > fifoSize) ? ((fifoSize / 2UL) - 2UL) : ((txFifoLevel == 1UL) ? txFifoLevel : (txFifoLevel - 1UL))));
 
             context->txBuf         = NULL;
-            context->txBufSize     = context->WriteFillSize - numToCopy;
+            context->txBufSize     = fillSize - numToCopy;
             context->WriteFillSize = 0UL;
         }
     }
+
+    /* Finally write back */
+    context->txBufSize = txRemain;
 }
 
 

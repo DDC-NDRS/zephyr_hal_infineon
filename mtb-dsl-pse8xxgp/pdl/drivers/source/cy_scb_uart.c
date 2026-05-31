@@ -37,7 +37,7 @@ extern "C" {
 static void HandleDataReceive (CySCB_Type *base, cy_stc_scb_uart_context_t *context);
 static void HandleRingBuffer  (CySCB_Type *base, cy_stc_scb_uart_context_t *context);
 static void HandleDataTransmit(CySCB_Type *base, cy_stc_scb_uart_context_t *context);
-static uint32_t SelectRxFifoLevel(CySCB_Type const *base);
+static inline uint32_t SelectRxFifoLevel(CySCB_Type const *base);
 
 /*******************************************************************************
 * Function Name: Cy_SCB_UART_SetOverSample
@@ -287,9 +287,16 @@ cy_en_scb_uart_status_t Cy_SCB_UART_Init(CySCB_Type *base, cy_stc_scb_uart_confi
     CY_ASSERT_L2(CY_SCB_IS_INTR_VALID(config->rxFifoIntEnableMask, CY_SCB_UART_RX_INTR_MASK));
     CY_ASSERT_L2(CY_SCB_IS_INTR_VALID(config->txFifoIntEnableMask, CY_SCB_UART_TX_INTR_MASK));
 
+    /* Cache repeatedly-read config fields — prevents N pointer derefs through
+     * const* at -Og where the compiler won't hoist them automatically.      */
+    cy_en_scb_uart_mode_t uartMode  = config->uartMode;
+    uint32_t dataWidth = config->dataWidth;
+    bool     msbFirst  = config->enableMsbFirst;
+    uint32_t stopBits  = ((uint32_t)config->stopBits) - 1UL;
+    uint32_t parity    = (uint32_t)config->parity;
     uint32_t ovs;
 
-    if ((CY_SCB_UART_IRDA == config->uartMode) && (!config->irdaEnableLowPowerReceiver))
+    if ((CY_SCB_UART_IRDA == uartMode) && (!config->irdaEnableLowPowerReceiver))
     {
         /* For Normal IrDA mode oversampling is always zero */
         ovs = 0UL;
@@ -300,70 +307,82 @@ cy_en_scb_uart_status_t Cy_SCB_UART_Init(CySCB_Type *base, cy_stc_scb_uart_confi
     }
 
     /* Configure the UART interface */
-#if((defined (CY_IP_MXSCB_VERSION) && (CY_IP_MXSCB_VERSION>=2)) || defined (CY_IP_MXS22SCB))
-    SCB_CTRL(base) = _BOOL2FLD(SCB_CTRL_ADDR_ACCEPT, config->acceptAddrInFifo)                      |
-                 _VAL2FLD(SCB_CTRL_MEM_WIDTH, ((config->dataWidth <= CY_SCB_BYTE_WIDTH)? 0UL:1UL))  |
-                 _VAL2FLD(SCB_CTRL_OVS, ovs)                                                        |
-                 _VAL2FLD(SCB_CTRL_MODE, CY_SCB_CTRL_MODE_UART);
-#elif((defined (CY_IP_MXSCB_VERSION) && CY_IP_MXSCB_VERSION==1))
-    SCB_CTRL(base) = _BOOL2FLD(SCB_CTRL_ADDR_ACCEPT, config->acceptAddrInFifo)               |
-                 _BOOL2FLD(SCB_CTRL_BYTE_MODE, (config->dataWidth <= CY_SCB_BYTE_WIDTH)) |
-                 _VAL2FLD(SCB_CTRL_OVS, ovs)                                             |
-                 _VAL2FLD(SCB_CTRL_MODE, CY_SCB_CTRL_MODE_UART);
-#endif /* CY_IP_MXSCB_VERSION */
+    #if((defined (CY_IP_MXSCB_VERSION) && (CY_IP_MXSCB_VERSION>=2)) || defined (CY_IP_MXS22SCB))
+    SCB_CTRL(base) =
+        _BOOL2FLD(SCB_CTRL_ADDR_ACCEPT, config->acceptAddrInFifo)                    |
+        _VAL2FLD(SCB_CTRL_MEM_WIDTH, ((dataWidth <= CY_SCB_BYTE_WIDTH) ? 0UL : 1UL)) |
+        _VAL2FLD(SCB_CTRL_OVS, ovs)                                                  |
+        _VAL2FLD(SCB_CTRL_MODE, CY_SCB_CTRL_MODE_UART);
+    #elif((defined (CY_IP_MXSCB_VERSION) && CY_IP_MXSCB_VERSION==1))
+    SCB_CTRL(base) =
+        _BOOL2FLD(SCB_CTRL_ADDR_ACCEPT, config->acceptAddrInFifo)       |
+        _BOOL2FLD(SCB_CTRL_BYTE_MODE, (dataWidth <= CY_SCB_BYTE_WIDTH)) |
+        _VAL2FLD(SCB_CTRL_OVS, ovs)                                     |
+        _VAL2FLD(SCB_CTRL_MODE, CY_SCB_CTRL_MODE_UART);
+    #endif /* CY_IP_MXSCB_VERSION */
+
     /* Configure SCB_CTRL.BYTE_MODE then verify levels */
     CY_ASSERT_L2(CY_SCB_IS_TRIGGER_LEVEL_VALID(base, config->rxFifoTriggerLevel));
     CY_ASSERT_L2(CY_SCB_IS_TRIGGER_LEVEL_VALID(base, config->txFifoTriggerLevel));
     CY_ASSERT_L2(CY_SCB_IS_TRIGGER_LEVEL_VALID(base, config->rtsRxFifoLevel));
 
-    SCB_UART_CTRL(base) = _VAL2FLD(SCB_UART_CTRL_MODE, (uint32_t) config->uartMode);
+    SCB_UART_CTRL(base) = _VAL2FLD(SCB_UART_CTRL_MODE, (uint32_t)uartMode);
 
-    /* Configure the RX direction */
-    SCB_UART_RX_CTRL(base) = _BOOL2FLD(SCB_UART_RX_CTRL_POLARITY, config->irdaInvertRx)                  |
-                         _BOOL2FLD(SCB_UART_RX_CTRL_MP_MODE, config->enableMultiProcessorMode)       |
-                         _BOOL2FLD(SCB_UART_RX_CTRL_DROP_ON_PARITY_ERROR, config->dropOnParityError) |
-                         _BOOL2FLD(SCB_UART_RX_CTRL_DROP_ON_FRAME_ERROR, config->dropOnFrameError)   |
-                         _VAL2FLD(SCB_UART_RX_CTRL_BREAK_WIDTH, (config->breakWidth - 1UL))          |
-                         _VAL2FLD(SCB_UART_RX_CTRL_STOP_BITS,   ((uint32_t) config->stopBits) - 1UL) |
-                         _VAL2FLD(CY_SCB_UART_RX_CTRL_SET_PARITY, (uint32_t) config->parity);
-#if((defined (CY_IP_MXSCB_VERSION) && (CY_IP_MXSCB_VERSION>=2)) || defined (CY_IP_MXS22SCB))
-    SCB_UART_RX_CTRL(base)|=_BOOL2FLD(SCB_UART_RX_CTRL_BREAK_LEVEL, config->breaklevel);
-#endif /* CY_IP_MXSCB_VERSION */
+    /* Configure the RX direction — accumulate in a local to produce a single volatile write */
+    uint32_t uartRxCtrl =
+        _BOOL2FLD(SCB_UART_RX_CTRL_POLARITY, config->irdaInvertRx)                  |
+        _BOOL2FLD(SCB_UART_RX_CTRL_MP_MODE, config->enableMultiProcessorMode)       |
+        _BOOL2FLD(SCB_UART_RX_CTRL_DROP_ON_PARITY_ERROR, config->dropOnParityError) |
+        _BOOL2FLD(SCB_UART_RX_CTRL_DROP_ON_FRAME_ERROR, config->dropOnFrameError)   |
+        _VAL2FLD(SCB_UART_RX_CTRL_BREAK_WIDTH, (config->breakWidth - 1UL))          |
+        _VAL2FLD(SCB_UART_RX_CTRL_STOP_BITS,   stopBits) |
+        _VAL2FLD(CY_SCB_UART_RX_CTRL_SET_PARITY, parity);
 
-#if (CY_SCB_UART_RX_HALF_DUPLEX_SUPPORTED)
-    SCB_UART_RX_CTRL(base)|=_BOOL2FLD(SCB_UART_RX_CTRL_HDRXEN, config->halfDuplexMode);
-#endif /* (CY_SCB_UART_RX_HALF_DUPLEX_SUPPORTED) */
+    #if((defined (CY_IP_MXSCB_VERSION) && (CY_IP_MXSCB_VERSION>=2)) || defined (CY_IP_MXS22SCB))
+    uartRxCtrl |= _BOOL2FLD(SCB_UART_RX_CTRL_BREAK_LEVEL, config->breaklevel);
+    #endif /* CY_IP_MXSCB_VERSION */
 
-    SCB_RX_CTRL(base) = _BOOL2FLD(SCB_RX_CTRL_MSB_FIRST, config->enableMsbFirst)          |
-                    _BOOL2FLD(SCB_RX_CTRL_MEDIAN, ((config->enableInputFilter) || \
-                                             (config->uartMode == CY_SCB_UART_IRDA))) |
-                    _VAL2FLD(SCB_RX_CTRL_DATA_WIDTH, (config->dataWidth - 1UL));
+    #if (CY_SCB_UART_RX_HALF_DUPLEX_SUPPORTED)
+    uartRxCtrl |= _BOOL2FLD(SCB_UART_RX_CTRL_HDRXEN, config->halfDuplexMode);
+    #endif /* (CY_SCB_UART_RX_HALF_DUPLEX_SUPPORTED) */
+    SCB_UART_RX_CTRL(base) = uartRxCtrl;
 
-    SCB_RX_MATCH(base) = _VAL2FLD(SCB_RX_MATCH_ADDR, config->receiverAddress) |
-                     _VAL2FLD(SCB_RX_MATCH_MASK, config->receiverAddressMask);
+    SCB_RX_CTRL(base) =
+        _BOOL2FLD(SCB_RX_CTRL_MSB_FIRST, msbFirst) |
+        _BOOL2FLD(SCB_RX_CTRL_MEDIAN, ((config->enableInputFilter) ||
+                                       (uartMode == CY_SCB_UART_IRDA))) |
+        _VAL2FLD(SCB_RX_CTRL_DATA_WIDTH, (dataWidth - 1UL));
+
+    SCB_RX_MATCH(base) =
+        _VAL2FLD(SCB_RX_MATCH_ADDR, config->receiverAddress) |
+        _VAL2FLD(SCB_RX_MATCH_MASK, config->receiverAddressMask);
 
     /* Configure SCB_CTRL.RX_CTRL then verify break width */
     CY_ASSERT_L2(CY_SCB_UART_IS_RX_BREAK_WIDTH_VALID(base, config->breakWidth));
 
     /* Configure the TX direction */
-    SCB_UART_TX_CTRL(base) = _BOOL2FLD(SCB_UART_TX_CTRL_RETRY_ON_NACK, ((config->smartCardRetryOnNack) && \
-                                                              (config->uartMode == CY_SCB_UART_SMARTCARD))) |
-                         _VAL2FLD(SCB_UART_TX_CTRL_STOP_BITS, ((uint32_t) config->stopBits) - 1UL)          |
-                         _VAL2FLD(CY_SCB_UART_TX_CTRL_SET_PARITY, (uint32_t) config->parity);
+    SCB_UART_TX_CTRL(base) =
+        _BOOL2FLD(SCB_UART_TX_CTRL_RETRY_ON_NACK, ((config->smartCardRetryOnNack) &&
+                                                   (uartMode == CY_SCB_UART_SMARTCARD))) |
+        _VAL2FLD(SCB_UART_TX_CTRL_STOP_BITS, stopBits) |
+        _VAL2FLD(CY_SCB_UART_TX_CTRL_SET_PARITY, parity);
 
-    SCB_TX_CTRL(base)  = _BOOL2FLD(SCB_TX_CTRL_MSB_FIRST,  config->enableMsbFirst)    |
-                     _VAL2FLD(SCB_TX_CTRL_DATA_WIDTH,  (config->dataWidth - 1UL)) |
-                     _BOOL2FLD(SCB_TX_CTRL_OPEN_DRAIN, (config->uartMode == CY_SCB_UART_SMARTCARD));
+    SCB_TX_CTRL(base) =
+        _BOOL2FLD(SCB_TX_CTRL_MSB_FIRST,  msbFirst) |
+        _VAL2FLD(SCB_TX_CTRL_DATA_WIDTH,  (dataWidth - 1UL)) |
+        _BOOL2FLD(SCB_TX_CTRL_OPEN_DRAIN, (uartMode == CY_SCB_UART_SMARTCARD));
 
     SCB_RX_FIFO_CTRL(base) = _VAL2FLD(SCB_RX_FIFO_CTRL_TRIGGER_LEVEL, config->rxFifoTriggerLevel);
 
     /* Configure the flow control */
-    SCB_UART_FLOW_CTRL(base) = _BOOL2FLD(SCB_UART_FLOW_CTRL_CTS_ENABLED, config->enableCts) |
-                           _BOOL2FLD(SCB_UART_FLOW_CTRL_CTS_POLARITY, (CY_SCB_UART_ACTIVE_HIGH == config->ctsPolarity)) |
-                           _BOOL2FLD(SCB_UART_FLOW_CTRL_RTS_POLARITY, (CY_SCB_UART_ACTIVE_HIGH == config->rtsPolarity)) |
-                           _VAL2FLD(SCB_UART_FLOW_CTRL_TRIGGER_LEVEL, config->rtsRxFifoLevel);
+    SCB_UART_FLOW_CTRL(base) =
+        _BOOL2FLD(SCB_UART_FLOW_CTRL_CTS_ENABLED, config->enableCts) |
+        _BOOL2FLD(SCB_UART_FLOW_CTRL_CTS_POLARITY, (CY_SCB_UART_ACTIVE_HIGH == config->ctsPolarity)) |
+        _BOOL2FLD(SCB_UART_FLOW_CTRL_RTS_POLARITY, (CY_SCB_UART_ACTIVE_HIGH == config->rtsPolarity)) |
+        _VAL2FLD(SCB_UART_FLOW_CTRL_TRIGGER_LEVEL, config->rtsRxFifoLevel);
 
-    SCB_TX_FIFO_CTRL(base) = _VAL2FLD(SCB_TX_FIFO_CTRL_TRIGGER_LEVEL, config->txFifoTriggerLevel);
+    SCB_TX_FIFO_CTRL(base) =
+        _VAL2FLD(SCB_TX_FIFO_CTRL_TRIGGER_LEVEL, config->txFifoTriggerLevel);
 
     /* Set up interrupt sources */
     SCB_INTR_RX_MASK(base) = (config->rxFifoIntEnableMask & CY_SCB_UART_RX_INTR_MASK);
@@ -385,12 +404,12 @@ cy_en_scb_uart_status_t Cy_SCB_UART_Init(CySCB_Type *base, cy_stc_scb_uart_confi
         context->cbEvents = NULL;
         context->irdaEnableLowPowerReceiver = config->irdaEnableLowPowerReceiver;
 
-    #if !defined(NDEBUG)
+        #if !defined(NDEBUG)
         /* Put an initialization key into the initKey variable to verify
-        * context initialization in the transfer API.
-        */
+         * context initialization in the transfer API.
+         */
         context->initKey = CY_SCB_UART_INIT_KEY;
-    #endif /* !(NDEBUG) */
+        #endif /* !(NDEBUG) */
     }
 
     return CY_SCB_UART_SUCCESS;
@@ -702,7 +721,7 @@ void Cy_SCB_UART_StartRingBuffer(CySCB_Type *base, void *buffer, uint32_t size, 
 * The RX FIFO level.
 *
 *******************************************************************************/
-static uint32_t SelectRxFifoLevel(CySCB_Type const *base)
+static inline uint32_t SelectRxFifoLevel(CySCB_Type const *base)
 {
     uint32_t halfFifoSize = Cy_SCB_GetFifoSize(base) / 2UL;
     uint32_t rtsFifoLevel = Cy_SCB_UART_GetRtsFifoLevel(base);
@@ -762,22 +781,14 @@ void Cy_SCB_UART_StopRingBuffer(CySCB_Type *base, cy_stc_scb_uart_context_t *con
 *******************************************************************************/
 uint32_t Cy_SCB_UART_GetNumInRingBuffer(CySCB_Type const *base, cy_stc_scb_uart_context_t const *context)
 {
-    uint32_t size;
     uint32_t locHead = context->rxRingBufHead;
+    uint32_t locTail = context->rxRingBufTail;
 
     /* Suppress a compiler warning about unused variables */
     (void) base;
 
-    if (locHead >= context->rxRingBufTail)
-    {
-        size = (locHead - context->rxRingBufTail);
-    }
-    else
-    {
-        size = (locHead + (context->rxRingBufSize - context->rxRingBufTail));
-    }
-
-    return (size);
+    return (locHead >= locTail) ? (locHead - locTail) :
+                                  (locHead + (context->rxRingBufSize - locTail));
 }
 
 
@@ -877,8 +888,9 @@ cy_en_scb_uart_status_t Cy_SCB_UART_Receive(CySCB_Type *base, void *buffer, uint
             if (numToCopy > 0UL)
             {
                 uint32_t idx;
-                uint32_t locTail = context->rxRingBufTail;
-                bool     byteMode = Cy_SCB_IsRxDataWidthByte(base);
+                uint32_t locTail        = context->rxRingBufTail;
+                uint32_t locRingBufSize = context->rxRingBufSize;
+                bool     byteMode       = Cy_SCB_IsRxDataWidthByte(base);
 
                 /* Adjust the number of items to be read */
                 if (numToCopy > size)
@@ -886,25 +898,29 @@ cy_en_scb_uart_status_t Cy_SCB_UART_Receive(CySCB_Type *base, void *buffer, uint
                     numToCopy = size;
                 }
 
-                /* Copy the data elements from the ring buffer */
-                for (idx = 0UL; idx < numToCopy; ++idx)
+                /* Copy the data elements from the ring buffer.
+                * Loop is split by byteMode to hoist the branch and pointer
+                * casts out of the hot path (removes N branches + 2N casts). */
+                if (byteMode)
                 {
-                    ++locTail;
-
-                    if (locTail == context->rxRingBufSize)
+                    uint8_t       *dst = (uint8_t *) buffer;
+                    uint8_t const *src = (uint8_t const *) context->rxRingBuf;
+                    for (idx = 0UL; idx < numToCopy; ++idx)
                     {
-                        locTail = 0UL;
+                        ++locTail;
+                        if (locTail == locRingBufSize) { locTail = 0UL; }
+                        dst[idx] = src[locTail];
                     }
-
-                    if (byteMode)
+                }
+                else
+                {
+                    uint16_t       *dst = (uint16_t *) buffer;
+                    uint16_t const *src = (uint16_t const *) context->rxRingBuf;
+                    for (idx = 0UL; idx < numToCopy; ++idx)
                     {
-                        uint8_t *buf = (uint8_t *) buffer;
-                        buf[idx] = ((uint8_t *) context->rxRingBuf)[locTail];
-                    }
-                    else
-                    {
-                        uint16_t *buf = (uint16_t *) buffer;
-                        buf[idx] = ((uint16_t *) context->rxRingBuf)[locTail];
+                        ++locTail;
+                        if (locTail == locRingBufSize) { locTail = 0UL; }
+                        dst[idx] = src[locTail];
                     }
                 }
 
@@ -1330,10 +1346,15 @@ void Cy_SCB_UART_SendBreakBlocking(CySCB_Type *base, uint32_t breakWidth)
 *******************************************************************************/
 void Cy_SCB_UART_Interrupt(CySCB_Type *base, cy_stc_scb_uart_context_t *context)
 {
-    if (0UL != (CY_SCB_RX_INTR & Cy_SCB_GetInterruptCause(base)))
+    uint32_t intrCause = Cy_SCB_GetInterruptCause(base);
+
+    if (0UL != (CY_SCB_RX_INTR & intrCause))
     {
+        /* Read masked RX interrupt status once — avoids 3 extra peripheral reads */
+        uint32_t locRxMasked = Cy_SCB_GetRxInterruptStatusMasked(base);
+
         /* Get RX error events: a frame error, parity error, and overflow */
-        uint32_t locRxErr = (CY_SCB_UART_RECEIVE_ERR & Cy_SCB_GetRxInterruptStatusMasked(base));
+        uint32_t locRxErr = (CY_SCB_UART_RECEIVE_ERR & locRxMasked);
 
         /* Handle the error conditions */
         if (0UL != locRxErr)
@@ -1349,7 +1370,7 @@ void Cy_SCB_UART_Interrupt(CySCB_Type *base, cy_stc_scb_uart_context_t *context)
         }
 
         /* Break the detect */
-        if (0UL != (CY_SCB_RX_INTR_UART_BREAK_DETECT & Cy_SCB_GetRxInterruptStatusMasked(base)))
+        if (0UL != (CY_SCB_RX_INTR_UART_BREAK_DETECT & locRxMasked))
         {
             context->rxStatus |= CY_SCB_UART_RECEIVE_BREAK_DETECT;
 
@@ -1357,7 +1378,7 @@ void Cy_SCB_UART_Interrupt(CySCB_Type *base, cy_stc_scb_uart_context_t *context)
         }
 
         /* Copy the received data */
-        if (0UL != (CY_SCB_RX_INTR_LEVEL & Cy_SCB_GetRxInterruptStatusMasked(base)))
+        if (0UL != (CY_SCB_RX_INTR_LEVEL & locRxMasked))
         {
             if (context->rxBufSize > 0UL)
             {
@@ -1374,7 +1395,7 @@ void Cy_SCB_UART_Interrupt(CySCB_Type *base, cy_stc_scb_uart_context_t *context)
             Cy_SCB_ClearRxInterrupt(base, CY_SCB_RX_INTR_LEVEL);
         }
 
-        if (0UL != (CY_SCB_RX_INTR_NOT_EMPTY & Cy_SCB_GetRxInterruptStatusMasked(base)))
+        if (0UL != (CY_SCB_RX_INTR_NOT_EMPTY & locRxMasked))
         {
             if (NULL != context->cbEvents)
             {
@@ -1386,9 +1407,11 @@ void Cy_SCB_UART_Interrupt(CySCB_Type *base, cy_stc_scb_uart_context_t *context)
 
     }
 
-    if (0UL != (CY_SCB_TX_INTR & Cy_SCB_GetInterruptCause(base)))
+    if (0UL != (CY_SCB_TX_INTR & intrCause))
     {
-        uint32_t locTxErr = (CY_SCB_UART_TRANSMIT_ERR & Cy_SCB_GetTxInterruptStatusMasked(base));
+        /* Read masked TX interrupt status once — avoids 3 extra peripheral reads */
+        uint32_t locTxMasked = Cy_SCB_GetTxInterruptStatusMasked(base);
+        uint32_t locTxErr    = (CY_SCB_UART_TRANSMIT_ERR & locTxMasked);
 
         /* Handle the TX error conditions */
         if (0UL != locTxErr)
@@ -1403,7 +1426,7 @@ void Cy_SCB_UART_Interrupt(CySCB_Type *base, cy_stc_scb_uart_context_t *context)
         }
 
         /* Load data to transmit */
-        if (0UL != (CY_SCB_TX_INTR_LEVEL & Cy_SCB_GetTxInterruptStatusMasked(base)))
+        if (0UL != (CY_SCB_TX_INTR_LEVEL & locTxMasked))
         {
             HandleDataTransmit(base, context);
 
@@ -1411,7 +1434,7 @@ void Cy_SCB_UART_Interrupt(CySCB_Type *base, cy_stc_scb_uart_context_t *context)
         }
 
         /* Handle the TX complete */
-        if (0UL != (CY_SCB_TX_INTR_UART_DONE & Cy_SCB_GetTxInterruptStatusMasked(base)))
+        if (0UL != (CY_SCB_TX_INTR_UART_DONE & locTxMasked))
         {
             if(context->txStatus != CY_SCB_UART_TRANSMIT_ACTIVE)
             {
@@ -1433,7 +1456,7 @@ void Cy_SCB_UART_Interrupt(CySCB_Type *base, cy_stc_scb_uart_context_t *context)
             }
         }
 
-        if (0UL != (CY_SCB_UART_TX_EMPTY & Cy_SCB_GetTxInterruptStatusMasked(base)))
+        if (0UL != (CY_SCB_UART_TX_EMPTY & locTxMasked))
         {
             if (NULL != context->cbEvents)
             {
@@ -1469,6 +1492,7 @@ static void HandleDataReceive(CySCB_Type *base, cy_stc_scb_uart_context_t *conte
 {
     uint32_t numCopied;
     uint32_t irqRxLevel = SelectRxFifoLevel(base);
+    bool     byteMode   = Cy_SCB_IsRxDataWidthByte(base);
 
     /* Get data from RX FIFO */
     numCopied = Cy_SCB_UART_GetArray(base, context->rxBuf, context->rxBufSize);
@@ -1505,7 +1529,7 @@ static void HandleDataReceive(CySCB_Type *base, cy_stc_scb_uart_context_t *conte
     {
         uint8_t *buf = (uint8_t *) context->rxBuf;
 
-        buf = &buf[(Cy_SCB_IsRxDataWidthByte(base) ? (numCopied) : (2UL * numCopied))];
+        buf = &buf[(byteMode ? (numCopied) : (2UL * numCopied))];
         context->rxBuf = (void *) buf;
 
         if (context->rxBufSize < irqRxLevel)
@@ -1535,9 +1559,15 @@ static void HandleDataReceive(CySCB_Type *base, cy_stc_scb_uart_context_t *conte
 *******************************************************************************/
 static void HandleRingBuffer(CySCB_Type *base, cy_stc_scb_uart_context_t *context)
 {
-    uint32_t irqRxLevel = SelectRxFifoLevel(base);
-    uint32_t numToCopy = Cy_SCB_GetNumInRxFifo(base);
-    uint32_t locHead = context->rxRingBufHead;
+    uint32_t irqRxLevel  = SelectRxFifoLevel(base);
+    uint32_t numToCopy   = Cy_SCB_GetNumInRxFifo(base);
+    uint32_t locHead     = context->rxRingBufHead;
+    uint32_t ringBufSize = context->rxRingBufSize;
+    uint32_t ringBufTail = context->rxRingBufTail;
+    bool     byteMode    = Cy_SCB_IsRxDataWidthByte(base);
+    /* Hoist pointer casts outside the per-byte loop (removes 2N casts) */
+    uint8_t  * const ringBuf8  = (uint8_t *)  context->rxRingBuf;
+    uint16_t * const ringBuf16 = (uint16_t *) context->rxRingBuf;
     uint32_t rxData;
 
     /* Get data into the ring buffer */
@@ -1545,12 +1575,12 @@ static void HandleRingBuffer(CySCB_Type *base, cy_stc_scb_uart_context_t *contex
     {
         ++locHead;
 
-        if (locHead == context->rxRingBufSize)
+        if (locHead == ringBufSize)
         {
             locHead = 0UL;
         }
 
-        if (locHead == context->rxRingBufTail)
+        if (locHead == ringBufTail)
         {
             /* The ring buffer is full, trigger a callback */
             if (NULL != context->cbEvents)
@@ -1561,11 +1591,11 @@ static void HandleRingBuffer(CySCB_Type *base, cy_stc_scb_uart_context_t *contex
             /* The ring buffer is still full. Disable the RX interrupt not to put data into the ring buffer.
             * The data is stored in the RX FIFO until it overflows. Revert the head index.
             */
-            if (locHead == context->rxRingBufTail)
+            if (locHead == ringBufTail)
             {
                 Cy_SCB_SetRxInterruptMask(base, CY_SCB_CLEAR_ALL_INTR_SRC);
 
-                locHead = (locHead > 0UL) ? (locHead - 1UL) : (context->rxRingBufSize - 1UL);
+                locHead = (locHead > 0UL) ? (locHead - 1UL) : (ringBufSize - 1UL);
                 break;
             }
         }
@@ -1574,13 +1604,13 @@ static void HandleRingBuffer(CySCB_Type *base, cy_stc_scb_uart_context_t *contex
         rxData = Cy_SCB_ReadRxFifo(base);
 
         /* Put a data item in the ring buffer */
-        if (Cy_SCB_IsRxDataWidthByte(base))
+        if (byteMode)
         {
-            ((uint8_t *) context->rxRingBuf)[locHead] = (uint8_t) rxData;
+            ringBuf8[locHead]  = (uint8_t)  rxData;
         }
         else
         {
-            ((uint16_t *) context->rxRingBuf)[locHead] = (uint16_t) rxData;
+            ringBuf16[locHead] = (uint16_t) rxData;
         }
 
         --numToCopy;
@@ -1590,7 +1620,7 @@ static void HandleRingBuffer(CySCB_Type *base, cy_stc_scb_uart_context_t *contex
     context->rxRingBufHead = locHead;
 
     /* Get free entries in the ring buffer */
-    numToCopy = context->rxRingBufSize - Cy_SCB_UART_GetNumInRingBuffer(base, context);
+    numToCopy = ringBufSize - Cy_SCB_UART_GetNumInRingBuffer(base, context);
 
     if (numToCopy < irqRxLevel)
     {

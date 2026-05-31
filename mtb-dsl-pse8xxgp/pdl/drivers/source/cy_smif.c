@@ -3082,7 +3082,10 @@ cy_en_smif_status_t Cy_SMIF_Clean_All_Cache(SMIF_CACHE_BLOCK_Type *base)
     base->MAINT_CTRL_ALL =  (uint32_t)_VAL2FLD(SMIF_CACHE_BLOCK_MAINT_CTRL_ALL_TRIG_CLEAN_ALL, 1U);
 
     /* Wait for Maintenance flag to be CLEARED */
-    while (((base->MAINT_STATUS) & SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk) == SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk) {}
+    uint32_t status;
+    do {
+        status = base->MAINT_STATUS;
+    } while ((status & SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk) == SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk);
 
     return CY_SMIF_SUCCESS;
 #else
@@ -3111,7 +3114,10 @@ cy_en_smif_status_t Cy_SMIF_Invalidate_All_Cache(SMIF_CACHE_BLOCK_Type *base)
     base->MAINT_CTRL_ALL =  (uint32_t)_VAL2FLD(SMIF_CACHE_BLOCK_MAINT_CTRL_ALL_TRIG_INVALIDATE_ALL, 1U);
 
     /* Wait for Maintenance flag to be CLEARED */
-    while (((base->MAINT_STATUS) & SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk) == SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk) {}
+    uint32_t status;
+    do {
+        status = base->MAINT_STATUS;
+    } while ((status & SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk) == SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk);
 
     return CY_SMIF_SUCCESS;
 #else
@@ -3142,7 +3148,10 @@ cy_en_smif_status_t Cy_SMIF_Clean_And_Invalidate_All_Cache(SMIF_CACHE_BLOCK_Type
                                         _VAL2FLD(SMIF_CACHE_BLOCK_MAINT_CTRL_ALL_TRIG_CLEAN_ALL, 1U));
 
     /* Wait for Maintenance flag to be CLEARED */
-    while (((base->MAINT_STATUS) & SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk) == SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk) {}
+    uint32_t status;
+    do {
+        status = base->MAINT_STATUS;
+    } while ((status & SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk) == SMIF_CACHE_BLOCK_MAINT_STATUS_ONGOING_MAINT_Msk);
 
     return CY_SMIF_SUCCESS;
 #else

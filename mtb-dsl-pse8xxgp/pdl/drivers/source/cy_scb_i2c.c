@@ -751,8 +751,9 @@ uint32_t Cy_SCB_I2C_GetDataRate(CySCB_Type const *base, uint32_t scbClockHz)
             uint32_t dutyCycle;
 
             /* Get number of clocks in one SCL period */
-            dutyCycle = _FLD2VAL(SCB_I2C_CTRL_LOW_PHASE_OVS,  SCB_I2C_CTRL(base)) +
-                        _FLD2VAL(SCB_I2C_CTRL_HIGH_PHASE_OVS, SCB_I2C_CTRL(base)) +
+            uint32_t i2cCtrl = SCB_I2C_CTRL(base);
+            dutyCycle = _FLD2VAL(SCB_I2C_CTRL_LOW_PHASE_OVS,  i2cCtrl) +
+                        _FLD2VAL(SCB_I2C_CTRL_HIGH_PHASE_OVS, i2cCtrl) +
                         2UL;
 
             /* Calculate the actual data rate */
@@ -1862,11 +1863,11 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterSendReStart(CySCB_Type *base,
         * If previous transfer was read, NACK is generated before ReStart to
         * complete previous transfer.
         */
-        SCB_I2C_M_CMD(base) = SCB_I2C_M_CMD_M_START_Msk | (_FLD2BOOL(SCB_I2C_STATUS_M_READ, SCB_I2C_STATUS(base)) ?
-                          SCB_I2C_M_CMD_M_NACK_Msk : 0UL);
+        bool prevWasRead = _FLD2BOOL(SCB_I2C_STATUS_M_READ, SCB_I2C_STATUS(base));
+        SCB_I2C_M_CMD(base) = SCB_I2C_M_CMD_M_START_Msk | (prevWasRead ? SCB_I2C_M_CMD_M_NACK_Msk : 0UL);
 
         /* Previous transfer was a write */
-        if (false == _FLD2BOOL(SCB_I2C_STATUS_M_READ, SCB_I2C_STATUS(base)))
+        if (!prevWasRead)
         {
             /* Cypress ID #295908: Wait until ReStart is generated to complete
             * the previous write transfer. This ensures that the address byte
@@ -2407,18 +2408,19 @@ static void SlaveHandleAddress(CySCB_Type *base, cy_stc_scb_i2c_context_t *conte
     if (NULL != context->cbAddr)
     {
         uint32_t events = 0UL;
+        uint32_t slaveIntrStatus = Cy_SCB_GetSlaveInterruptStatusMasked(base);
 
         /* Set an address in the FIFO event if the address accept is enabled */
         if (_FLD2BOOL(SCB_CTRL_ADDR_ACCEPT, SCB_CTRL(base)))
         {
-            events = (0UL != (CY_SCB_SLAVE_INTR_I2C_ADDR_MATCH & Cy_SCB_GetSlaveInterruptStatusMasked(base))) ?
+            events = (0UL != (CY_SCB_SLAVE_INTR_I2C_ADDR_MATCH & slaveIntrStatus)) ?
                               CY_SCB_I2C_ADDR_IN_FIFO_EVENT : 0UL;
         }
 
         /* Set a general call event if "ignore general call" is disabled */
         if (!_FLD2BOOL(SCB_I2C_CTRL_S_GENERAL_IGNORE, SCB_I2C_CTRL(base)))
         {
-            events |= (0UL != (CY_SCB_SLAVE_INTR_I2C_GENERAL_ADDR & Cy_SCB_GetSlaveInterruptStatusMasked(base))) ?
+            events |= (0UL != (CY_SCB_SLAVE_INTR_I2C_GENERAL_ADDR & slaveIntrStatus)) ?
                                CY_SCB_I2C_GENERAL_CALL_EVENT : 0UL;
         }
 
@@ -2647,10 +2649,11 @@ static void SlaveHandleDataTransmit(CySCB_Type *base, cy_stc_scb_i2c_context_t *
     }
     else
     {
-        if (context->slaveTxBufferSize > 1UL)
+        uint32_t txSize = context->slaveTxBufferSize;
+        if (txSize > 1UL)
         {
             /* Get the number of bytes to copy into TX FIFO */
-            numToCopy = (context->useTxFifo) ? (context->slaveTxBufferSize - 1UL) : (1UL);
+            numToCopy = (context->useTxFifo) ? (txSize - 1UL) : (1UL);
 
             /* Write data into TX FIFO */
             numToCopy = Cy_SCB_WriteArray(base, context->slaveTxBuffer, numToCopy);
@@ -2660,7 +2663,7 @@ static void SlaveHandleDataTransmit(CySCB_Type *base, cy_stc_scb_i2c_context_t *
         }
 
         /* Put the last byte */
-        if ((CY_SCB_I2C_FIFO_SIZE != Cy_SCB_GetNumInTxFifo(base)) && (1UL == context->slaveTxBufferSize))
+        if ((1UL == context->slaveTxBufferSize) && (CY_SCB_I2C_FIFO_SIZE != Cy_SCB_GetNumInTxFifo(base)))
         {
             uint32_t intrStatus;
 
@@ -2979,12 +2982,14 @@ static void MasterHandleDataReceive(CySCB_Type *base, cy_stc_scb_i2c_context_t *
             context->masterBufferSize -= numToCopied;
             context->masterBuffer      = &context->masterBuffer[numToCopied];
 
-            if (context->masterBufferSize < 2UL)
+            uint32_t remaining = context->masterBufferSize;
+
+            if (remaining < 2UL)
             {
                 /* Stop ACKing data */
                 SCB_I2C_CTRL(base) &= (uint32_t) ~SCB_I2C_CTRL_M_READY_DATA_ACK_Msk;
 
-                if (1UL == context->masterBufferSize)
+                if (1UL == remaining)
                 {
                     /* Catch the last byte */
                     Cy_SCB_SetRxFifoLevel(base, 0UL);
@@ -3004,8 +3009,8 @@ static void MasterHandleDataReceive(CySCB_Type *base, cy_stc_scb_i2c_context_t *
                 uint32_t halfFifoSize = CY_SCB_I2C_HALF_FIFO_SIZE;
 
                 /* Continue the transfer: Adjust the level in RX FIFO */
-                Cy_SCB_SetRxFifoLevel(base, (context->masterBufferSize <= halfFifoSize) ?
-                                            (context->masterBufferSize - 2UL) : (halfFifoSize - 1UL));
+                Cy_SCB_SetRxFifoLevel(base, (remaining <= halfFifoSize) ?
+                                            (remaining - 2UL) : (halfFifoSize - 1UL));
             }
         }
         break;
@@ -3054,7 +3059,7 @@ static void MasterHandleDataTransmit(CySCB_Type *base, cy_stc_scb_i2c_context_t 
         }
 
         /* Put the last byte */
-        if ((CY_SCB_I2C_FIFO_SIZE != Cy_SCB_GetNumInTxFifo(base)) && (1UL == context->masterBufferSize))
+        if ((1UL == context->masterBufferSize) && (CY_SCB_I2C_FIFO_SIZE != Cy_SCB_GetNumInTxFifo(base)))
         {
             uint32_t intrStatus;
 
@@ -3215,8 +3220,7 @@ static void MasterHandleComplete(CySCB_Type *base, cy_stc_scb_i2c_context_t *con
         /* Check the Master-Slave address an ACK/NACK */
         if (((uint32_t) CY_SCB_I2C_MASTER_SLAVE) == _FLD2VAL(CY_SCB_I2C_CTRL_MODE, SCB_I2C_CTRL(base)))
         {
-            resetIp = ((0UL != (CY_SCB_MASTER_INTR_I2C_ACK & masterIntrStatus)) ? true :
-                            ((0UL != (CY_SCB_MASTER_INTR_I2C_BUS_ERROR & masterIntrStatus)) ? true : false));
+            resetIp = (0UL != ((CY_SCB_MASTER_INTR_I2C_ACK | CY_SCB_MASTER_INTR_I2C_BUS_ERROR) & masterIntrStatus));
         }
 
         if (resetIp)

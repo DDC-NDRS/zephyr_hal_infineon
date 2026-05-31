@@ -1911,11 +1911,16 @@ cy_en_syspm_status_t Cy_SysPm_RetLdoConfigure(cy_stc_syspm_retldo_params_t *retL
     CY_ASSERT_L2(CY_SYSPM_IS_RETLDO_GAIN_VALID(retLdoParam->activeGain));
     CY_ASSERT_L2(CY_SYSPM_IS_RETLDO_GAIN_VALID(retLdoParam->deepsleepGain));
 
-    CY_REG32_CLR_SET(SRSS_PWR_RETLDO_CTL, SRSS_PWR_RETLDO_CTL_RETLDO_LVL, retLdoParam->activeVoltSel);
-    CY_REG32_CLR_SET(SRSS_PWR_RETLDO_CTL, SRSS_PWR_RETLDO_CTL_RETLDO_GAIN, retLdoParam->activeGain);
-
-    CY_REG32_CLR_SET(SRSS_PWR_RETLDO_CTL, SRSS_PWR_RETLDO_CTL_RETLDO_LVL_DPSLP, retLdoParam->deepsleepVoltSel);
-    CY_REG32_CLR_SET(SRSS_PWR_RETLDO_CTL, SRSS_PWR_RETLDO_CTL_RETLDO_GAIN_DPSLP, retLdoParam->deepsleepGain);
+    uint32_t retldoCtl = SRSS_PWR_RETLDO_CTL;
+    retldoCtl &= ~(SRSS_PWR_RETLDO_CTL_RETLDO_LVL_Msk       |
+                   SRSS_PWR_RETLDO_CTL_RETLDO_GAIN_Msk      |
+                   SRSS_PWR_RETLDO_CTL_RETLDO_LVL_DPSLP_Msk |
+                   SRSS_PWR_RETLDO_CTL_RETLDO_GAIN_DPSLP_Msk);
+    retldoCtl |= _VAL2FLD(SRSS_PWR_RETLDO_CTL_RETLDO_LVL,       retLdoParam->activeVoltSel)    |
+                 _VAL2FLD(SRSS_PWR_RETLDO_CTL_RETLDO_GAIN,      retLdoParam->activeGain)       |
+                 _VAL2FLD(SRSS_PWR_RETLDO_CTL_RETLDO_LVL_DPSLP, retLdoParam->deepsleepVoltSel) |
+                 _VAL2FLD(SRSS_PWR_RETLDO_CTL_RETLDO_GAIN_DPSLP,retLdoParam->deepsleepGain);
+    SRSS_PWR_RETLDO_CTL = retldoCtl;
 
     return Cy_SysPm_RetLdoStatus();
 }
@@ -1944,11 +1949,14 @@ cy_en_syspm_status_t Cy_SysPm_SramLdoConfigure(cy_stc_syspm_sramldo_params_t *sr
 {
     CY_ASSERT_L2(CY_SYSPM_IS_SRAMLDO_VOLTAGE_VALID(sramLdoParam->sramLdoVoltSel));
 
-    CY_REG32_CLR_SET(SRSS_PWR_SRAMLDO_CTL, SRSS_PWR_SRAMLDO_CTL_SRAMLDO_EN, (sramLdoParam->sramLdoEnable ? 1U : 0U));
-
-    CY_REG32_CLR_SET(SRSS_PWR_SRAMLDO_CTL, SRSS_PWR_SRAMLDO_CTL_SRAMLDO_DPSLP_EN, (sramLdoParam->deepsleepSramLdoEnable ? 1U : 0U));
-
-    CY_REG32_CLR_SET(SRSS_PWR_SRAMLDO_CTL, SRSS_PWR_SRAMLDO_CTL_SRAMLDO_VOUT, sramLdoParam->sramLdoVoltSel);
+    uint32_t sramldoCtl = SRSS_PWR_SRAMLDO_CTL;
+    sramldoCtl &= ~(SRSS_PWR_SRAMLDO_CTL_SRAMLDO_EN_Msk       |
+                    SRSS_PWR_SRAMLDO_CTL_SRAMLDO_DPSLP_EN_Msk |
+                    SRSS_PWR_SRAMLDO_CTL_SRAMLDO_VOUT_Msk);
+    sramldoCtl |= _VAL2FLD(SRSS_PWR_SRAMLDO_CTL_SRAMLDO_EN,      (sramLdoParam->sramLdoEnable ? 1U : 0U))          |
+                  _VAL2FLD(SRSS_PWR_SRAMLDO_CTL_SRAMLDO_DPSLP_EN,(sramLdoParam->deepsleepSramLdoEnable ? 1U : 0U)) |
+                  _VAL2FLD(SRSS_PWR_SRAMLDO_CTL_SRAMLDO_VOUT,    sramLdoParam->sramLdoVoltSel);
+    SRSS_PWR_SRAMLDO_CTL = sramldoCtl;
 
     return Cy_SysPm_SramLdoStatus();
 }
@@ -1978,13 +1986,16 @@ cy_en_syspm_status_t Cy_SysPm_MiscLdoConfigure(cy_stc_syspm_miscldo_params_t *mi
     CY_ASSERT_L2(CY_SYSPM_IS_MISCLDO_VCCACT_TRIM_VALID(miscLdoParam->miscLdoVaccActTrimSel));
     CY_ASSERT_L2(CY_SYSPM_IS_MISCLDO_MODE_VALID(miscLdoParam->miscLdoMode));
 
-    CY_REG32_CLR_SET(SRSS_PWR_MISCLDO_CTL, SRSS_PWR_MISCLDO_CTL_MISCLDO_EN, (miscLdoParam->miscLdoEnable ? 1U : 0U));
-
-    CY_REG32_CLR_SET(SRSS_PWR_MISCLDO_CTL, SRSS_PWR_MISCLDO_CTL_MISCLDO_MODE, miscLdoParam->miscLdoMode);
-
-    CY_REG32_CLR_SET(SRSS_PWR_MISCLDO_CTL, SRSS_PWR_MISCLDO_CTL_MISCLDO_VOUT, miscLdoParam->miscLdoVoltSel);
-
-    CY_REG32_CLR_SET(SRSS_PWR_MISCLDO_CTL, SRSS_PWR_MISCLDO_CTL_MISCLDO_VCCACT_TRIM, miscLdoParam->miscLdoVaccActTrimSel);
+    uint32_t miscldoCtl = SRSS_PWR_MISCLDO_CTL;
+    miscldoCtl &= ~(SRSS_PWR_MISCLDO_CTL_MISCLDO_EN_Msk   |
+                    SRSS_PWR_MISCLDO_CTL_MISCLDO_MODE_Msk |
+                    SRSS_PWR_MISCLDO_CTL_MISCLDO_VOUT_Msk |
+                    SRSS_PWR_MISCLDO_CTL_MISCLDO_VCCACT_TRIM_Msk);
+    miscldoCtl |= _VAL2FLD(SRSS_PWR_MISCLDO_CTL_MISCLDO_EN,         (miscLdoParam->miscLdoEnable ? 1U : 0U)) |
+                  _VAL2FLD(SRSS_PWR_MISCLDO_CTL_MISCLDO_MODE,        miscLdoParam->miscLdoMode)              |
+                  _VAL2FLD(SRSS_PWR_MISCLDO_CTL_MISCLDO_VOUT,        miscLdoParam->miscLdoVoltSel)           |
+                  _VAL2FLD(SRSS_PWR_MISCLDO_CTL_MISCLDO_VCCACT_TRIM, miscLdoParam->miscLdoVaccActTrimSel);
+    SRSS_PWR_MISCLDO_CTL = miscldoCtl;
 
     return Cy_SysPm_MiscLdoStatus();
 }

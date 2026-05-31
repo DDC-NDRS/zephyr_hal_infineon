@@ -396,23 +396,21 @@ static uint32_t SfdpFindParameterHeader(uint32_t id, uint8_t const sfdpBuffer[])
     uint32_t headerOffset = PARAMETER_IS_NOT_FOUND;
     uint32_t maxMinorRevision = 0UL;
     uint32_t sfdpAddress = FIRST_HEADER_OFFSET; /* Begin from 1st Parameter Header */
+    uint32_t headerLimit = ((uint32_t)sfdpBuffer[PARAM_HEADERS_NUM] * HEADER_LENGTH) + FIRST_HEADER_OFFSET;
 
-    while (sfdpAddress <= (((uint32_t)sfdpBuffer[PARAM_HEADERS_NUM] *
-                                        HEADER_LENGTH) +
-                                        FIRST_HEADER_OFFSET))
+    while (sfdpAddress <= headerLimit)
     {
         /* Check parameter ID */
         if (((id & PARAM_ID_LSB_MASK) == sfdpBuffer[sfdpAddress]) &&  /* Parameter ID LSB */
             (((id >> PARAM_ID_MSB_OFFSET) & PARAM_ID_LSB_MASK) ==
-                    sfdpBuffer[sfdpAddress +  /* Parameter ID MSB */
-                    PARAM_ID_MSB_REL_OFFSET]))
+                    sfdpBuffer[sfdpAddress + PARAM_ID_MSB_REL_OFFSET]))  /* Parameter ID MSB */
         {
             /* Check parameter major and minor revisions */
-            if ((sfdpBuffer[sfdpAddress + PARAM_MINOR_REV_REL_OFFSET] >= maxMinorRevision) &&
+            uint8_t minorRev = sfdpBuffer[sfdpAddress + PARAM_MINOR_REV_REL_OFFSET];
+            if ((minorRev >= maxMinorRevision) &&
                 (sfdpBuffer[sfdpAddress + PARAM_MAJOR_REV_REL_OFFSET] == CY_SMIF_SFDP_MAJOR_REV_1))
             {
-                /* Get the maximum minor revision */
-                maxMinorRevision = sfdpBuffer[sfdpAddress + PARAM_MINOR_REV_REL_OFFSET];
+                maxMinorRevision = minorRev;
 
                 /* Save the the Parameter Header offset with the maximum minor revision */
                 headerOffset = sfdpAddress;
@@ -1934,13 +1932,13 @@ static cy_en_smif_status_t SfdpEnterFourByteAddressing(SMIF_Type *base, uint8_t 
 static void SfdpGetEraseSizeAndCmd(uint8_t const sfdpBuffer[],
                                    cy_stc_smif_erase_type_t eraseType[])
 {
-    uint32_t idx = 0UL;
     for (uint32_t currET = 0UL; currET < ERASE_TYPE_COUNT; currET++)
     {
+        uint32_t offset = currET * TYPE_STEP;
+
         /* The erase size in the SFDP buffer defined as power of two */
-        eraseType[currET].eraseSize = 1UL << sfdpBuffer[CY_SMIF_SFDP_BFPT_BYTE_1C + idx];
-        eraseType[currET].eraseCmd = sfdpBuffer[CY_SMIF_SFDP_BFPT_BYTE_1D + idx];
-        idx += TYPE_STEP;
+        eraseType[currET].eraseSize = 1UL << sfdpBuffer[CY_SMIF_SFDP_BFPT_BYTE_1C + offset];
+        eraseType[currET].eraseCmd  = sfdpBuffer[CY_SMIF_SFDP_BFPT_BYTE_1D + offset];
     }
 }
 
@@ -2125,20 +2123,21 @@ static cy_en_smif_status_t SfdpPopulateRegionInfo(SMIF_Type *base,
                 regionSize = ((*( (uint32_t*) &sectorMapBuff[currTableIdx]) >> BITS_IN_BYTE) + 1UL) * SECTOR_MAP_REGION_SIZE_MULTIPLIER;
                 CY_MISRA_BLOCK_END('MISRA C-2012 Rule 11.3')
                 currRegionPtr = device->hybridRegionInfo[currRegion];
+                cy_stc_smif_erase_type_t const *et = &eraseType[supportedEraseType];
 
                 currRegionPtr->regionAddress = currRegionAddr;
-                currRegionPtr->eraseCmd = (uint32_t)eraseType[supportedEraseType].eraseCmd;
-                currRegionPtr->eraseTime = eraseType[supportedEraseType].eraseTime;
-                if(regionSize < eraseType[supportedEraseType].eraseSize)
+                currRegionPtr->eraseCmd  = (uint32_t)et->eraseCmd;
+                currRegionPtr->eraseTime = et->eraseTime;
+                if(regionSize < et->eraseSize)
                 {
                     /* One region with a single sector */
-                    currRegionPtr->eraseSize = regionSize;
+                    currRegionPtr->eraseSize    = regionSize;
                     currRegionPtr->sectorsCount = 1UL;
                 }
                 else
                 {
-                    currRegionPtr->eraseSize = eraseType[supportedEraseType].eraseSize;
-                    currRegionPtr->sectorsCount = regionSize / eraseType[supportedEraseType].eraseSize;
+                    currRegionPtr->eraseSize    = et->eraseSize;
+                    currRegionPtr->sectorsCount = regionSize / et->eraseSize;
                 }
             }
         }

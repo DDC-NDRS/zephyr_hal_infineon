@@ -136,8 +136,9 @@ cy_en_smif_status_t Cy_SMIF_MemInit(SMIF_Type *base,
                    In case of power consumption impact we have to optimize this setting */
                 SMIF_CLK_DRIVE_STRENGTH(base) = ((CY_GPIO_DRIVE_FULL) | (CY_GPIO_DRIVE_FULL << 8U));
                 SMIF_RWDS_DRIVE_STRENGTH(base) = CY_GPIO_DRIVE_FULL;
-                SMIF_DEVICE_IDX_RX_CAPTURE_CONFIG(base, idx) |= _VAL2FLD(SMIF_CORE_DEVICE_RX_CAPTURE_CONFIG_NEG_SDL_TAP_SEL, 1U);
-                SMIF_DEVICE_IDX_RX_CAPTURE_CONFIG(base, idx) |= _VAL2FLD(SMIF_CORE_DEVICE_RX_CAPTURE_CONFIG_POS_SDL_TAP_SEL, 1U);
+                SMIF_DEVICE_IDX_RX_CAPTURE_CONFIG(base, idx) |=
+                    _VAL2FLD(SMIF_CORE_DEVICE_RX_CAPTURE_CONFIG_NEG_SDL_TAP_SEL, 1U) |
+                    _VAL2FLD(SMIF_CORE_DEVICE_RX_CAPTURE_CONFIG_POS_SDL_TAP_SEL, 1U);
 
                 /* SPI(deviceCfg) and Hyperbus(hbdeviceCfg) are mutually exclusive and if both are initialized, priority would be for SPI(deviceCfg) */
                 if(memCfg->deviceCfg != NULL)
@@ -418,45 +419,46 @@ bool Cy_SMIF_MemIsBusy(SMIF_Type *base, cy_stc_smif_mem_config_t const *memDevic
     cy_en_smif_status_t readStsResult = CY_SMIF_CMD_NOT_FOUND;
     cy_stc_smif_mem_device_cfg_t* device =  memDevice->deviceCfg;
 
-    if(NULL != device->readStsRegWipCmd)
+    cy_stc_smif_mem_cmd_t* wipCmd = device->readStsRegWipCmd;
+    if (NULL != wipCmd)
     {
-        if (device->readStsRegWipCmd->cmdWidth == CY_SMIF_WIDTH_OCTAL)
+        if (wipCmd->cmdWidth == CY_SMIF_WIDTH_OCTAL)
         {
             uint8_t addr_param[4] = {0};
             /* Read the memory status register */
             readStsResult = Cy_SMIF_TransmitCommand_Ext( base,
-                        (uint16_t)(device->readStsRegWipCmd->command | (device->readStsRegWipCmd->commandH << 8)),
+                        (uint16_t)(wipCmd->command | (wipCmd->commandH << 8)),
                         true,
-                        device->readStsRegWipCmd->cmdWidth,
-                        device->readStsRegWipCmd->cmdRate,
+                        wipCmd->cmdWidth,
+                        wipCmd->cmdRate,
                         addr_param, sizeof(addr_param),
-                        device->readStsRegWipCmd->addrWidth,
-                        device->readStsRegWipCmd->addrRate,
+                        wipCmd->addrWidth,
+                        wipCmd->addrRate,
                         memDevice->slaveSelect,
                         CY_SMIF_TX_NOT_LAST_BYTE,
                         context);
 
-            if ((CY_SMIF_SUCCESS == readStsResult) &&  (device->readStsRegWipCmd->dummyCycles > 0U))
+            if ((CY_SMIF_SUCCESS == readStsResult) && (wipCmd->dummyCycles > 0U))
             {
                 readStsResult = Cy_SMIF_SendDummyCycles_Ext(base,
-                    device->readStsRegWipCmd->addrWidth,
-                    device->readStsRegWipCmd->addrRate,
-                    device->readStsRegWipCmd->dummyCycles);
+                    wipCmd->addrWidth,
+                    wipCmd->addrRate,
+                    wipCmd->dummyCycles);
             }
             if (CY_SMIF_SUCCESS == readStsResult)
             {
                 readStsResult = Cy_SMIF_ReceiveDataBlocking_Ext( base, (uint8_t *)&status,
-                                        (device->readStsRegWipCmd->cmdRate == CY_SMIF_DDR) ? 2U : 1U,
-                                           device->readStsRegWipCmd->cmdWidth,
-                                           device->readStsRegWipCmd->cmdRate,
+                                        (wipCmd->cmdRate == CY_SMIF_DDR) ? 2U : 1U,
+                                           wipCmd->cmdWidth,
+                                           wipCmd->cmdRate,
                                            context);
             }
 
         }
         else
         {
-             readStsResult = Cy_SMIF_MemCmdReadStatus(base, memDevice,  (uint8_t *)&status,
-                            (uint8_t)device->readStsRegWipCmd->command,
+             readStsResult = Cy_SMIF_MemCmdReadStatus(base, memDevice, (uint8_t *)&status,
+                            (uint8_t)wipCmd->command,
                             context);
         }
     }
@@ -924,7 +926,7 @@ cy_en_smif_status_t Cy_SMIF_MemCmdSectorErase(SMIF_Type *base,
         {
             uint16_t eraseCommand = (uint16_t)((result == CY_SMIF_SUCCESS) ? (hybrInfo->eraseCmd) : (cmdErase->command));
             uint16_t eraseCommandH = (uint16_t)((result == CY_SMIF_SUCCESS) ? (hybrInfo->eraseCmd) : (cmdErase->commandH));
-            if (device->eraseCmd->cmdWidth != CY_SMIF_WIDTH_OCTAL)
+            if (cmdErase->cmdWidth != CY_SMIF_WIDTH_OCTAL)
             {
                 result = Cy_SMIF_TransmitCommand( base, (uint8_t)eraseCommand,
                         cmdErase->cmdWidth, sectorAddr, device->numOfAddrBytes,
@@ -1331,6 +1333,8 @@ cy_en_smif_status_t Cy_SMIF_MemIsReady(SMIF_Type *base, cy_stc_smif_mem_config_t
 
     CY_ASSERT_L1(NULL != context);
 
+    bool xipEnabled = (_FLD2VAL(SMIF_CTL_XIP_MODE, SMIF_CTL(base)) != 0U);
+
     if (context->memReadyPollDelay > 0U)
     {
         if (isBusy)
@@ -1339,7 +1343,7 @@ cy_en_smif_status_t Cy_SMIF_MemIsReady(SMIF_Type *base, cy_stc_smif_mem_config_t
             do
             {
                 /* Avoid using weak function if XIP is enabled */
-                if (_FLD2VAL(SMIF_CTL_XIP_MODE, SMIF_CTL(base)) != 0U)
+                if (xipEnabled)
                 {
                     Cy_SysLib_DelayUs(pollingDelay);
                 }
@@ -1379,7 +1383,7 @@ cy_en_smif_status_t Cy_SMIF_MemIsReady(SMIF_Type *base, cy_stc_smif_mem_config_t
                 delayUs = (uint16_t) (timeoutSlice % 1000UL);
 
                 /* Avoid using weak function if XIP is enabled */
-                if (_FLD2VAL(SMIF_CTL_XIP_MODE, SMIF_CTL(base)) != 0U)
+                if (xipEnabled)
                 {
                     Cy_SysLib_Delay(delayMs);
                     Cy_SysLib_DelayUs(delayUs);
