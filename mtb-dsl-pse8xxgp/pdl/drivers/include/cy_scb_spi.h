@@ -644,8 +644,8 @@ typedef struct cy_stc_scb_spi_context
 * \addtogroup group_scb_spi_general_functions
 * \{
 */
-cy_en_scb_spi_status_t Cy_SCB_SPI_Init(CySCB_Type *base, cy_stc_scb_spi_config_t const *config,
-                                       cy_stc_scb_spi_context_t *context);
+void Cy_SCB_SPI_Init(CySCB_Type *base, cy_stc_scb_spi_config_t const *config,
+                     cy_stc_scb_spi_context_t *context);
 void Cy_SCB_SPI_DeInit (CySCB_Type *base);
 __STATIC_INLINE void Cy_SCB_SPI_Enable(CySCB_Type *base);
 void Cy_SCB_SPI_Disable(CySCB_Type *base, cy_stc_scb_spi_context_t *context);
