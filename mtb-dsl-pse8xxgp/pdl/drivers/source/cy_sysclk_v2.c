@@ -5884,27 +5884,29 @@ cy_en_sysclk_status_t Cy_SysClk_DpllLpManualConfigure(uint32_t pllNum, cy_stc_pl
     CY_UNUSED_PARAMETER(pllNum);
     CY_UNUSED_PARAMETER(config);
 
+    cy_stc_dpll_lp_config_t* lpPllCfg = config->lpPllCfg;
+
     #if defined(CY_IP_MXS22SRSS) && CY_IP_MXS22SRSS_VERSION_MINOR == (1u)
     /* Overwrite with default values as personality generated config structure not updated */
-    config->lpPllCfg->sscgDepth    = CY_SYSCLK_DPLL_LP_CONFIG3_SSCG_DEPTH;
-    config->lpPllCfg->sscgRate     = (uint8_t)CY_SYSCLK_DPLL_LP_CONFIG3_SSCG_RATE;
-    config->lpPllCfg->sscgDitherEn = CY_SYSCLK_DPLL_LP_CONFIG3_SSCG_DITHER_EN;
-    config->lpPllCfg->sscgMode     = CY_SYSCLK_DPLL_LP_CONFIG3_SSCG_MODE;
-    config->lpPllCfg->sscgEn       = CY_SYSCLK_DPLL_LP_CONFIG3_SSCG_EN;
-    config->lpPllCfg->dcoCode      = CY_SYSCLK_DPLL_LP_CONFIG4_DCO_CODE;
-    config->lpPllCfg->pllTg        = CY_SYSCLK_DPLL_LP_CONFIG4_PLL_TG;
-    config->lpPllCfg->kiInt        = CY_SYSCLK_DPLL_LP_CONFIG5_KI_INT;
-    config->lpPllCfg->kpInt        = CY_SYSCLK_DPLL_LP_CONFIG5_KP_INT;
-    config->lpPllCfg->kiAccInt     = CY_SYSCLK_DPLL_LP_CONFIG5_KI_ACC_INT;
-    config->lpPllCfg->kpAccInt     = CY_SYSCLK_DPLL_LP_CONFIG5_KP_ACC_INT;
-    config->lpPllCfg->kiFrac       = CY_SYSCLK_DPLL_LP_CONFIG6_KI_FRAC;
-    config->lpPllCfg->kpFrac       = CY_SYSCLK_DPLL_LP_CONFIG6_KP_FRAC;
-    config->lpPllCfg->kiAccFrac    = CY_SYSCLK_DPLL_LP_CONFIG6_KI_ACC_FRAC;
-    config->lpPllCfg->kpAccFrac    = CY_SYSCLK_DPLL_LP_CONFIG6_KP_ACC_FRAC;
-    config->lpPllCfg->kiSscg       = CY_SYSCLK_DPLL_LP_CONFIG7_KI_SSCG;
-    config->lpPllCfg->kpSscg       = CY_SYSCLK_DPLL_LP_CONFIG7_KP_SSCG;
-    config->lpPllCfg->kiAccSscg    = CY_SYSCLK_DPLL_LP_CONFIG7_KI_ACC_SSCG;
-    config->lpPllCfg->kpAccSscg    = CY_SYSCLK_DPLL_LP_CONFIG7_KP_ACC_SSCG;
+    lpPllCfg->sscgDepth    = CY_SYSCLK_DPLL_LP_CONFIG3_SSCG_DEPTH;
+    lpPllCfg->sscgRate     = (uint8_t)CY_SYSCLK_DPLL_LP_CONFIG3_SSCG_RATE;
+    lpPllCfg->sscgDitherEn = CY_SYSCLK_DPLL_LP_CONFIG3_SSCG_DITHER_EN;
+    lpPllCfg->sscgMode     = CY_SYSCLK_DPLL_LP_CONFIG3_SSCG_MODE;
+    lpPllCfg->sscgEn       = CY_SYSCLK_DPLL_LP_CONFIG3_SSCG_EN;
+    lpPllCfg->dcoCode      = CY_SYSCLK_DPLL_LP_CONFIG4_DCO_CODE;
+    lpPllCfg->pllTg        = CY_SYSCLK_DPLL_LP_CONFIG4_PLL_TG;
+    lpPllCfg->kiInt        = CY_SYSCLK_DPLL_LP_CONFIG5_KI_INT;
+    lpPllCfg->kpInt        = CY_SYSCLK_DPLL_LP_CONFIG5_KP_INT;
+    lpPllCfg->kiAccInt     = CY_SYSCLK_DPLL_LP_CONFIG5_KI_ACC_INT;
+    lpPllCfg->kpAccInt     = CY_SYSCLK_DPLL_LP_CONFIG5_KP_ACC_INT;
+    lpPllCfg->kiFrac       = CY_SYSCLK_DPLL_LP_CONFIG6_KI_FRAC;
+    lpPllCfg->kpFrac       = CY_SYSCLK_DPLL_LP_CONFIG6_KP_FRAC;
+    lpPllCfg->kiAccFrac    = CY_SYSCLK_DPLL_LP_CONFIG6_KI_ACC_FRAC;
+    lpPllCfg->kpAccFrac    = CY_SYSCLK_DPLL_LP_CONFIG6_KP_ACC_FRAC;
+    lpPllCfg->kiSscg       = CY_SYSCLK_DPLL_LP_CONFIG7_KI_SSCG;
+    lpPllCfg->kpSscg       = CY_SYSCLK_DPLL_LP_CONFIG7_KP_SSCG;
+    lpPllCfg->kiAccSscg    = CY_SYSCLK_DPLL_LP_CONFIG7_KI_ACC_SSCG;
+    lpPllCfg->kpAccSscg    = CY_SYSCLK_DPLL_LP_CONFIG7_KP_ACC_SSCG;
     #endif
 
     #if (CY_SRSS_DPLL_LP_PRESENT != 0U)
@@ -5916,110 +5918,110 @@ cy_en_sysclk_status_t Cy_SysClk_DpllLpManualConfigure(uint32_t pllNum, cy_stc_pl
         retVal = CY_SYSCLK_INVALID_STATE;
     }
     /* valid divider bitfield values */
-    else if ((config->lpPllCfg->outputDiv < CY_SYSCLK_DPLL_LP_MIN_OUTPUT_DIV) ||
-             (CY_SYSCLK_DPLL_LP_MAX_OUTPUT_DIV < config->lpPllCfg->outputDiv) ||
-             (config->lpPllCfg->referenceDiv < CY_SYSCLK_DPLL_LP_MIN_REF_DIV) ||
-             (CY_SYSCLK_DPLL_LP_MAX_REF_DIV < config->lpPllCfg->referenceDiv) ||
-             (config->lpPllCfg->feedbackDiv < CY_SYSCLK_DPLL_LP_MIN_FB_DIV) ||
-             (CY_SYSCLK_DPLL_LP_MAX_FB_DIV < config->lpPllCfg->feedbackDiv)) {
+    else if ((lpPllCfg->outputDiv < CY_SYSCLK_DPLL_LP_MIN_OUTPUT_DIV) ||
+             (CY_SYSCLK_DPLL_LP_MAX_OUTPUT_DIV < lpPllCfg->outputDiv) ||
+             (lpPllCfg->referenceDiv < CY_SYSCLK_DPLL_LP_MIN_REF_DIV) ||
+             (CY_SYSCLK_DPLL_LP_MAX_REF_DIV < lpPllCfg->referenceDiv) ||
+             (lpPllCfg->feedbackDiv < CY_SYSCLK_DPLL_LP_MIN_FB_DIV) ||
+             (CY_SYSCLK_DPLL_LP_MAX_FB_DIV < lpPllCfg->feedbackDiv)) {
         retVal = CY_SYSCLK_BAD_PARAM;
     }
     else {
         /* If output mode is bypass (input routed directly to output), then done.
            The output frequency equals the input frequency regardless of the frequency parameters. */
-        if (config->lpPllCfg->outputMode != CY_SYSCLK_FLLPLL_OUTPUT_INPUT) {
+        if (lpPllCfg->outputMode != CY_SYSCLK_FLLPLL_OUTPUT_INPUT) {
             SRSS_CLK_DPLL_LP_CONFIG(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG_FEEDBACK_DIV, config->lpPllCfg->feedbackDiv) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG_REFERENCE_DIV, config->lpPllCfg->referenceDiv) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG_OUTPUT_DIV, config->lpPllCfg->outputDiv) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG_FEEDBACK_DIV, lpPllCfg->feedbackDiv) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG_REFERENCE_DIV, lpPllCfg->referenceDiv) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG_OUTPUT_DIV, lpPllCfg->outputDiv) |
                 #if defined(CY_IP_MXS22SRSS)
-                _VAL2FLD(CLK_DPLL_LP_CONFIG_PLL_DCO_MODE, config->lpPllCfg->pllDcoMode);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG_PLL_DCO_MODE, lpPllCfg->pllDcoMode);
                 #else
-                _VAL2FLD(CLK_DPLL_LP_CONFIG_PLL_DCO_CODE_MULT, config->lpPllCfg->pllDcoMode);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG_PLL_DCO_CODE_MULT, lpPllCfg->pllDcoMode);
                 #endif
 
             SRSS_CLK_DPLL_LP_CONFIG2(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG2_FRAC_DIV, config->lpPllCfg->fracDiv) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG2_FRAC_DITHER_EN, config->lpPllCfg->fracDitherEn) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG2_FRAC_EN, config->lpPllCfg->fracEn);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG2_FRAC_DIV, lpPllCfg->fracDiv) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG2_FRAC_DITHER_EN, lpPllCfg->fracDitherEn) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG2_FRAC_EN, lpPllCfg->fracEn);
 
             SRSS_CLK_DPLL_LP_CONFIG3(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG3_SSCG_DEPTH, config->lpPllCfg->sscgDepth) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG3_SSCG_RATE, config->lpPllCfg->sscgRate) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG3_SSCG_DITHER_EN, config->lpPllCfg->sscgDitherEn) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG3_SSCG_MODE, config->lpPllCfg->sscgMode) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG3_SSCG_EN, config->lpPllCfg->sscgEn);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG3_SSCG_DEPTH, lpPllCfg->sscgDepth) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG3_SSCG_RATE, lpPllCfg->sscgRate) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG3_SSCG_DITHER_EN, lpPllCfg->sscgDitherEn) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG3_SSCG_MODE, lpPllCfg->sscgMode) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG3_SSCG_EN, lpPllCfg->sscgEn);
 
             #if defined(CY_IP_MXS22SRSS) && CY_IP_MXS22SRSS_VERSION_MINOR == (0u)
             SRSS_CLK_DPLL_LP_CONFIG4(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_DCO_CODE, config->lpPllCfg->dcoCode) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_PLL_CS_PB2_DIS, config->lpPllCfg->disableBias) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_DCO_SD_EN, config->lpPllCfg->enableDcoSd);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_DCO_CODE, lpPllCfg->dcoCode) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_PLL_CS_PB2_DIS, lpPllCfg->disableBias) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_DCO_SD_EN, lpPllCfg->enableDcoSd);
 
             SRSS_CLK_DPLL_LP_CONFIG5(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_INT, config->lpPllCfg->kiInt)    |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_FRACT, config->lpPllCfg->kiFrac) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_SSCG, config->lpPllCfg->kiSscg)  |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_INT, config->lpPllCfg->kpInt)    |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_FRACT, config->lpPllCfg->kpFrac) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_SSCG, config->lpPllCfg->kpSscg);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_INT, lpPllCfg->kiInt)    |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_FRACT, lpPllCfg->kiFrac) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_SSCG, lpPllCfg->kiSscg)  |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_INT, lpPllCfg->kpInt)    |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_FRACT, lpPllCfg->kpFrac) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_SSCG, lpPllCfg->kpSscg);
             #elif defined(CY_IP_MXS22SRSS) && CY_IP_MXS22SRSS_VERSION_MINOR == (1u)
             SRSS_CLK_DPLL_LP_CONFIG4(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_DCO_CODE, config->lpPllCfg->dcoCode) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_PLL_CS_PB2_DIS, config->lpPllCfg->disableBias) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_PLL_TG, config->lpPllCfg->pllTg);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_DCO_CODE, lpPllCfg->dcoCode) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_PLL_CS_PB2_DIS, lpPllCfg->disableBias) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_PLL_TG, lpPllCfg->pllTg);
 
             SRSS_CLK_DPLL_LP_CONFIG5(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_INT, config->lpPllCfg->kiInt) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_INT, config->lpPllCfg->kpInt) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_ACC_INT, config->lpPllCfg->kiAccInt) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_ACC_INT, config->lpPllCfg->kpAccInt) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_PWRUP_ACC_INT, config->lpPllCfg->pwrupAccInt);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_INT, lpPllCfg->kiInt) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_INT, lpPllCfg->kpInt) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_ACC_INT, lpPllCfg->kiAccInt) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_ACC_INT, lpPllCfg->kpAccInt) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_PWRUP_ACC_INT, lpPllCfg->pwrupAccInt);
 
             SRSS_CLK_DPLL_LP_CONFIG6(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KI_FRACT, config->lpPllCfg->kiFrac) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KP_FRACT, config->lpPllCfg->kpFrac) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KI_ACC_FRACT, config->lpPllCfg->kiAccFrac) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KP_ACC_FRACT, config->lpPllCfg->kpAccFrac) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG6_PWRUP_ACC_FRACT, config->lpPllCfg->pwrupAccFrac);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KI_FRACT, lpPllCfg->kiFrac) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KP_FRACT, lpPllCfg->kpFrac) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KI_ACC_FRACT, lpPllCfg->kiAccFrac) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KP_ACC_FRACT, lpPllCfg->kpAccFrac) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG6_PWRUP_ACC_FRACT, lpPllCfg->pwrupAccFrac);
 
             SRSS_CLK_DPLL_LP_CONFIG7(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KI_SSCG, config->lpPllCfg->kiSscg) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KP_SSCG, config->lpPllCfg->kpSscg) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KI_ACC_SSCG, config->lpPllCfg->kiAccSscg) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KP_ACC_SSCG, config->lpPllCfg->kpAccSscg) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG7_PWRUP_ACC_SSCG, config->lpPllCfg->pwrupAccSscg);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KI_SSCG, lpPllCfg->kiSscg) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KP_SSCG, lpPllCfg->kpSscg) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KI_ACC_SSCG, lpPllCfg->kiAccSscg) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KP_ACC_SSCG, lpPllCfg->kpAccSscg) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG7_PWRUP_ACC_SSCG, lpPllCfg->pwrupAccSscg);
 
             #else
             SRSS_CLK_DPLL_LP_CONFIG4(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_DCO_CODE, config->lpPllCfg->dcoCode) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_ACC_MODE, config->lpPllCfg->accMode) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_TDC_MODE, config->lpPllCfg->tdcMode) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_PLL_TG, config->lpPllCfg->pllTg) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG4_ACC_CNT_LOCK, config->lpPllCfg->accCntLock);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_DCO_CODE, lpPllCfg->dcoCode) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_ACC_MODE, lpPllCfg->accMode) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_TDC_MODE, lpPllCfg->tdcMode) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_PLL_TG, lpPllCfg->pllTg) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG4_ACC_CNT_LOCK, lpPllCfg->accCntLock);
 
             SRSS_CLK_DPLL_LP_CONFIG5(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_INT, config->lpPllCfg->kiInt) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_INT, config->lpPllCfg->kpInt) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_ACC_INT, config->lpPllCfg->kiAccInt) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_ACC_INT, config->lpPllCfg->kpAccInt);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_INT, lpPllCfg->kiInt) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_INT, lpPllCfg->kpInt) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KI_ACC_INT, lpPllCfg->kiAccInt) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG5_KP_ACC_INT, lpPllCfg->kpAccInt);
 
             SRSS_CLK_DPLL_LP_CONFIG6(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KI_FRACT, config->lpPllCfg->kiFrac) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KP_FRACT, config->lpPllCfg->kpFrac) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KI_ACC_FRACT, config->lpPllCfg->kiAccFrac) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KP_ACC_FRACT, config->lpPllCfg->kpAccFrac);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KI_FRACT, lpPllCfg->kiFrac) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KP_FRACT, lpPllCfg->kpFrac) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KI_ACC_FRACT, lpPllCfg->kiAccFrac) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG6_KP_ACC_FRACT, lpPllCfg->kpAccFrac);
 
             SRSS_CLK_DPLL_LP_CONFIG7(pllNum) =
-                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KI_SSCG, config->lpPllCfg->kiSscg) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KP_SSCG, config->lpPllCfg->kpSscg) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KI_ACC_SSCG, config->lpPllCfg->kiAccSscg) |
-                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KP_ACC_SSCG, config->lpPllCfg->kpAccSscg);
+                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KI_SSCG, lpPllCfg->kiSscg) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KP_SSCG, lpPllCfg->kpSscg) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KI_ACC_SSCG, lpPllCfg->kiAccSscg) |
+                _VAL2FLD(CLK_DPLL_LP_CONFIG7_KP_ACC_SSCG, lpPllCfg->kpAccSscg);
             #endif
         }
 
         CY_REG32_CLR_SET(SRSS_CLK_DPLL_LP_CONFIG(pllNum), CLK_DPLL_LP_CONFIG_BYPASS_SEL,
-                         (uint32_t)config->lpPllCfg->outputMode);
+                         (uint32_t)lpPllCfg->outputMode);
     }
 
     return (retVal);
@@ -6039,57 +6041,59 @@ cy_en_sysclk_status_t Cy_SysClk_DpllLpGetConfiguration(uint32_t pllNum, cy_stc_p
 
     /* Initialize config structure to 0 */
     *(config->lpPllCfg) = (cy_stc_dpll_lp_config_t) {0};
+    cy_stc_dpll_lp_config_t* lpPllCfg = config->lpPllCfg;
+    CLK_DPLL_LP_Type* DPLL_LP = &SRSS->CLK_DPLL_LP[pllNum];
 
-    uint32_t tempReg               = SRSS_CLK_DPLL_LP_CONFIG(pllNum);
-    config->lpPllCfg->feedbackDiv  = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG_FEEDBACK_DIV, tempReg);
-    config->lpPllCfg->referenceDiv = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG_REFERENCE_DIV, tempReg);
-    config->lpPllCfg->outputDiv    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG_OUTPUT_DIV, tempReg);
+    uint32_t tempReg = DPLL_LP->CONFIG;
+    lpPllCfg->feedbackDiv  = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG_FEEDBACK_DIV, tempReg);
+    lpPllCfg->referenceDiv = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG_REFERENCE_DIV, tempReg);
+    lpPllCfg->outputDiv    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG_OUTPUT_DIV, tempReg);
     #if defined(CY_IP_MXS22SRSS)
-    config->lpPllCfg->pllDcoMode = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG_PLL_DCO_MODE, tempReg);
+    lpPllCfg->pllDcoMode = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG_PLL_DCO_MODE, tempReg);
     #else
-    config->lpPllCfg->pllDcoMode = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG_PLL_DCO_CODE_MULT, tempReg);
+    lpPllCfg->pllDcoMode = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG_PLL_DCO_CODE_MULT, tempReg);
     #endif
 
-    config->lpPllCfg->outputMode =
+    lpPllCfg->outputMode =
         (cy_en_fll_pll_output_mode_t)((uint32_t)_FLD2VAL(CLK_DPLL_LP_CONFIG_BYPASS_SEL, tempReg));
 
-    tempReg                        = SRSS_CLK_DPLL_LP_CONFIG2(pllNum);
-    config->lpPllCfg->fracDiv      = _FLD2VAL(CLK_DPLL_LP_CONFIG2_FRAC_DIV, tempReg);
-    config->lpPllCfg->fracDitherEn = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG2_FRAC_DITHER_EN, tempReg);
-    config->lpPllCfg->fracEn       = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG2_FRAC_EN, tempReg);
+    tempReg = DPLL_LP->CONFIG2;
+    lpPllCfg->fracDiv      = _FLD2VAL(CLK_DPLL_LP_CONFIG2_FRAC_DIV, tempReg);
+    lpPllCfg->fracDitherEn = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG2_FRAC_DITHER_EN, tempReg);
+    lpPllCfg->fracEn       = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG2_FRAC_EN, tempReg);
 
-    tempReg                        = SRSS_CLK_DPLL_LP_CONFIG3(pllNum);
-    config->lpPllCfg->sscgDepth    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG3_SSCG_DEPTH, tempReg);
-    config->lpPllCfg->sscgRate     = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG3_SSCG_RATE, tempReg);
-    config->lpPllCfg->sscgDitherEn = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG3_SSCG_DITHER_EN, tempReg);
-    config->lpPllCfg->sscgMode     = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG3_SSCG_MODE, tempReg);
-    config->lpPllCfg->sscgEn       = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG3_SSCG_EN, tempReg);
+    tempReg = DPLL_LP->CONFIG3;
+    lpPllCfg->sscgDepth    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG3_SSCG_DEPTH, tempReg);
+    lpPllCfg->sscgRate     = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG3_SSCG_RATE, tempReg);
+    lpPllCfg->sscgDitherEn = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG3_SSCG_DITHER_EN, tempReg);
+    lpPllCfg->sscgMode     = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG3_SSCG_MODE, tempReg);
+    lpPllCfg->sscgEn       = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG3_SSCG_EN, tempReg);
 
     #if (defined(CY_IP_MXS40SSRSS) && (SRSS_NUM_TOTAL_PLL > 0UL))
-    tempReg                      = SRSS_CLK_DPLL_LP_CONFIG4(pllNum);
-    config->lpPllCfg->dcoCode    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG4_DCO_CODE, tempReg);
-    config->lpPllCfg->accMode    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG4_ACC_MODE, tempReg);
-    config->lpPllCfg->tdcMode    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG4_TDC_MODE, tempReg);
-    config->lpPllCfg->pllTg      = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG4_PLL_TG, tempReg);
-    config->lpPllCfg->accCntLock = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG4_ACC_CNT_LOCK, tempReg);
+    tempReg = DPLL_LP->CONFIG4;
+    lpPllCfg->dcoCode    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG4_DCO_CODE, tempReg);
+    lpPllCfg->accMode    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG4_ACC_MODE, tempReg);
+    lpPllCfg->tdcMode    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG4_TDC_MODE, tempReg);
+    lpPllCfg->pllTg      = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG4_PLL_TG, tempReg);
+    lpPllCfg->accCntLock = (bool)_FLD2VAL(CLK_DPLL_LP_CONFIG4_ACC_CNT_LOCK, tempReg);
 
-    tempReg                    = SRSS_CLK_DPLL_LP_CONFIG5(pllNum);
-    config->lpPllCfg->kiInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG5_KI_INT, tempReg);
-    config->lpPllCfg->kpInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG5_KP_INT, tempReg);
-    config->lpPllCfg->kiAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG5_KI_ACC_INT, tempReg);
-    config->lpPllCfg->kpAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG5_KP_ACC_INT, tempReg);
+    tempReg = DPLL_LP->CONFIG5;
+    lpPllCfg->kiInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG5_KI_INT, tempReg);
+    lpPllCfg->kpInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG5_KP_INT, tempReg);
+    lpPllCfg->kiAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG5_KI_ACC_INT, tempReg);
+    lpPllCfg->kpAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG5_KP_ACC_INT, tempReg);
 
-    tempReg                    = SRSS_CLK_DPLL_LP_CONFIG6(pllNum);
-    config->lpPllCfg->kiInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG6_KI_FRACT, tempReg);
-    config->lpPllCfg->kpInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG6_KP_FRACT, tempReg);
-    config->lpPllCfg->kiAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG6_KI_ACC_FRACT, tempReg);
-    config->lpPllCfg->kpAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG6_KP_ACC_FRACT, tempReg);
+    tempReg = DPLL_LP->CONFIG6;
+    lpPllCfg->kiInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG6_KI_FRACT, tempReg);
+    lpPllCfg->kpInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG6_KP_FRACT, tempReg);
+    lpPllCfg->kiAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG6_KI_ACC_FRACT, tempReg);
+    lpPllCfg->kpAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG6_KP_ACC_FRACT, tempReg);
 
-    tempReg                    = SRSS_CLK_DPLL_LP_CONFIG7(pllNum);
-    config->lpPllCfg->kiInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG7_KI_SSCG, tempReg);
-    config->lpPllCfg->kpInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG7_KP_SSCG, tempReg);
-    config->lpPllCfg->kiAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG7_KI_ACC_SSCG, tempReg);
-    config->lpPllCfg->kpAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG7_KP_ACC_SSCG, tempReg);
+    tempReg = DPLL_LP->CONFIG7;
+    lpPllCfg->kiInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG7_KI_SSCG, tempReg);
+    lpPllCfg->kpInt    = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG7_KP_SSCG, tempReg);
+    lpPllCfg->kiAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG7_KI_ACC_SSCG, tempReg);
+    lpPllCfg->kpAccInt = (uint8_t)_FLD2VAL(CLK_DPLL_LP_CONFIG7_KP_ACC_SSCG, tempReg);
     #endif
 
     retVal = CY_SYSCLK_SUCCESS;
@@ -6423,6 +6427,7 @@ Cy_SysClk_DpllHpManualConfigure(uint32_t pllNum, cy_stc_pll_manual_config_t cons
 
     #if (CY_SRSS_DPLL_HP_PRESENT)
     cy_en_sysclk_status_t retVal = CY_SYSCLK_SUCCESS;
+    cy_stc_dpll_hp_config_t* hpPllCfg = config->hpPllCfg;
 
     CY_ASSERT_L1(pllNum < SRSS_NUM_DPLL_LP);
 
@@ -6430,71 +6435,71 @@ Cy_SysClk_DpllHpManualConfigure(uint32_t pllNum, cy_stc_pll_manual_config_t cons
         retVal = CY_SYSCLK_INVALID_STATE;
     }
     /* valid divider bitfield values */
-    else if ((config->hpPllCfg->nDiv < (CY_SYSCLK_DPLL_HP_MIN_NDIV - 1U)) ||
-             ((CY_SYSCLK_DPLL_HP_MAX_NDIV - 1U) < config->hpPllCfg->nDiv) ||
-             ((CY_SYSCLK_DPLL_HP_MAX_PDIV - 1U) < config->hpPllCfg->pDiv) ||
-             ((CY_SYSCLK_DPLL_HP_MAX_KDIV - 1U) < config->hpPllCfg->kDiv)) {
+    else if ((hpPllCfg->nDiv < (CY_SYSCLK_DPLL_HP_MIN_NDIV - 1U)) ||
+             ((CY_SYSCLK_DPLL_HP_MAX_NDIV - 1U) < hpPllCfg->nDiv) ||
+             ((CY_SYSCLK_DPLL_HP_MAX_PDIV - 1U) < hpPllCfg->pDiv) ||
+             ((CY_SYSCLK_DPLL_HP_MAX_KDIV - 1U) < hpPllCfg->kDiv)) {
         retVal = CY_SYSCLK_BAD_PARAM;
     }
     else {
         /* If output mode is bypass (input routed directly to output), then done.
            The output frequency equals the input frequency regardless of the frequency parameters. */
-        if (config->hpPllCfg->outputMode != CY_SYSCLK_FLLPLL_OUTPUT_INPUT) {
+        if (hpPllCfg->outputMode != CY_SYSCLK_FLLPLL_OUTPUT_INPUT) {
             SRSS_CLK_DPLL_HP_CONFIG(pllNum) =
-                _VAL2FLD(CLK_DPLL_HP_CONFIG_PLL_FREQ_NDIV_INT_SEL, config->hpPllCfg->nDiv) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG_PLL_FREQ_PDIV_SEL, config->hpPllCfg->pDiv) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG_PLL_FREQ_KDIV_SEL, config->hpPllCfg->kDiv) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG_ENABLE, config->hpPllCfg->pllEn);
+                _VAL2FLD(CLK_DPLL_HP_CONFIG_PLL_FREQ_NDIV_INT_SEL, hpPllCfg->nDiv) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG_PLL_FREQ_PDIV_SEL, hpPllCfg->pDiv) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG_PLL_FREQ_KDIV_SEL, hpPllCfg->kDiv) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG_ENABLE, hpPllCfg->pllEn);
 
             SRSS_CLK_DPLL_HP_CONFIG2(pllNum) =
-                _VAL2FLD(CLK_DPLL_HP_CONFIG2_PLL_FREQ_NDIV_FRACT_SEL, config->hpPllCfg->nDivFract) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG2_PLL_FREQ_MODE_SEL, config->hpPllCfg->freqModeSel) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG2_PLL_IVR_TRIM, config->hpPllCfg->ivrTrim);
+                _VAL2FLD(CLK_DPLL_HP_CONFIG2_PLL_FREQ_NDIV_FRACT_SEL, hpPllCfg->nDivFract) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG2_PLL_FREQ_MODE_SEL, hpPllCfg->freqModeSel) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG2_PLL_IVR_TRIM, hpPllCfg->ivrTrim);
 
             SRSS_CLK_DPLL_HP_CONFIG3(pllNum) =
-                _VAL2FLD(CLK_DPLL_HP_CONFIG3_PLL_CLKR_SEL, config->hpPllCfg->clkrSel) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG3_PLL_FDSM_SEL, config->hpPllCfg->fdsmSel);
+                _VAL2FLD(CLK_DPLL_HP_CONFIG3_PLL_CLKR_SEL, hpPllCfg->clkrSel) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG3_PLL_FDSM_SEL, hpPllCfg->fdsmSel);
 
             SRSS_CLK_DPLL_HP_CONFIG4(pllNum) =
-                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_LF_LC_ALPHA, config->hpPllCfg->alphaCoarse) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_LF_LC_BETA, config->hpPllCfg->betaCoarse) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_EN_THRESH, config->hpPllCfg->flockThresh) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_WAITPER, config->hpPllCfg->flockWait) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_LK_THRESH, config->hpPllCfg->flockLkThres) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_LK_WAITPER, config->hpPllCfg->flockLkWait) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_OBSWIN, config->hpPllCfg->flockObs);
+                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_LF_LC_ALPHA, hpPllCfg->alphaCoarse) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_LF_LC_BETA, hpPllCfg->betaCoarse) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_EN_THRESH, hpPllCfg->flockThresh) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_WAITPER, hpPllCfg->flockWait) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_LK_THRESH, hpPllCfg->flockLkThres) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_LK_WAITPER, hpPllCfg->flockLkWait) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_OBSWIN, hpPllCfg->flockObs);
 
             SRSS_CLK_DPLL_HP_CONFIG5(pllNum) =
-                _VAL2FLD(CLK_DPLL_HP_CONFIG5_PLL_LF_ALPHA, config->hpPllCfg->alphaExt) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG5_PLL_LF_BETA, config->hpPllCfg->betaExt) |
-                _VAL2FLD(CLK_DPLL_HP_CONFIG5_PLL_LF_SET_PARAMS, config->hpPllCfg->lfEn);
+                _VAL2FLD(CLK_DPLL_HP_CONFIG5_PLL_LF_ALPHA, hpPllCfg->alphaExt) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG5_PLL_LF_BETA, hpPllCfg->betaExt) |
+                _VAL2FLD(CLK_DPLL_HP_CONFIG5_PLL_LF_SET_PARAMS, hpPllCfg->lfEn);
 
             SRSS_CLK_DPLL_HP_TRIGMOD(pllNum) =
-                _VAL2FLD(CLK_DPLL_HP_TRIGMOD_PLL_TRIMOD_FREQ, config->hpPllCfg->tmodFreq) |
-                _VAL2FLD(CLK_DPLL_HP_TRIGMOD_PLL_TRIMOD_GRD, config->hpPllCfg->tmodGrad);
+                _VAL2FLD(CLK_DPLL_HP_TRIGMOD_PLL_TRIMOD_FREQ, hpPllCfg->tmodFreq) |
+                _VAL2FLD(CLK_DPLL_HP_TRIGMOD_PLL_TRIMOD_GRD, hpPllCfg->tmodGrad);
 
             SRSS_CLK_DPLL_HP_TRIGMOD2(pllNum) =
-                _VAL2FLD(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_RATE, config->hpPllCfg->tmodRate) |
-                _VAL2FLD(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_EN, config->hpPllCfg->tmodEn) |
-                _VAL2FLD(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_STP, config->hpPllCfg->tmodStop);
+                _VAL2FLD(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_RATE, hpPllCfg->tmodRate) |
+                _VAL2FLD(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_EN, hpPllCfg->tmodEn) |
+                _VAL2FLD(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_STP, hpPllCfg->tmodStop);
 
             SRSS_CLK_DPLL_HP_STATUS(pllNum) =
-                _VAL2FLD(CLK_DPLL_HP_STATUS_LOCKED, config->hpPllCfg->pllLocked) |
-                _VAL2FLD(CLK_DPLL_HP_STATUS_UNLOCK_OCCURRED, config->hpPllCfg->pllUnlock) |
-                _VAL2FLD(CLK_DPLL_HP_STATUS_PLL_LOCKDET_RES, config->hpPllCfg->lockDetReset) |
-                _VAL2FLD(CLK_DPLL_HP_STATUS_PLL_LOCKDET_RES_ACK, config->hpPllCfg->lockDetRstAck);
+                _VAL2FLD(CLK_DPLL_HP_STATUS_LOCKED, hpPllCfg->pllLocked) |
+                _VAL2FLD(CLK_DPLL_HP_STATUS_UNLOCK_OCCURRED, hpPllCfg->pllUnlock) |
+                _VAL2FLD(CLK_DPLL_HP_STATUS_PLL_LOCKDET_RES, hpPllCfg->lockDetReset) |
+                _VAL2FLD(CLK_DPLL_HP_STATUS_PLL_LOCKDET_RES_ACK, hpPllCfg->lockDetRstAck);
 
             SRSS_CLK_DPLL_HP_DUTYCAL_CTRL(pllNum) =
-                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_DELTA, config->hpPllCfg->dcCalDelta) |
-                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTY_CAL_RATIO_OK, config->hpPllCfg->dcRatioStatus) |
-                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTY_CAL_OK, config->hpPllCfg->dcStatus) |
-                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_TARGET, config->hpPllCfg->dcTarget) |
-                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_CTRL_RG_EN, config->hpPllCfg->dcEnRingOsc) |
-                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_EN, config->hpPllCfg->dcEn);
+                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_DELTA, hpPllCfg->dcCalDelta) |
+                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTY_CAL_RATIO_OK, hpPllCfg->dcRatioStatus) |
+                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTY_CAL_OK, hpPllCfg->dcStatus) |
+                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_TARGET, hpPllCfg->dcTarget) |
+                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_CTRL_RG_EN, hpPllCfg->dcEnRingOsc) |
+                _VAL2FLD(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_EN, hpPllCfg->dcEn);
         }
 
         CY_REG32_CLR_SET(SRSS_CLK_DPLL_HP_CONFIG(pllNum), CLK_DPLL_HP_CONFIG_BYPASS_SEL,
-                         (uint32_t)config->hpPllCfg->outputMode);
+                         (uint32_t)hpPllCfg->outputMode);
     }
 
     return (retVal);
@@ -6514,62 +6519,64 @@ cy_en_sysclk_status_t Cy_SysClk_DpllHpGetConfiguration(uint32_t pllNum, cy_stc_p
 
     /* Initialize config structure to 0 */
     *(config->hpPllCfg) = (cy_stc_dpll_hp_config_t) {0};
+    cy_stc_dpll_hp_config_t* hpPllCfg = config->hpPllCfg;
+    CLK_DPLL_HP_Type* DPLL_HP = &SRSS->CLK_DPLL_HP[pllNum];
 
-    uint32_t tempReg       = SRSS_CLK_DPLL_HP_CONFIG(pllNum);
-    config->hpPllCfg->nDiv = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG_PLL_FREQ_NDIV_INT_SEL, tempReg);
-    config->hpPllCfg->pDiv = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG_PLL_FREQ_PDIV_SEL, tempReg);
-    config->hpPllCfg->kDiv = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG_PLL_FREQ_KDIV_SEL, tempReg);
-    config->hpPllCfg->outputMode =
+    uint32_t tempReg = DPLL_HP->CONFIG;
+    hpPllCfg->nDiv = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG_PLL_FREQ_NDIV_INT_SEL, tempReg);
+    hpPllCfg->pDiv = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG_PLL_FREQ_PDIV_SEL, tempReg);
+    hpPllCfg->kDiv = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG_PLL_FREQ_KDIV_SEL, tempReg);
+    hpPllCfg->outputMode =
         (cy_en_fll_pll_output_mode_t)((uint32_t)_FLD2VAL(CLK_DPLL_HP_CONFIG_BYPASS_SEL, tempReg));
-    config->hpPllCfg->pllEn = (bool)_FLD2VAL(CLK_DPLL_HP_CONFIG_ENABLE, tempReg);
+    hpPllCfg->pllEn = (bool)_FLD2VAL(CLK_DPLL_HP_CONFIG_ENABLE, tempReg);
 
-    tempReg                     = SRSS_CLK_DPLL_HP_CONFIG2(pllNum);
-    config->hpPllCfg->nDivFract = (uint32_t)_FLD2VAL(CLK_DPLL_HP_CONFIG2_PLL_FREQ_NDIV_FRACT_SEL, tempReg);
+    tempReg = DPLL_HP->CONFIG2;
+    hpPllCfg->nDivFract = (uint32_t)_FLD2VAL(CLK_DPLL_HP_CONFIG2_PLL_FREQ_NDIV_FRACT_SEL, tempReg);
     CY_MISRA_DEVIATE_LINE('MISRA C-2012 Rule 10.8',
                           'Cast of composite expression of essential type unsigned to essential type enum');
-    config->hpPllCfg->freqModeSel = (cy_en_wait_mode_select_t)_FLD2VAL(CLK_DPLL_HP_CONFIG2_PLL_FREQ_MODE_SEL, tempReg);
-    config->hpPllCfg->ivrTrim     = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG2_PLL_IVR_TRIM, tempReg);
+    hpPllCfg->freqModeSel = (cy_en_wait_mode_select_t)_FLD2VAL(CLK_DPLL_HP_CONFIG2_PLL_FREQ_MODE_SEL, tempReg);
+    hpPllCfg->ivrTrim     = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG2_PLL_IVR_TRIM, tempReg);
 
-    tempReg                   = SRSS_CLK_DPLL_HP_CONFIG3(pllNum);
-    config->hpPllCfg->clkrSel = (bool)_FLD2VAL(CLK_DPLL_HP_CONFIG3_PLL_CLKR_SEL, tempReg);
-    config->hpPllCfg->fdsmSel = (bool)_FLD2VAL(CLK_DPLL_HP_CONFIG3_PLL_FDSM_SEL, tempReg);
+    tempReg = DPLL_HP->CONFIG3;
+    hpPllCfg->clkrSel = (bool)_FLD2VAL(CLK_DPLL_HP_CONFIG3_PLL_CLKR_SEL, tempReg);
+    hpPllCfg->fdsmSel = (bool)_FLD2VAL(CLK_DPLL_HP_CONFIG3_PLL_FDSM_SEL, tempReg);
 
-    tempReg                        = SRSS_CLK_DPLL_HP_CONFIG4(pllNum);
-    config->hpPllCfg->alphaCoarse  = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_LF_LC_ALPHA, tempReg);
-    config->hpPllCfg->betaCoarse   = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_LF_LC_BETA, tempReg);
-    config->hpPllCfg->flockThresh  = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_EN_THRESH, tempReg);
-    config->hpPllCfg->flockWait    = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_WAITPER, tempReg);
-    config->hpPllCfg->flockLkThres = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_LK_THRESH, tempReg);
-    config->hpPllCfg->flockLkWait  = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_LK_WAITPER, tempReg);
-    config->hpPllCfg->flockObs     = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_OBSWIN, tempReg);
+    tempReg = DPLL_HP->CONFIG4;
+    hpPllCfg->alphaCoarse  = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_LF_LC_ALPHA, tempReg);
+    hpPllCfg->betaCoarse   = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_LF_LC_BETA, tempReg);
+    hpPllCfg->flockThresh  = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_EN_THRESH, tempReg);
+    hpPllCfg->flockWait    = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_WAITPER, tempReg);
+    hpPllCfg->flockLkThres = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_LK_THRESH, tempReg);
+    hpPllCfg->flockLkWait  = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_LK_WAITPER, tempReg);
+    hpPllCfg->flockObs     = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG4_PLL_FLOCK_OBSWIN, tempReg);
 
-    tempReg                    = SRSS_CLK_DPLL_HP_CONFIG5(pllNum);
-    config->hpPllCfg->alphaExt = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG5_PLL_LF_ALPHA, tempReg);
-    config->hpPllCfg->betaExt  = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG5_PLL_LF_BETA, tempReg);
-    config->hpPllCfg->lfEn     = (bool)_FLD2VAL(CLK_DPLL_HP_CONFIG5_PLL_LF_SET_PARAMS, tempReg);
+    tempReg = DPLL_HP->CONFIG5;
+    hpPllCfg->alphaExt = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG5_PLL_LF_ALPHA, tempReg);
+    hpPllCfg->betaExt  = (uint8_t)_FLD2VAL(CLK_DPLL_HP_CONFIG5_PLL_LF_BETA, tempReg);
+    hpPllCfg->lfEn     = (bool)_FLD2VAL(CLK_DPLL_HP_CONFIG5_PLL_LF_SET_PARAMS, tempReg);
 
-    tempReg                    = SRSS_CLK_DPLL_HP_TRIGMOD(pllNum);
-    config->hpPllCfg->tmodFreq = (uint16_t)_FLD2VAL(CLK_DPLL_HP_TRIGMOD_PLL_TRIMOD_FREQ, tempReg);
-    config->hpPllCfg->tmodGrad = (uint16_t)_FLD2VAL(CLK_DPLL_HP_TRIGMOD_PLL_TRIMOD_GRD, tempReg);
+    tempReg = DPLL_HP->TRIGMOD;
+    hpPllCfg->tmodFreq = (uint16_t)_FLD2VAL(CLK_DPLL_HP_TRIGMOD_PLL_TRIMOD_FREQ, tempReg);
+    hpPllCfg->tmodGrad = (uint16_t)_FLD2VAL(CLK_DPLL_HP_TRIGMOD_PLL_TRIMOD_GRD, tempReg);
 
-    tempReg                    = SRSS_CLK_DPLL_HP_TRIGMOD2(pllNum);
-    config->hpPllCfg->tmodRate = (uint32_t)_FLD2VAL(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_RATE, tempReg);
-    config->hpPllCfg->tmodEn   = (bool)_FLD2VAL(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_EN, tempReg);
-    config->hpPllCfg->tmodStop = (bool)_FLD2VAL(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_STP, tempReg);
+    tempReg = DPLL_HP->TRIGMOD2;
+    hpPllCfg->tmodRate = (uint32_t)_FLD2VAL(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_RATE, tempReg);
+    hpPllCfg->tmodEn   = (bool)_FLD2VAL(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_EN, tempReg);
+    hpPllCfg->tmodStop = (bool)_FLD2VAL(CLK_DPLL_HP_TRIGMOD2_PLL_TRIMOD_STP, tempReg);
 
-    tempReg                         = SRSS_CLK_DPLL_HP_STATUS(pllNum);
-    config->hpPllCfg->pllLocked     = (bool)_FLD2VAL(CLK_DPLL_HP_STATUS_LOCKED, tempReg);
-    config->hpPllCfg->pllUnlock     = (bool)_FLD2VAL(CLK_DPLL_HP_STATUS_UNLOCK_OCCURRED, tempReg);
-    config->hpPllCfg->lockDetReset  = (bool)_FLD2VAL(CLK_DPLL_HP_STATUS_PLL_LOCKDET_RES, tempReg);
-    config->hpPllCfg->lockDetRstAck = (bool)_FLD2VAL(CLK_DPLL_HP_STATUS_PLL_LOCKDET_RES_ACK, tempReg);
+    tempReg = DPLL_HP->STATUS;
+    hpPllCfg->pllLocked     = (bool)_FLD2VAL(CLK_DPLL_HP_STATUS_LOCKED, tempReg);
+    hpPllCfg->pllUnlock     = (bool)_FLD2VAL(CLK_DPLL_HP_STATUS_UNLOCK_OCCURRED, tempReg);
+    hpPllCfg->lockDetReset  = (bool)_FLD2VAL(CLK_DPLL_HP_STATUS_PLL_LOCKDET_RES, tempReg);
+    hpPllCfg->lockDetRstAck = (bool)_FLD2VAL(CLK_DPLL_HP_STATUS_PLL_LOCKDET_RES_ACK, tempReg);
 
-    tempReg                         = SRSS_CLK_DPLL_HP_DUTYCAL_CTRL(pllNum);
-    config->hpPllCfg->dcCalDelta    = (uint8_t)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_DELTA, tempReg);
-    config->hpPllCfg->dcRatioStatus = (bool)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTY_CAL_RATIO_OK, tempReg);
-    config->hpPllCfg->dcStatus      = (bool)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTY_CAL_OK, tempReg);
-    config->hpPllCfg->dcTarget      = (uint16_t)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_TARGET, tempReg);
-    config->hpPllCfg->dcEnRingOsc   = (bool)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_CTRL_RG_EN, tempReg);
-    config->hpPllCfg->dcEn          = (bool)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_EN, tempReg);
+    tempReg = DPLL_HP->DUTYCAL_CTRL;
+    hpPllCfg->dcCalDelta    = (uint8_t)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_DELTA, tempReg);
+    hpPllCfg->dcRatioStatus = (bool)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTY_CAL_RATIO_OK, tempReg);
+    hpPllCfg->dcStatus      = (bool)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTY_CAL_OK, tempReg);
+    hpPllCfg->dcTarget      = (uint16_t)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_TARGET, tempReg);
+    hpPllCfg->dcEnRingOsc   = (bool)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_CTRL_RG_EN, tempReg);
+    hpPllCfg->dcEn          = (bool)_FLD2VAL(CLK_DPLL_HP_DUTYCAL_CTRL_PLL_DUTYCAL_EN, tempReg);
 
     retVal = CY_SYSCLK_SUCCESS;
 
