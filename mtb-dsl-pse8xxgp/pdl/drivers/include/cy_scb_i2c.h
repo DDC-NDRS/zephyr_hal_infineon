@@ -649,8 +649,8 @@ typedef struct cy_stc_scb_i2c_master_xfer_config
 * \addtogroup group_scb_i2c_general_functions
 * \{
 */
-cy_en_scb_i2c_status_t Cy_SCB_I2C_Init(CySCB_Type *base, cy_stc_scb_i2c_config_t const *config,
-                                       cy_stc_scb_i2c_context_t *context);
+void Cy_SCB_I2C_Init(CySCB_Type *base, cy_stc_scb_i2c_config_t const *config,
+                     cy_stc_scb_i2c_context_t *context);
 void Cy_SCB_I2C_DeInit(CySCB_Type *base);
 __STATIC_INLINE void Cy_SCB_I2C_Enable(CySCB_Type *base);
 void Cy_SCB_I2C_Disable(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
