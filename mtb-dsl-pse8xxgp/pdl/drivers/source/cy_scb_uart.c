@@ -255,8 +255,8 @@ void Cy_SCB_UART_SetEnableMsbFirst(CySCB_Type* base, bool enableMsbFirst) {
 * Ensure that the SCB block is disabled before calling this function.
 *
 *******************************************************************************/
-void Cy_SCB_UART_Init(CySCB_Type* base, cy_stc_scb_uart_config_t const* config,
-                      cy_stc_scb_uart_context_t* context) {
+cy_en_scb_uart_status_t Cy_SCB_UART_Init(CySCB_Type* base, cy_stc_scb_uart_config_t const* config,
+                                         cy_stc_scb_uart_context_t* context) {
     CY_ASSERT_L3(CY_SCB_UART_IS_MODE_VALID(config->uartMode));
     CY_ASSERT_L3(CY_SCB_UART_IS_STOP_BITS_VALID(config->stopBits));
     CY_ASSERT_L3(CY_SCB_UART_IS_PARITY_VALID(config->parity));
@@ -394,6 +394,8 @@ void Cy_SCB_UART_Init(CySCB_Type* base, cy_stc_scb_uart_config_t const* config,
         context->initKey = CY_SCB_UART_INIT_KEY;
         #endif /* !(NDEBUG) */
     }
+
+    return (CY_SCB_UART_SUCCESS);
 }
 
 /*******************************************************************************

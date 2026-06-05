@@ -597,8 +597,8 @@ typedef struct cy_stc_scb_uart_context
 * \addtogroup group_scb_uart_general_functions
 * \{
 */
-void Cy_SCB_UART_Init(CySCB_Type *base, cy_stc_scb_uart_config_t const *config,
-                      cy_stc_scb_uart_context_t *context);
+cy_en_scb_uart_status_t Cy_SCB_UART_Init(CySCB_Type *base, cy_stc_scb_uart_config_t const *config,
+                                         cy_stc_scb_uart_context_t *context);
 void Cy_SCB_UART_DeInit (CySCB_Type *base);
 __STATIC_INLINE void Cy_SCB_UART_Enable(CySCB_Type *base);
 void Cy_SCB_UART_Disable(CySCB_Type *base, cy_stc_scb_uart_context_t *context);
