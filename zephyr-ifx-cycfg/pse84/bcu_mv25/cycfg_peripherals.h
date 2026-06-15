@@ -4,15 +4,13 @@
  * Description:
  * Analog configuration
  * This file was automatically generated and should not be modified.
- * Configurator Backend 3.70.0
- * device-db 4.34.0.9502
- * ifx-mcuboot-pse84 1.1.0.349
- * ifx-tf-m 2.1.400.14138
- * mtb-dsl-pse8xxgp 1.2.0.895
+ * Configurator Backend 3.80.0
+ * device-db 4.37.0.10260
+ * mtb-dsl-pse8xxgp 1.5.0.1072
  *
  *******************************************************************************
- * Copyright 2026 Cypress Semiconductor Corporation (an Infineon company) or
- * an affiliate of Cypress Semiconductor Corporation.
+ * Copyright 2026, Infineon Technologies AG, or an affiliate of Infineon
+ * Technologies AG. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,16 +32,15 @@
 #include "cycfg_notices.h"
 #include "cy_autanalog.h"
 #include "cy_sysclk.h"
-#include "cy_pdm_pcm_v2.h"
-#include "cy_scb_i2c.h"
+#include "cy_i3c.h"
 #include "cy_scb_uart.h"
-#include "cy_scb_ezi2c.h"
 #include "cy_scb_spi.h"
+#include "cy_scb_i2c.h"
 #include "cy_sd_host.h"
+#include "cy_canfd.h"
 #include "cy_smif.h"
 #include "cycfg_qspi_memslot.h"
 #include "cy_mcwdt.h"
-#include "cy_tdm.h"
 #include "cy_tcpwm_counter.h"
 #include "cycfg_routing.h"
 #include "cy_tcpwm_pwm.h"
@@ -59,10 +56,10 @@
 extern "C" {
 #endif /* defined(__cplusplus) */
 
-#define CYBSP_AUTONOMOUS_ANALOG_ENABLED 1U
-#define AUTANALOG_CLOCK_DIV_PRIO_HS_DEFAULT 20
-#define CYBSP_AUTONOMOUS_ANALOG_lppass_IRQ pass_interrupt_lppass_IRQn
-#define CYBSP_AUTONOMOUS_ANALOG_fifo_IRQ pass_interrupt_fifo_IRQn
+#define BSP_ADC_ENABLED 1U
+#define AUTANALOG_CLOCK_DIV_PRIO_HS_DEFAULT 12
+#define BSP_ADC_lppass_IRQ pass_interrupt_lppass_IRQn
+#define BSP_ADC_fifo_IRQ pass_interrupt_fifo_IRQn
 #define CYBSP_AUTONOMOUS_CONTROLLER_ENABLED 1U
 #define CYBSP_SAR_ADC_ENABLED 1U
 #define CYBSP_AUTONOMOUS_CONTROLLER_STATE_0_ENABLED 1U
@@ -71,101 +68,237 @@ extern "C" {
 #define CYBSP_SAR_ADC_GPIO_CH_0_ENABLED 1U
 #define CYBSP_SAR_ADC_SCAN_GRP_0_ENABLED 1U
 #define CYBSP_SAR_ADC_SCAN_GRP_0_SCAN_0_ENABLED 1U
-#define CYBSP_PDM_ENABLED 1U
-#define CYBSP_PDM_HW PDM0
-#define CYBSP_PDM_CHANNEL_2_IRQ pdm_0_interrupts_2_IRQn
-#define CYBSP_PDM_CHANNEL_3_IRQ pdm_0_interrupts_3_IRQn
-#define CYBSP_I2C_CONTROLLER_ENABLED 1U
-#define CYBSP_I2C_CONTROLLER_HW SCB0
-#define CYBSP_I2C_CONTROLLER_IRQ scb_0_interrupt_IRQn
+#define CYBSP_ETH_IF_ENABLED 1U
+#define ETH_PHY_LAN8710AI 
+#define CYBSP_ETH_IF_PHY_ADDR 0
+#define CYBSP_ETH_IF_PHY_INTERFACE 1u
+#define CYBSP_ETH_IF_PHY_SPEED 3
+#define CYBSP_ETH_IF_PHY_MODE 2
+#define CYBSP_ETH_IF_MAC_ADDR0 0x00U
+#define CYBSP_ETH_IF_MAC_ADDR1 0x03U
+#define CYBSP_ETH_IF_MAC_ADDR2 0x19U
+#define CYBSP_ETH_IF_MAC_ADDR3 0x45U
+#define CYBSP_ETH_IF_MAC_ADDR4 0x00U
+#define CYBSP_ETH_IF_MAC_ADDR5 0x00U
+#define CYBSP_ETH_IF_MAC_ADDR (((uint64_t)CYBSP_ETH_IF_MAC_ADDR0<<0) | ((uint64_t)CYBSP_ETH_IF_MAC_ADDR1<<8) | ((uint64_t)CYBSP_ETH_IF_MAC_ADDR2<<16) | ((uint64_t)CYBSP_ETH_IF_MAC_ADDR3<<24) | ((uint64_t)CYBSP_ETH_IF_MAC_ADDR4<<32) | ((uint64_t)CYBSP_ETH_IF_MAC_ADDR5<<40))
+#define CYBSP_ETH_IF_STATIC_IP 0
+#define CYBSP_ETH_IF_MAC_CLOCK 0u
+#define CYBSP_ETH_IF_PROMISCUOUS_MODE false
+#define CYBSP_ETH_IF_ACCEPT_BROADCAST_FRAMES true
+#define CYBSP_ETH_IF_ETHERNET_INDEX 0
+#define CYBSP_ETH_IF_INTRSRC_Q0 (eth_interrupt_eth_0_IRQn)
+#define CYBSP_ETH_IF_INTRSRC_Q1 (eth_interrupt_eth_1_IRQn)
+#define CYBSP_ETH_IF_INTRSRC_Q2 (eth_interrupt_eth_2_IRQn)
+#define CYBSP_ETH_IF_INTRPRIORITY 3UL
+#define CYCFG_NETIF_NAME "bcu-mv25"
+#define CYCFG_TCPIP_THREAD_PRIO 4
+#define CYCFG_TCPIP_THREAD_STACKSIZE 4096
+#define CYCFG_IP_OPTIONS_ALLOWED 1
+#define CYCFG_LWIP_IPV6 1
+#define CYCFG_IP_FRAG 0
+#define CYCFG_IP_REASSEMBLY 0
+#define CYCFG_IP_DEFAULT_TTL 255
+#define CYCFG_ARP_TABLE_SIZE 10
+#define CYCFG_LWIP_AUTOIP 0
+#define CYCFG_LWIP_ICMP 1
+#define CYCFG_LWIP_IGMP 1
+#define CYCFG_LWIP_TCP 1
+#define CYCFG_TCP_MSS 1460
+#define CYCFG_TCP_WND 5840
+#define CYCFG_TCP_SND_BUF 5840
+#define CYCFG_TCP_SND_QUEUELEN 25
+#define CYCFG_LWIP_UDP 1
+#define CYCFG_MEM_SIZE 1600
+#define CYCFG_PBUF_POOL_SIZE 50
+#define CYCFG_MEMP_NUM_PBUF 16
+#define CYCFG_MEMP_NUM_RAW_PCB 4
+#define CYCFG_MEMP_NUM_UDP_PCB 8
+#define CYCFG_MEMP_NUM_TCP_PCB 8
+#define CYCFG_MEMP_NUM_TCP_PCB_LISTEN 1
+#define CYCFG_MEMP_NUM_TCP_SEG 27
+#define CYCFG_MEMP_NUM_ARP_QUEUE 30
+#define CYCFG_MEMP_NUM_NETBUF 8
+#define CYCFG_MEMP_NUM_NETCONN 16
+#define CYCFG_MEMP_NUM_TCPIP_MSG_API 8
+#define CYCFG_MEMP_NUM_TCPIP_MSG_INPKT 8
+#define CYBSP_I3C_CONTROLLER_ENABLED 1U
+#define CYBSP_I3C_CONTROLLER_HW I3C_CORE
+#define CYBSP_I3C_CONTROLLER_IRQ i3c_interrupt_IRQn
 #define CYBSP_DEBUG_UART_ENABLED 1U
-#define IFX_TFM_SPM_UART_ENABLED CYBSP_DEBUG_UART_ENABLED
-#define CYBSP_DEBUG_UART_HW SCB2
-#define IFX_TFM_SPM_UART_HW CYBSP_DEBUG_UART_HW
-#define CYBSP_DEBUG_UART_IRQ scb_2_interrupt_IRQn
-#define IFX_TFM_SPM_UART_IRQ CYBSP_DEBUG_UART_IRQ
+#define UART_LS_ENABLED CYBSP_DEBUG_UART_ENABLED
+#define CYBSP_DEBUG_UART_HW SCB1
+#define UART_LS_HW CYBSP_DEBUG_UART_HW
+#define CYBSP_DEBUG_UART_IRQ scb_1_interrupt_IRQn
+#define UART_LS_IRQ CYBSP_DEBUG_UART_IRQ
+#define UART_HS_ENABLED 1U
+#define UART_HS_HW SCB2
+#define UART_HS_IRQ scb_2_interrupt_IRQn
+#define PMIC_FRAM_IF_ENABLED 1U
+#define PMIC_FRAM_IF_HW SCB3
+#define PMIC_FRAM_IF_IRQ scb_3_interrupt_IRQn
 #define CYBSP_BT_UART_ENABLED 1U
 #define CYBSP_BT_UART_HW SCB4
 #define CYBSP_BT_UART_IRQ scb_4_interrupt_IRQn
-#define CYBSP_EZ_I2C_TARGET_ENABLED 1U
-#define CYBSP_EZ_I2C_TARGET_HW SCB5
-#define CYBSP_EZ_I2C_TARGET_IRQ scb_5_interrupt_IRQn
-#define CYBSP_SPI_CONTROLLER_ENABLED 1U
-#define CYBSP_SPI_CONTROLLER_HW SCB10
-#define CYBSP_SPI_CONTROLLER_IRQ scb_10_interrupt_IRQn
+#define BMS_COM2_IF_ENABLED 1U
+#define BMS_COM2_IF_HW SCB5
+#define BMS_COM2_IF_IRQ scb_5_interrupt_IRQn
+#define CYBSP_I2C_CONTROLLER_ENABLED 1U
+#define RTC_SE_IF_ENABLED CYBSP_I2C_CONTROLLER_ENABLED
+#define CYBSP_I2C_CONTROLLER_HW SCB6
+#define RTC_SE_IF_HW CYBSP_I2C_CONTROLLER_HW
+#define CYBSP_I2C_CONTROLLER_IRQ scb_6_interrupt_IRQn
+#define RTC_SE_IF_IRQ CYBSP_I2C_CONTROLLER_IRQ
+#define RS485_IF_ENABLED 1U
+#define RS485_IF_HW SCB8
+#define RS485_IF_IRQ scb_8_interrupt_IRQn
+#define MC33HB2000_IF_ENABLED 1U
+#define MC33HB2000_IF_HW SCB9
+#define MC33HB2000_IF_IRQ scb_9_interrupt_IRQn
+#define BMS_COM1_IF_ENABLED 1U
+#define BMS_COM1_IF_HW SCB11
+#define BMS_COM1_IF_IRQ scb_11_interrupt_IRQn
 #define CYBSP_WIFI_SDIO_ENABLED 1U
 #define CYBSP_WIFI_SDIO_HW SDHC0
 #define CYBSP_WIFI_SDIO_IRQ sdhc_0_interrupt_general_IRQn
-#define CYBSP_USB_DEVICE_0_ENABLED 1U
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_ENABLED 1U
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_HW SMIF0_CORE
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_IRQ smif_0_smif0_interrupt_nsec_IRQn
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_MEMORY_MODE_ALIGMENT_ERROR (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_RX_DATA_FIFO_UNDERFLOW (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_COMMAND_FIFO_OVERFLOW (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_DATA_FIFO_OVERFLOW (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_RX_DMA_TRIGGER_OUT_USED (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_DMA_TRIGGER_OUT_USED (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_RX_FIFO_TRIGGER_LEVEL (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_FIFO_TRIGGER_LEVEL (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_DATALINES0_1 (1UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_DATALINES2_3 (1UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_DATALINES4_5 (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_DATALINES6_7 (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_SS0 (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_SS1 (1UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_SS2 (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_SS3 (0UL)
-#define CYBSP_SMIF_CORE_0_XSPI_FLASH_DESELECT_DELAY 7
-#define CYBSP_SMIF_CORE_1_PSRAM_ENABLED 1U
-#define CYBSP_SMIF_CORE_1_PSRAM_HW SMIF1_CORE
-#define CYBSP_SMIF_CORE_1_PSRAM_IRQ smif_1_smif0_interrupt_nsec_IRQn
-#define CYBSP_SMIF_CORE_1_PSRAM_MEMORY_MODE_ALIGMENT_ERROR (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_RX_DATA_FIFO_UNDERFLOW (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_TX_COMMAND_FIFO_OVERFLOW (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_TX_DATA_FIFO_OVERFLOW (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_RX_DMA_TRIGGER_OUT_USED (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_TX_DMA_TRIGGER_OUT_USED (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_RX_FIFO_TRIGGER_LEVEL (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_TX_FIFO_TRIGGER_LEVEL (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_DATALINES0_1 (1UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_DATALINES2_3 (1UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_DATALINES4_5 (1UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_DATALINES6_7 (1UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_SS0 (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_SS1 (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_SS2 (1UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_SS3 (0UL)
-#define CYBSP_SMIF_CORE_1_PSRAM_DESELECT_DELAY 7
+#define CANFD_ENABLED 1U
+#define CAN0_IF_ENABLED CANFD_ENABLED
+#define CANFD_HW CANFD0
+#define CAN0_IF_HW CANFD_HW
+#define CANFD_CHANNEL CANFD0_CH0
+#define CAN0_IF_CHANNEL CANFD_CHANNEL
+#define CANFD_STD_ID_FILTER_ID_0 0
+#define CAN0_IF_STD_ID_FILTER_ID_0 CANFD_STD_ID_FILTER_ID_0
+#define CANFD_EXT_ID_FILTER_ID_0 0
+#define CAN0_IF_EXT_ID_FILTER_ID_0 CANFD_EXT_ID_FILTER_ID_0
+#define CANFD_DATA_0 0
+#define CAN0_IF_DATA_0 CANFD_DATA_0
+#define CANFD_DATA_1 1
+#define CAN0_IF_DATA_1 CANFD_DATA_1
+#define CANFD_DATA_2 2
+#define CAN0_IF_DATA_2 CANFD_DATA_2
+#define CANFD_DATA_3 3
+#define CAN0_IF_DATA_3 CANFD_DATA_3
+#define CANFD_DATA_4 4
+#define CAN0_IF_DATA_4 CANFD_DATA_4
+#define CANFD_DATA_5 5
+#define CAN0_IF_DATA_5 CANFD_DATA_5
+#define CANFD_DATA_6 6
+#define CAN0_IF_DATA_6 CANFD_DATA_6
+#define CANFD_DATA_7 7
+#define CAN0_IF_DATA_7 CANFD_DATA_7
+#define CANFD_DATA_8 8
+#define CAN0_IF_DATA_8 CANFD_DATA_8
+#define CANFD_DATA_9 9
+#define CAN0_IF_DATA_9 CANFD_DATA_9
+#define CANFD_DATA_10 10
+#define CAN0_IF_DATA_10 CANFD_DATA_10
+#define CANFD_DATA_11 11
+#define CAN0_IF_DATA_11 CANFD_DATA_11
+#define CANFD_DATA_12 12
+#define CAN0_IF_DATA_12 CANFD_DATA_12
+#define CANFD_DATA_13 13
+#define CAN0_IF_DATA_13 CANFD_DATA_13
+#define CANFD_DATA_14 14
+#define CAN0_IF_DATA_14 CANFD_DATA_14
+#define CANFD_DATA_15 15
+#define CAN0_IF_DATA_15 CANFD_DATA_15
+#define CANFD_IRQ_0 canfd_0_interrupts0_0_IRQn
+#define CAN0_IF_IRQ_0 CANFD_IRQ_0
+#define CANFD_IRQ_1 canfd_0_interrupts1_0_IRQn
+#define CAN0_IF_IRQ_1 CANFD_IRQ_1
+#define CANFD_CHANNEL_NUM 0U
+#define CAN0_IF_CHANNEL_NUM CANFD_CHANNEL_NUM
+#define CAN1_IF_ENABLED 1U
+#define CAN1_IF_HW CANFD0
+#define CAN1_IF_CHANNEL CANFD0_CH1
+#define CAN1_IF_STD_ID_FILTER_ID_0 0
+#define CAN1_IF_EXT_ID_FILTER_ID_0 0
+#define CAN1_IF_DATA_0 0
+#define CAN1_IF_DATA_1 1
+#define CAN1_IF_DATA_2 2
+#define CAN1_IF_DATA_3 3
+#define CAN1_IF_DATA_4 4
+#define CAN1_IF_DATA_5 5
+#define CAN1_IF_DATA_6 6
+#define CAN1_IF_DATA_7 7
+#define CAN1_IF_DATA_8 8
+#define CAN1_IF_DATA_9 9
+#define CAN1_IF_DATA_10 10
+#define CAN1_IF_DATA_11 11
+#define CAN1_IF_DATA_12 12
+#define CAN1_IF_DATA_13 13
+#define CAN1_IF_DATA_14 14
+#define CAN1_IF_DATA_15 15
+#define CAN1_IF_IRQ_0 canfd_0_interrupts0_1_IRQn
+#define CAN1_IF_IRQ_1 canfd_0_interrupts1_1_IRQn
+#define CAN1_IF_CHANNEL_NUM 1U
+#define SMIF0_QSPI_NOR_ENABLED 1U
+#define SMIF0_QSPI_NOR_HW SMIF0_CORE
+#define SMIF0_QSPI_NOR_IRQ smif_0_smif0_interrupt_nsec_IRQn
+#define SMIF0_QSPI_NOR_MEMORY_MODE_ALIGMENT_ERROR (0UL)
+#define SMIF0_QSPI_NOR_RX_DATA_FIFO_UNDERFLOW (0UL)
+#define SMIF0_QSPI_NOR_TX_COMMAND_FIFO_OVERFLOW (0UL)
+#define SMIF0_QSPI_NOR_TX_DATA_FIFO_OVERFLOW (0UL)
+#define SMIF0_QSPI_NOR_RX_DMA_TRIGGER_OUT_USED (0UL)
+#define SMIF0_QSPI_NOR_TX_DMA_TRIGGER_OUT_USED (0UL)
+#define SMIF0_QSPI_NOR_RX_FIFO_TRIGGER_LEVEL (0UL)
+#define SMIF0_QSPI_NOR_TX_FIFO_TRIGGER_LEVEL (0UL)
+#define SMIF0_QSPI_NOR_DATALINES0_1 (1UL)
+#define SMIF0_QSPI_NOR_DATALINES2_3 (1UL)
+#define SMIF0_QSPI_NOR_DATALINES4_5 (0UL)
+#define SMIF0_QSPI_NOR_DATALINES6_7 (0UL)
+#define SMIF0_QSPI_NOR_SS0 (1UL)
+#define SMIF0_QSPI_NOR_SS1 (0UL)
+#define SMIF0_QSPI_NOR_SS2 (0UL)
+#define SMIF0_QSPI_NOR_SS3 (0UL)
+#define SMIF0_QSPI_NOR_DESELECT_DELAY 7
+#define SMIF1_HYPERRAM_ENABLED 1U
+#define SMIF1_HYPERRAM_HW SMIF1_CORE
+#define SMIF1_HYPERRAM_IRQ smif_1_smif0_interrupt_nsec_IRQn
+#define SMIF1_HYPERRAM_MEMORY_MODE_ALIGMENT_ERROR (0UL)
+#define SMIF1_HYPERRAM_RX_DATA_FIFO_UNDERFLOW (0UL)
+#define SMIF1_HYPERRAM_TX_COMMAND_FIFO_OVERFLOW (0UL)
+#define SMIF1_HYPERRAM_TX_DATA_FIFO_OVERFLOW (0UL)
+#define SMIF1_HYPERRAM_RX_DMA_TRIGGER_OUT_USED (0UL)
+#define SMIF1_HYPERRAM_TX_DMA_TRIGGER_OUT_USED (0UL)
+#define SMIF1_HYPERRAM_RX_FIFO_TRIGGER_LEVEL (0UL)
+#define SMIF1_HYPERRAM_TX_FIFO_TRIGGER_LEVEL (0UL)
+#define SMIF1_HYPERRAM_DATALINES0_1 (1UL)
+#define SMIF1_HYPERRAM_DATALINES2_3 (1UL)
+#define SMIF1_HYPERRAM_DATALINES4_5 (1UL)
+#define SMIF1_HYPERRAM_DATALINES6_7 (1UL)
+#define SMIF1_HYPERRAM_SS0 (0UL)
+#define SMIF1_HYPERRAM_SS1 (0UL)
+#define SMIF1_HYPERRAM_SS2 (1UL)
+#define SMIF1_HYPERRAM_SS3 (0UL)
+#define SMIF1_HYPERRAM_DESELECT_DELAY 7
 #define CYBSP_CM33_LPTIMER_0_ENABLED 1U
 #define CYBSP_CM33_LPTIMER_0_HW MCWDT_STRUCT0
 #define CYBSP_CM33_LPTIMER_0_IRQ srss_interrupt_mcwdt_0_IRQn
 #define CYBSP_CM55_LPTIMER_1_ENABLED 1U
 #define CYBSP_CM55_LPTIMER_1_HW MCWDT_STRUCT1
 #define CYBSP_CM55_LPTIMER_1_IRQ srss_interrupt_mcwdt_1_IRQn
-#define CYBSP_TDM_CONTROLLER_0_ENABLED 1U
-#define CYBSP_TDM_CONTROLLER_0_HW TDM_STRUCT0
-#define CYBSP_TDM_CONTROLLER_0_TX_HW TDM_STRUCT0_TX
-#define CYBSP_TDM_CONTROLLER_0_RX_HW TDM_STRUCT0_RX
-#define CYBSP_TDM_CONTROLLER_0_TX_IRQ tdm_0_interrupts_tx_0_IRQn
-#define CYBSP_TDM_CONTROLLER_0_RX_IRQ tdm_0_interrupts_rx_0_IRQn
-#define CYBSP_GENERAL_PURPOSE_TIMER_ENABLED 1U
-#define CYBSP_GENERAL_PURPOSE_TIMER_HW TCPWM0
-#define CYBSP_GENERAL_PURPOSE_TIMER_NUM 0UL
-#define CYBSP_GENERAL_PURPOSE_TIMER_IRQ tcpwm_0_interrupts_0_IRQn
-#define CYBSP_USB_OS_TIMER_COUNTER_ENABLED 1U
-#define emUSB_OS_Timer_HW TCPWM0
-#define emUSB_OS_Timer_NUM 1UL
-#define emUSB_OS_Timer_IRQ tcpwm_0_interrupts_1_IRQn
-#define CYBSP_PWM_LED_CTRL_ENABLED 1U
-#define CYBSP_PWM_LED_CTRL_HW TCPWM0
-#define CYBSP_PWM_LED_CTRL_NUM 5UL
-#define CYBSP_DEAD_TIME_PWM_ENABLED 1U
-#define CYBSP_DEAD_TIME_PWM_HW TCPWM0
-#define CYBSP_DEAD_TIME_PWM_NUM 7UL
-#define CYBSP_SMARTIO_PWM_ENABLED 1U
-#define CYBSP_SMARTIO_PWM_HW TCPWM0
-#define CYBSP_SMARTIO_PWM_NUM 262UL
+#define BSP_GP_TMR_ENABLED 1U
+#define BSP_GP_TMR_HW TCPWM0
+#define BSP_GP_TMR_NUM 0UL
+#define MC33HB2000_PWM_ENABLED 1U
+#define MC33HB2000_PWM_HW TCPWM0
+#define MC33HB2000_PWM_NUM 1UL
+#define tcpwm_0_group_0_cnt_2_ENABLED 1U
+#define tcpwm_0_group_0_cnt_2_HW TCPWM0
+#define tcpwm_0_group_0_cnt_2_NUM 2UL
+#define tcpwm_0_group_0_cnt_5_ENABLED 1U
+#define tcpwm_0_group_0_cnt_5_HW TCPWM0
+#define tcpwm_0_group_0_cnt_5_NUM 5UL
+#define tcpwm_0_group_0_cnt_6_ENABLED 1U
+#define tcpwm_0_group_0_cnt_6_HW TCPWM0
+#define tcpwm_0_group_0_cnt_6_NUM 6UL
+#define INTERLOCK_IN_ENABLED 1U
+#define INTERLOCK_IN_HW TCPWM0
+#define INTERLOCK_IN_NUM 260UL
+#define INTERLOCKOUT_ENABLED 1U
+#define INTERLOCKOUT_HW TCPWM0
+#define INTERLOCKOUT_NUM 272UL
 
 extern cy_stc_autanalog_cfg_t autonomous_analog_cfg;
 extern cy_stc_autanalog_stt_t autonomous_analog_stt[];
@@ -184,35 +317,44 @@ extern cy_stc_autanalog_stt_sar_t CYBSP_SAR_ADC_stt[];
 extern mtb_hal_adc_configurator_t CYBSP_SAR_ADC_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_ADC) */
 
-extern const cy_stc_pdm_pcm_config_v2_t CYBSP_PDM_config;
-extern const cy_stc_pdm_pcm_channel_config_t channel_2_config;
-extern const cy_stc_pdm_pcm_channel_config_t channel_3_config;
-extern const cy_stc_scb_i2c_config_t CYBSP_I2C_CONTROLLER_config;
-
-#if defined (COMPONENT_MTB_HAL)
-extern const mtb_hal_peri_div_t CYBSP_I2C_CONTROLLER_clock_ref;
-extern const mtb_hal_clock_t CYBSP_I2C_CONTROLLER_hal_clock;
-#endif /* defined (COMPONENT_MTB_HAL) */
-
-#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_I2C)
-extern const mtb_hal_i2c_configurator_t CYBSP_I2C_CONTROLLER_hal_config;
-#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_I2C) */
-
+extern const cy_stc_i3c_config_t CYBSP_I3C_CONTROLLER_config;
 extern const cy_stc_scb_uart_config_t CYBSP_DEBUG_UART_config;
 
-#define IFX_TFM_SPM_UART_config CYBSP_DEBUG_UART_config
+#define UART_LS_config CYBSP_DEBUG_UART_config
 
 #if defined (COMPONENT_MTB_HAL)
 extern const mtb_hal_peri_div_t CYBSP_DEBUG_UART_clock_ref;
-#define IFX_TFM_SPM_UART_clock_ref CYBSP_DEBUG_UART_clock_ref
+#define UART_LS_clock_ref CYBSP_DEBUG_UART_clock_ref
 extern const mtb_hal_clock_t CYBSP_DEBUG_UART_hal_clock;
-#define IFX_TFM_SPM_UART_hal_clock CYBSP_DEBUG_UART_hal_clock
+#define UART_LS_hal_clock CYBSP_DEBUG_UART_hal_clock
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_UART)
 extern const mtb_hal_uart_configurator_t CYBSP_DEBUG_UART_hal_config;
-#define IFX_TFM_SPM_UART_hal_config CYBSP_DEBUG_UART_hal_config
+#define UART_LS_hal_config CYBSP_DEBUG_UART_hal_config
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_UART) */
+
+extern const cy_stc_scb_uart_config_t UART_HS_config;
+
+#if defined (COMPONENT_MTB_HAL)
+extern const mtb_hal_peri_div_t UART_HS_clock_ref;
+extern const mtb_hal_clock_t UART_HS_hal_clock;
+#endif /* defined (COMPONENT_MTB_HAL) */
+
+#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_UART)
+extern const mtb_hal_uart_configurator_t UART_HS_hal_config;
+#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_UART) */
+
+extern const cy_stc_scb_spi_config_t PMIC_FRAM_IF_config;
+
+#if defined (COMPONENT_MTB_HAL)
+extern const mtb_hal_peri_div_t PMIC_FRAM_IF_clock_ref;
+extern const mtb_hal_clock_t PMIC_FRAM_IF_hal_clock;
+#endif /* defined (COMPONENT_MTB_HAL) */
+
+#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_SPI)
+extern const mtb_hal_spi_configurator_t PMIC_FRAM_IF_hal_config;
+#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_SPI) */
 
 extern const cy_stc_scb_uart_config_t CYBSP_BT_UART_config;
 
@@ -225,16 +367,64 @@ extern const mtb_hal_clock_t CYBSP_BT_UART_hal_clock;
 extern const mtb_hal_uart_configurator_t CYBSP_BT_UART_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_UART) */
 
-extern const cy_stc_scb_ezi2c_config_t CYBSP_EZ_I2C_TARGET_config;
-extern const cy_stc_scb_spi_config_t CYBSP_SPI_CONTROLLER_config;
+extern const cy_stc_scb_spi_config_t BMS_COM2_IF_config;
 
 #if defined (COMPONENT_MTB_HAL)
-extern const mtb_hal_peri_div_t CYBSP_SPI_CONTROLLER_clock_ref;
-extern const mtb_hal_clock_t CYBSP_SPI_CONTROLLER_hal_clock;
+extern const mtb_hal_peri_div_t BMS_COM2_IF_clock_ref;
+extern const mtb_hal_clock_t BMS_COM2_IF_hal_clock;
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_SPI)
-extern const mtb_hal_spi_configurator_t CYBSP_SPI_CONTROLLER_hal_config;
+extern const mtb_hal_spi_configurator_t BMS_COM2_IF_hal_config;
+#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_SPI) */
+
+extern const cy_stc_scb_i2c_config_t CYBSP_I2C_CONTROLLER_config;
+
+#define RTC_SE_IF_config CYBSP_I2C_CONTROLLER_config
+
+#if defined (COMPONENT_MTB_HAL)
+extern const mtb_hal_peri_div_t CYBSP_I2C_CONTROLLER_clock_ref;
+#define RTC_SE_IF_clock_ref CYBSP_I2C_CONTROLLER_clock_ref
+extern const mtb_hal_clock_t CYBSP_I2C_CONTROLLER_hal_clock;
+#define RTC_SE_IF_hal_clock CYBSP_I2C_CONTROLLER_hal_clock
+#endif /* defined (COMPONENT_MTB_HAL) */
+
+#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_I2C)
+extern const mtb_hal_i2c_configurator_t CYBSP_I2C_CONTROLLER_hal_config;
+#define RTC_SE_IF_hal_config CYBSP_I2C_CONTROLLER_hal_config
+#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_I2C) */
+
+extern const cy_stc_scb_uart_config_t RS485_IF_config;
+
+#if defined (COMPONENT_MTB_HAL)
+extern const mtb_hal_peri_div_t RS485_IF_clock_ref;
+extern const mtb_hal_clock_t RS485_IF_hal_clock;
+#endif /* defined (COMPONENT_MTB_HAL) */
+
+#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_UART)
+extern const mtb_hal_uart_configurator_t RS485_IF_hal_config;
+#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_UART) */
+
+extern const cy_stc_scb_spi_config_t MC33HB2000_IF_config;
+
+#if defined (COMPONENT_MTB_HAL)
+extern const mtb_hal_peri_div_t MC33HB2000_IF_clock_ref;
+extern const mtb_hal_clock_t MC33HB2000_IF_hal_clock;
+#endif /* defined (COMPONENT_MTB_HAL) */
+
+#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_SPI)
+extern const mtb_hal_spi_configurator_t MC33HB2000_IF_hal_config;
+#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_SPI) */
+
+extern const cy_stc_scb_spi_config_t BMS_COM1_IF_config;
+
+#if defined (COMPONENT_MTB_HAL)
+extern const mtb_hal_peri_div_t BMS_COM1_IF_clock_ref;
+extern const mtb_hal_clock_t BMS_COM1_IF_hal_clock;
+#endif /* defined (COMPONENT_MTB_HAL) */
+
+#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_SPI)
+extern const mtb_hal_spi_configurator_t BMS_COM1_IF_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_SPI) */
 
 extern cy_en_sd_host_card_capacity_t CYBSP_WIFI_SDIO_cardCapacity;
@@ -253,26 +443,121 @@ extern const mtb_hal_sdhc_configurator_t CYBSP_WIFI_SDIO_sdhc_hal_config;
 extern const mtb_hal_sdio_configurator_t CYBSP_WIFI_SDIO_sdio_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_SDIO) */
 
-extern const cy_stc_smif_config_t CYBSP_SMIF_CORE_0_XSPI_FLASH_config;
+extern const cy_stc_canfd_bitrate_t CANFD_nominalBitrateConfig;
+
+#define CAN0_IF_nominalBitrateConfig CANFD_nominalBitrateConfig
+
+extern const cy_stc_canfd_bitrate_t CANFD_dataBitrateConfig;
+
+#define CAN0_IF_dataBitrateConfig CANFD_dataBitrateConfig
+
+extern const cy_stc_canfd_transceiver_delay_compensation_t CANFD_tdcConfig;
+
+#define CAN0_IF_tdcConfig CANFD_tdcConfig
+
+extern const cy_stc_id_filter_t CANFD_stdIdFilter_0;
+
+#define CAN0_IF_stdIdFilter_0 CANFD_stdIdFilter_0
+
+extern const cy_stc_id_filter_t CANFD_stdIdFilters[];
+
+#define CAN0_IF_stdIdFilters CANFD_stdIdFilters
+
+extern const cy_stc_canfd_sid_filter_config_t CANFD_sidFiltersConfig;
+
+#define CAN0_IF_sidFiltersConfig CANFD_sidFiltersConfig
+
+extern const cy_stc_canfd_f0_t CANFD_extIdFilterF0Config_0;
+
+#define CAN0_IF_extIdFilterF0Config_0 CANFD_extIdFilterF0Config_0
+
+extern const cy_stc_canfd_f1_t CANFD_extIdFilterF1Config_0;
+
+#define CAN0_IF_extIdFilterF1Config_0 CANFD_extIdFilterF1Config_0
+
+extern const cy_stc_extid_filter_t CANFD_extIdFilter_0;
+
+#define CAN0_IF_extIdFilter_0 CANFD_extIdFilter_0
+
+extern const cy_stc_extid_filter_t CANFD_extIdFilters[];
+
+#define CAN0_IF_extIdFilters CANFD_extIdFilters
+
+extern const cy_stc_canfd_extid_filter_config_t CANFD_extIdFiltersConfig;
+
+#define CAN0_IF_extIdFiltersConfig CANFD_extIdFiltersConfig
+
+extern const cy_stc_canfd_global_filter_config_t CANFD_globalFilterConfig;
+
+#define CAN0_IF_globalFilterConfig CANFD_globalFilterConfig
+
+extern const cy_en_canfd_fifo_config_t CANFD_rxFifo0Config;
+
+#define CAN0_IF_rxFifo0Config CANFD_rxFifo0Config
+
+extern const cy_en_canfd_fifo_config_t CANFD_rxFifo1Config;
+
+#define CAN0_IF_rxFifo1Config CANFD_rxFifo1Config
+
+extern const cy_stc_canfd_config_t CANFD_config;
+
+#define CAN0_IF_config CANFD_config
+
+extern cy_stc_canfd_t0_t CANFD_T0RegisterBuffer_0;
+
+#define CAN0_IF_T0RegisterBuffer_0 CANFD_T0RegisterBuffer_0
+
+extern cy_stc_canfd_t1_t CANFD_T1RegisterBuffer_0;
+
+#define CAN0_IF_T1RegisterBuffer_0 CANFD_T1RegisterBuffer_0
+
+extern uint32_t CANFD_dataBuffer_0[];
+
+#define CAN0_IF_dataBuffer_0 CANFD_dataBuffer_0
+
+extern cy_stc_canfd_tx_buffer_t CANFD_txBuffer_0;
+
+#define CAN0_IF_txBuffer_0 CANFD_txBuffer_0
+
+extern const cy_stc_canfd_bitrate_t CAN1_IF_nominalBitrateConfig;
+extern const cy_stc_canfd_bitrate_t CAN1_IF_dataBitrateConfig;
+extern const cy_stc_canfd_transceiver_delay_compensation_t CAN1_IF_tdcConfig;
+extern const cy_stc_id_filter_t CAN1_IF_stdIdFilter_0;
+extern const cy_stc_id_filter_t CAN1_IF_stdIdFilters[];
+extern const cy_stc_canfd_sid_filter_config_t CAN1_IF_sidFiltersConfig;
+extern const cy_stc_canfd_f0_t CAN1_IF_extIdFilterF0Config_0;
+extern const cy_stc_canfd_f1_t CAN1_IF_extIdFilterF1Config_0;
+extern const cy_stc_extid_filter_t CAN1_IF_extIdFilter_0;
+extern const cy_stc_extid_filter_t CAN1_IF_extIdFilters[];
+extern const cy_stc_canfd_extid_filter_config_t CAN1_IF_extIdFiltersConfig;
+extern const cy_stc_canfd_global_filter_config_t CAN1_IF_globalFilterConfig;
+extern const cy_en_canfd_fifo_config_t CAN1_IF_rxFifo0Config;
+extern const cy_en_canfd_fifo_config_t CAN1_IF_rxFifo1Config;
+extern const cy_stc_canfd_config_t CAN1_IF_config;
+extern cy_stc_canfd_t0_t CAN1_IF_T0RegisterBuffer_0;
+extern cy_stc_canfd_t1_t CAN1_IF_T1RegisterBuffer_0;
+extern uint32_t CAN1_IF_dataBuffer_0[];
+extern cy_stc_canfd_tx_buffer_t CAN1_IF_txBuffer_0;
+extern const cy_stc_smif_config_t SMIF0_QSPI_NOR_config;
 
 #if defined (COMPONENT_MTB_HAL)
-extern const mtb_hal_hf_clock_t CYBSP_SMIF_CORE_0_XSPI_FLASH_clock_ref;
-extern const mtb_hal_clock_t CYBSP_SMIF_CORE_0_XSPI_FLASH_hal_clock;
+extern const mtb_hal_hf_clock_t SMIF0_QSPI_NOR_clock_ref;
+extern const mtb_hal_clock_t SMIF0_QSPI_NOR_hal_clock;
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI)
-extern const mtb_hal_memoryspi_configurator_t CYBSP_SMIF_CORE_0_XSPI_FLASH_hal_config;
+extern const mtb_hal_memoryspi_configurator_t SMIF0_QSPI_NOR_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI) */
 
-extern const cy_stc_smif_config_t CYBSP_SMIF_CORE_1_PSRAM_config;
+extern const cy_stc_smif_config_t SMIF1_HYPERRAM_config;
 
 #if defined (COMPONENT_MTB_HAL)
-extern const mtb_hal_hf_clock_t CYBSP_SMIF_CORE_1_PSRAM_clock_ref;
-extern const mtb_hal_clock_t CYBSP_SMIF_CORE_1_PSRAM_hal_clock;
+extern const mtb_hal_hf_clock_t SMIF1_HYPERRAM_clock_ref;
+extern const mtb_hal_clock_t SMIF1_HYPERRAM_hal_clock;
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI)
-extern const mtb_hal_memoryspi_configurator_t CYBSP_SMIF_CORE_1_PSRAM_hal_config;
+extern const mtb_hal_memoryspi_configurator_t SMIF1_HYPERRAM_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI) */
 
 extern const cy_stc_mcwdt_config_t CYBSP_CM33_LPTIMER_0_config;
@@ -287,62 +572,81 @@ extern const cy_stc_mcwdt_config_t CYBSP_CM55_LPTIMER_1_config;
 extern const mtb_hal_lptimer_configurator_t CYBSP_CM55_LPTIMER_1_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_LPTIMER) */
 
-extern cy_stc_tdm_config_tx_t CYBSP_TDM_CONTROLLER_0_tx_config;
-extern cy_stc_tdm_config_rx_t CYBSP_TDM_CONTROLLER_0_rx_config;
-extern const cy_stc_tdm_config_t CYBSP_TDM_CONTROLLER_0_config;
-extern const cy_stc_tcpwm_counter_config_t CYBSP_GENERAL_PURPOSE_TIMER_config;
+extern const cy_stc_tcpwm_counter_config_t BSP_GP_TMR_config;
 
 #if defined (COMPONENT_MTB_HAL)
-extern const mtb_hal_peri_div_t CYBSP_GENERAL_PURPOSE_TIMER_clock_ref;
-extern const mtb_hal_clock_t CYBSP_GENERAL_PURPOSE_TIMER_hal_clock;
+extern const mtb_hal_peri_div_t BSP_GP_TMR_clock_ref;
+extern const mtb_hal_clock_t BSP_GP_TMR_hal_clock;
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_TIMER)
-extern const mtb_hal_timer_configurator_t CYBSP_GENERAL_PURPOSE_TIMER_hal_config;
+extern const mtb_hal_timer_configurator_t BSP_GP_TMR_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_TIMER) */
 
-extern cy_stc_tcpwm_counter_config_t emUSB_OS_Timer_config;
+extern const cy_stc_tcpwm_pwm_config_t MC33HB2000_PWM_config;
 
 #if defined (COMPONENT_MTB_HAL)
-extern mtb_hal_peri_div_t emUSB_OS_Timer_clock_ref;
-extern mtb_hal_clock_t emUSB_OS_Timer_hal_clock;
+extern const mtb_hal_peri_div_t MC33HB2000_PWM_clock_ref;
+extern const mtb_hal_clock_t MC33HB2000_PWM_hal_clock;
+#endif /* defined (COMPONENT_MTB_HAL) */
+
+#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_PWM)
+extern const mtb_hal_pwm_configurator_t MC33HB2000_PWM_hal_config;
+#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_PWM) */
+
+extern const cy_stc_tcpwm_pwm_config_t tcpwm_0_group_0_cnt_2_config;
+
+#if defined (COMPONENT_MTB_HAL)
+extern const mtb_hal_peri_div_t tcpwm_0_group_0_cnt_2_clock_ref;
+extern const mtb_hal_clock_t tcpwm_0_group_0_cnt_2_hal_clock;
+#endif /* defined (COMPONENT_MTB_HAL) */
+
+#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_PWM)
+extern const mtb_hal_pwm_configurator_t tcpwm_0_group_0_cnt_2_hal_config;
+#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_PWM) */
+
+extern const cy_stc_tcpwm_counter_config_t tcpwm_0_group_0_cnt_5_config;
+
+#if defined (COMPONENT_MTB_HAL)
+extern const mtb_hal_peri_div_t tcpwm_0_group_0_cnt_5_clock_ref;
+extern const mtb_hal_clock_t tcpwm_0_group_0_cnt_5_hal_clock;
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_TIMER)
-extern mtb_hal_timer_configurator_t emUSB_OS_Timer_hal_config;
+extern const mtb_hal_timer_configurator_t tcpwm_0_group_0_cnt_5_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_TIMER) */
 
-extern const cy_stc_tcpwm_pwm_config_t CYBSP_PWM_LED_CTRL_config;
+extern const cy_stc_tcpwm_counter_config_t tcpwm_0_group_0_cnt_6_config;
 
 #if defined (COMPONENT_MTB_HAL)
-extern const mtb_hal_peri_div_t CYBSP_PWM_LED_CTRL_clock_ref;
-extern const mtb_hal_clock_t CYBSP_PWM_LED_CTRL_hal_clock;
+extern const mtb_hal_peri_div_t tcpwm_0_group_0_cnt_6_clock_ref;
+extern const mtb_hal_clock_t tcpwm_0_group_0_cnt_6_hal_clock;
+#endif /* defined (COMPONENT_MTB_HAL) */
+
+#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_TIMER)
+extern const mtb_hal_timer_configurator_t tcpwm_0_group_0_cnt_6_hal_config;
+#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_TIMER) */
+
+extern const cy_stc_tcpwm_counter_config_t INTERLOCK_IN_config;
+
+#if defined (COMPONENT_MTB_HAL)
+extern const mtb_hal_peri_div_t INTERLOCK_IN_clock_ref;
+extern const mtb_hal_clock_t INTERLOCK_IN_hal_clock;
+#endif /* defined (COMPONENT_MTB_HAL) */
+
+#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_TIMER)
+extern const mtb_hal_timer_configurator_t INTERLOCK_IN_hal_config;
+#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_TIMER) */
+
+extern const cy_stc_tcpwm_pwm_config_t INTERLOCKOUT_config;
+
+#if defined (COMPONENT_MTB_HAL)
+extern const mtb_hal_peri_div_t INTERLOCKOUT_clock_ref;
+extern const mtb_hal_clock_t INTERLOCKOUT_hal_clock;
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_PWM)
-extern const mtb_hal_pwm_configurator_t CYBSP_PWM_LED_CTRL_hal_config;
-#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_PWM) */
-
-extern const cy_stc_tcpwm_pwm_config_t CYBSP_DEAD_TIME_PWM_config;
-
-#if defined (COMPONENT_MTB_HAL)
-extern const mtb_hal_peri_div_t CYBSP_DEAD_TIME_PWM_clock_ref;
-extern const mtb_hal_clock_t CYBSP_DEAD_TIME_PWM_hal_clock;
-#endif /* defined (COMPONENT_MTB_HAL) */
-
-#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_PWM)
-extern const mtb_hal_pwm_configurator_t CYBSP_DEAD_TIME_PWM_hal_config;
-#endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_PWM) */
-
-extern const cy_stc_tcpwm_pwm_config_t CYBSP_SMARTIO_PWM_config;
-
-#if defined (COMPONENT_MTB_HAL)
-extern const mtb_hal_peri_div_t CYBSP_SMARTIO_PWM_clock_ref;
-extern const mtb_hal_clock_t CYBSP_SMARTIO_PWM_hal_clock;
-#endif /* defined (COMPONENT_MTB_HAL) */
-
-#if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_PWM)
-extern const mtb_hal_pwm_configurator_t CYBSP_SMARTIO_PWM_hal_config;
+extern const mtb_hal_pwm_configurator_t INTERLOCKOUT_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_PWM) */
 
 void init_cycfg_peripherals(void);

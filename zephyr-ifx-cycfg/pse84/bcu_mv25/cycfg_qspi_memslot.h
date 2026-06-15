@@ -4,11 +4,11 @@
  * Description:
  * Provides declarations of the SMIF-driver memory configuration.
  * This file was automatically generated and should not be modified.
- * QSPI Configurator 4.70.0.2834
+ * QSPI Configurator 4.80.0.2923
  *
  *******************************************************************************
- * Copyright 2026 Cypress Semiconductor Corporation (an Infineon company) or
- * an affiliate of Cypress Semiconductor Corporation.
+ * Copyright 2026, Infineon Technologies AG, or an affiliate of Infineon
+ * Technologies AG. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@
 #define CYCFG_QSPI_MEMSLOT_H
 #include "cy_smif_memslot.h"
 
-#define CY_SMIF_CFG_TOOL_VERSION           (470)
+#define CY_SMIF_CFG_TOOL_VERSION           (480)
 
 /* Supported QSPI Driver version */
 #define CY_SMIF_DRV_VERSION_REQUIRED       (100)
@@ -47,28 +47,39 @@ typedef cy_stc_smif_block_config_t cy_serial_flash_block_config_t;
 
 #define CY_SMIF_DEVICE_NUM0 1
 
-#define CY_SMIF_DEVICE_NUM1 0
+#define CY_SMIF_DEVICE_NUM1 1
 
 #define smifBlockConfig smif0BlockConfig
 #define smifMemConfigs smif0MemConfigs
 
-extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_1_readCmd;
-extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_1_writeEnCmd;
-extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_1_writeDisCmd;
-extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_1_eraseCmd;
-extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_1_chipEraseCmd;
-extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_1_programCmd;
-extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_1_readStsRegQeCmd;
-extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_1_readStsRegWipCmd;
-extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_1_writeStsRegQeCmd;
+extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_0_readCmd;
+extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_0_writeEnCmd;
+extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_0_writeDisCmd;
+extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_0_eraseCmd;
+extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_0_chipEraseCmd;
+extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_0_programCmd;
+extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_0_readStsRegQeCmd;
+extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_0_readStsRegWipCmd;
+extern cy_stc_smif_mem_cmd_t S25HS512T_SMIF0_SlaveSlot_0_writeStsRegQeCmd;
 
-extern cy_stc_smif_mem_device_cfg_t deviceCfg_S25HS512T_SMIF0_SlaveSlot_1;
+extern cy_stc_smif_mem_device_cfg_t deviceCfg_S25HS512T_SMIF0_SlaveSlot_0;
 
-extern cy_stc_smif_mem_config_t S25HS512T_SMIF0_SlaveSlot_1;
+extern cy_stc_smif_mem_config_t S25HS512T_SMIF0_SlaveSlot_0;
+
+extern cy_stc_smif_mem_cmd_t S70KS1283_SMIF1_SlaveSlot_2_readCmd;
+extern cy_stc_smif_mem_cmd_t S70KS1283_SMIF1_SlaveSlot_2_writeEnCmd;
+extern cy_stc_smif_mem_cmd_t S70KS1283_SMIF1_SlaveSlot_2_writeDisCmd;
+extern cy_stc_smif_mem_cmd_t S70KS1283_SMIF1_SlaveSlot_2_programCmd;
+
+extern cy_stc_smif_mem_device_cfg_t deviceCfg_S70KS1283_SMIF1_SlaveSlot_2;
+
+extern cy_stc_smif_mem_config_t S70KS1283_SMIF1_SlaveSlot_2;
 
 extern cy_stc_smif_mem_config_t* smif0MemConfigs[CY_SMIF_DEVICE_NUM0];
 
 extern cy_stc_smif_block_config_t smif0BlockConfig;
+
+extern cy_stc_smif_mem_config_t* smif1MemConfigs[CY_SMIF_DEVICE_NUM1];
 
 extern cy_stc_smif_block_config_t smif1BlockConfig;
 

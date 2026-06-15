@@ -4,15 +4,13 @@
  * Description:
  * Clock configuration
  * This file was automatically generated and should not be modified.
- * Configurator Backend 3.70.0
- * device-db 4.34.0.9502
- * ifx-mcuboot-pse84 1.1.0.349
- * ifx-tf-m 2.1.400.14138
- * mtb-dsl-pse8xxgp 1.2.0.895
+ * Configurator Backend 3.80.0
+ * device-db 4.37.0.10260
+ * mtb-dsl-pse8xxgp 1.5.0.1072
  *
  *******************************************************************************
- * Copyright 2026 Cypress Semiconductor Corporation (an Infineon company) or
- * an affiliate of Cypress Semiconductor Corporation.
+ * Copyright 2026, Infineon Technologies AG, or an affiliate of Infineon
+ * Technologies AG. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +32,7 @@
 #include "cycfg_notices.h"
 #include "cy_sysclk.h"
 #include "cy_wdt.h"
+#include "cycfg_system.h"
 #include "cycfg_clock_types.h"
 #include "cy_rtc.h"
 #include "cy_gpio.h"
@@ -54,7 +53,6 @@ extern "C" {
 #define srss_0_clock_0_eco_0_ENABLED 1U
 #define srss_0_clock_0_ext_0_ENABLED 1U
 #define srss_0_clock_0_iho_0_ENABLED 1U
-#define srss_0_clock_0_wco_0_ENABLED 1U
 #define srss_0_clock_0_timerclk_0_ENABLED 1U
 #define srss_0_clock_0_pilo_0_ENABLED 1U
 #define srss_0_clock_0_lfclk_0_ENABLED 1U
@@ -84,18 +82,12 @@ extern "C" {
 #define CY_CFG_SYSCLK_CLKHF5 5UL
 #define srss_0_clock_0_hfclk_6_ENABLED 1U
 #define CY_CFG_SYSCLK_CLKHF6 6UL
-#define srss_0_clock_0_hfclk_7_ENABLED 1U
-#define CY_CFG_SYSCLK_CLKHF7 7UL
-#define srss_0_clock_0_hfclk_8_ENABLED 1U
-#define CY_CFG_SYSCLK_CLKHF8 8UL
 #define srss_0_clock_0_hfclk_9_ENABLED 1U
 #define CY_CFG_SYSCLK_CLKHF9 9UL
 #define srss_0_clock_0_hfclk_10_ENABLED 1U
 #define CY_CFG_SYSCLK_CLKHF10 10UL
 #define srss_0_clock_0_hfclk_11_ENABLED 1U
 #define CY_CFG_SYSCLK_CLKHF11 11UL
-#define srss_0_clock_0_hfclk_12_ENABLED 1U
-#define CY_CFG_SYSCLK_CLKHF12 12UL
 #define srss_0_clock_0_hfclk_13_ENABLED 1U
 #define CY_CFG_SYSCLK_CLKHF13 13UL
 
@@ -107,12 +99,9 @@ extern const cycfg_clkhf_config_t cycfg_hf3Config;
 extern const cycfg_clkhf_config_t cycfg_hf4Config;
 extern const cycfg_clkhf_config_t cycfg_hf5Config;
 extern const cycfg_clkhf_config_t cycfg_hf6Config;
-extern const cycfg_clkhf_config_t cycfg_hf7Config;
-extern const cycfg_clkhf_config_t cycfg_hf8Config;
 extern const cycfg_clkhf_config_t cycfg_hf9Config;
 extern const cycfg_clkhf_config_t cycfg_hf10Config;
 extern const cycfg_clkhf_config_t cycfg_hf11Config;
-extern const cycfg_clkhf_config_t cycfg_hf12Config;
 extern const cycfg_clkhf_config_t cycfg_hf13Config;
 
 void init_cycfg_ns_clocks(void);
