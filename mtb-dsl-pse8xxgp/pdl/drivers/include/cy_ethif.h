@@ -703,7 +703,7 @@ typedef struct {
  * \{
  */
 
-cy_en_ethif_status_t Cy_ETHIF_MdioInit(ETH_Type* base, cy_stc_ethif_mac_config_t* pstcEthIfConfig);
+cy_en_ethif_status_t Cy_ETHIF_MdioInit(ETH_Type* base, cy_stc_ethif_mac_config_t const* pstcEthIfConfig);
 cy_en_ethif_status_t Cy_ETHIF_Init(ETH_Type* base, cy_stc_ethif_mac_config_t* pstcEthIfConfig,
                                    cy_stc_ethif_intr_config_t* pstcInterruptList);
 void                 Cy_ETHIF_RegisterCallbacks(ETH_Type* base, cy_stc_ethif_cb_t* cbFuncsList);

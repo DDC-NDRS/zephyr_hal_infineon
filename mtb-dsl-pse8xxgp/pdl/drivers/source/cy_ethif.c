@@ -102,7 +102,7 @@ static cy_ethif_buffpool_t* g_pRxQbuffPool[CY_ETH_DEFINE_NUM_IP][CY_ETH_DEFINE_N
  * Local function prototypes ('static')
  *****************************************************************************/
 static void    Cy_ETHIF_EnableInterrupts(uint8_t u8EthIfInstance, cy_stc_ethif_intr_config_t* pstcInterruptList);
-static void    Cy_ETHIF_PrepareConfiguration(uint8_t u8EthIfInstance, cy_stc_ethif_mac_config_t* pstcEthIfConfig);
+static void    Cy_ETHIF_PrepareConfiguration(uint8_t u8EthIfInstance, cy_stc_ethif_mac_config_t const* pstcEthIfConfig);
 static void    Cy_ETHIF_AssignMemory(uint8_t u8EthIfInstance);
 static uint8_t Cy_ETHIF_GetEthIfInstance(void* pcy_privatedata);
 static void    Cy_ETHIF_EventTx(void* pcy_privatedata, uint32_t u32event, uint8_t u8qnum);
@@ -179,7 +179,7 @@ CY_MISRA_BLOCK_END('MISRA C-2012 Rule 8.4')
 * This function Initializes the Ethernet MAC partially. This function is only
 * required if user wants to access PHY registers before \ref Cy_ETHIF_Init().
 *******************************************************************************/
-cy_en_ethif_status_t Cy_ETHIF_MdioInit(ETH_Type* base, cy_stc_ethif_mac_config_t* pstcEthIfConfig) {
+cy_en_ethif_status_t Cy_ETHIF_MdioInit(ETH_Type* base, cy_stc_ethif_mac_config_t const* pstcEthIfConfig) {
     uint8_t u8EthIfInstance;
     uint32_t u32RetValue;
     cy_en_ethif_status_t status = CY_ETHIF_SUCCESS;
@@ -1109,7 +1109,7 @@ static void Cy_ETHIF_EnableInterrupts(uint8_t u8EthIfInstance, cy_stc_ethif_intr
 * \param config Pointer to Ethernet configuration passed from Application layer
 *
 *******************************************************************************/
-static void Cy_ETHIF_PrepareConfiguration(uint8_t u8EthIfInstance, cy_stc_ethif_mac_config_t* pstcEthIfConfig) {
+static void Cy_ETHIF_PrepareConfiguration(uint8_t u8EthIfInstance, cy_stc_ethif_mac_config_t const* pstcEthIfConfig) {
     #if defined(CY_IP_MXETH_INSTANCES) && (CY_IP_MXETH_INSTANCES > 1u)
     CY_ASSERT(u8EthIfInstance <= 1u);
     #else
