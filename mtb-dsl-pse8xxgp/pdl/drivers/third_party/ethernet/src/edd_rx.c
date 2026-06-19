@@ -57,6 +57,10 @@ uint32_t emacCalcMaxRxFrameSize(void* pD, uint32_t* maxSize) {
     uint8_t  enabled = 0;
     uint16_t length;
 
+    if (maxSize == NULL) {
+        return EINVAL;
+    }
+
     if (0 != emacGetJumboFramesRx(pD, &enabled)) {
         return EINVAL;
     }
@@ -223,7 +227,7 @@ uint32_t emacAddRxBuf(void* pD, uint8_t queueNum, CEDI_BuffAddr* buf, uint8_t in
  * @return EINVAL if invalid parameter
  */
 uint32_t emacNumRxBufs(void* pD, uint8_t queueNum, uint16_t* numBufs) {
-    if (queueNum >= (CEDI_PdVar(cfg)).rxQs) {
+    if ((numBufs == NULL) || (queueNum >= (CEDI_PdVar(cfg)).rxQs)) {
         return EINVAL;
     }
 
@@ -258,6 +262,7 @@ uint32_t emacNumRxUsed(void* pD, uint8_t queueNum) {
         else {
             break;
         }
+
         if (thisWd & CEDI_RXD_WRAP) {
             thisDesc = rxQ->rxDescStart;
         }
@@ -506,7 +511,12 @@ uint32_t emacReadRxBuf(void* pD, uint8_t queueNum, CEDI_BuffAddr* buf,
  * @param rxDStat - pointer to bit-field struct for decoded status fields
  */
 void emacGetRxDescStat(void* pD, uint32_t rxDStatWord, CEDI_RxDescStat* rxDStat) {
-    uint32_t reg, wd1;
+    uint32_t reg;
+    uint32_t wd1;
+
+    if (rxDStat == NULL) {
+        return;
+    }
 
     reg = CPS_UncachedRead32(CEDI_RegAddr(network_config));
 
@@ -667,13 +677,15 @@ uint32_t emacRemoveRxBuf(void* pD, uint8_t queueNum, CEDI_BuffAddr* buf) {
 void emacFindQBaseAddr(void* pD, uint8_t queueNum, rxQueue_t* rxQ,
                        uint32_t* pAddr, uintptr_t* vAddr) {
     uint8_t q = 0;
-    /* find start addresses for this rxQ */
+
+    /* Find start addresses for this rxQ */
     *vAddr = CEDI_PdVar(cfg).rxQAddr;
     *pAddr = CEDI_PdVar(cfg).rxQPhyAddr;
 
     if (queueNum > 0) {
         rxQ->rxBufVAddr = (CEDI_PdVar(rxQueue[0]).rxBufVAddr);
     }
+
     while (q < queueNum) {
         *vAddr += (rxQ->numRxDesc) * (CEDI_PdVar(rxDescriptorSize)); // sizeof(rxDesc);
         *pAddr += (rxQ->numRxDesc) * (CEDI_PdVar(rxDescriptorSize)); // sizeof(rxDesc);
@@ -773,9 +785,9 @@ uint32_t emacResetRxQ(void* pD, uint8_t queueNum, uint8_t ptrsOnly) {
             }
         }
         else {
-            CPS_UncachedWrite32((uint32_t*)&(descPtr->word[0]), i ? 0 : CEDI_RXD_WRAP | CEDI_RXD_USED);
-            CPS_UncachedWrite32((uint32_t*)&(descPtr->word[1]), CEDI_RXD_EMPTY);
-            descPtr = (rxDesc*)(((uintptr_t)(descPtr)) + (CEDI_PdVar(rxDescriptorSize)));
+            CPS_UncachedWrite32((uint32_t*)&descPtr->word[0], i ? 0 : CEDI_RXD_WRAP | CEDI_RXD_USED);
+            CPS_UncachedWrite32((uint32_t*)&descPtr->word[1], CEDI_RXD_EMPTY);
+            descPtr = (rxDesc*)(((uintptr_t)descPtr) + (CEDI_PdVar(rxDescriptorSize)));
         }
     }
 
@@ -896,7 +908,8 @@ uint32_t emacGetHdrDataSplit(void* pD, uint8_t* enable) {
  */
 uint32_t emacSetRscEnable(void* pD, uint8_t queue, uint8_t enable) {
 
-    uint32_t reg, enableField;
+    uint32_t reg;
+    uint32_t enableField;
 
     if (CEDI_PdVar(hwCfg).pbuf_rsc == 0) {
         return ENOTSUP;
@@ -975,8 +988,8 @@ uint32_t emacSetRxPartialStFwd(void* pD, uint32_t watermark, uint8_t enable) {
         return ENOTSUP;
     }
 
-    //    if ((enable) && (!CEDI_PdVar(hwCfg).rx_pkt_buffer))
-    //        return EINVAL;
+    // if ((enable) && (!CEDI_PdVar(hwCfg).rx_pkt_buffer))
+    //     return EINVAL;
     if (watermark > ((1UL << CEDI_PdVar(hwCfg).rx_pbuf_addr) - 1)) {
         return EINVAL;
     }
@@ -2000,7 +2013,9 @@ uint32_t emacGetType2EthertypeReg(void* pD, uint8_t index, uint16_t* eTypeVal) {
         CEDI_RD_SCRN_TYPE2_ETHTYPE_REG_CASE(6)
         CEDI_RD_SCRN_TYPE2_ETHTYPE_REG_CASE(7)
     }
+
     *eTypeVal = (uint16_t)(EMAC_REGS__SCREENING_TYPE_2_ETHERTYPE_REG__COMPARE_VALUE__READ(reg));
+
     return 0;
 }
 
