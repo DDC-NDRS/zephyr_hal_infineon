@@ -541,6 +541,24 @@ blobs:
     url: https://github.com/Infineon/wifi-resources/raw/release-v2.0.0/clm/COMPONENT_WIFI6/COMPONENT_55500/COMPONENT_CYW55513IUBG/55500A1-mfgtest.clm_blob
     description: "Wi-Fi CLM for CYW55500 (mfgtest) Device"
     doc-url: https://github.com/Infineon/whd-expansion
+  #clm for CYW55513_MOD_PSE84_SOM
+  - path: img/whd/resources/clm/COMPONENT_55500/COMPONENT_CYW55513_MOD_PSE84_SOM/55500A1.clm_blob
+    sha256: c9e86e9ce7d75e25d5b3e9f398d2d4be51adf8f3863b81a0937df49a6d1b82e6
+    type: img
+    version: 'v3.0.5'
+    license-path: zephyr/blobs/license.txt
+    url: https://github.com/Infineon/wifi-resources/raw/release-v3.0.5/clm/COMPONENT_WIFI6/COMPONENT_55500/COMPONENT_CYW55513_MOD_PSE84_SOM/55500A1.clm_blob
+    description: "Wi-Fi CLM for CYW55500 Device"
+    doc-url: https://github.com/Infineon/whd-expansion
+  #clm (mfgtest) for CYW55513_MOD_PSE84_SOM
+  - path: img/whd/resources/clm/COMPONENT_55500/COMPONENT_CYW55513_MOD_PSE84_SOM/55500A1-mfgtest.clm_blob
+    sha256: 62892cc868d18d9d15f77b0f6964195c563e44a81a5aa44261459df888219a56
+    type: img
+    version: 'v3.0.5'
+    license-path: zephyr/blobs/license.txt
+    url: https://github.com/Infineon/wifi-resources/raw/release-v3.0.5/clm/COMPONENT_WIFI6/COMPONENT_55500/COMPONENT_CYW55513_MOD_PSE84_SOM/55500A1-mfgtest.clm_blob
+    description: "Wi-Fi CLM for CYW55500 (mfgtest) Device"
+    doc-url: https://github.com/Infineon/whd-expansion
 
   #CYW55530 Device
   #firmware
