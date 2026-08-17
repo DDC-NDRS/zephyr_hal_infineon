@@ -759,6 +759,10 @@ typedef enum {
 #include "pse84_config.h"
 #include "gpio_pse84_bga_220.h"
 
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#include "mcu_reg_stub.h"
+#endif
+
 /*******************************************************************************
 *                                   MAIN_NVM
 *******************************************************************************/
@@ -776,9 +780,14 @@ typedef enum {
 /*******************************************************************************
 *                                     PERI
 *******************************************************************************/
-
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#define PERI0_BASE                              ((PERI_Type*)ut_mcu_peri0_ptr)
+#define PERI1_BASE                              ((PERI_Type*)ut_mcu_peri1_ptr)
+#else
 #define PERI0_BASE                              0x42000000UL
 #define PERI1_BASE                              0x44000000UL
+#endif
+
 #define PERI0                                   ((PERI_Type*) PERI0_BASE)                                         /* 0x42000000 */
 #define PERI1                                   ((PERI_Type*) PERI1_BASE)                                         /* 0x44000000 */
 #define PERI0_GR0                               ((PERI_GR_Type*) &PERI0->GR[0])                                   /* 0x42004000 */
@@ -1781,10 +1790,6 @@ typedef enum {
 /*******************************************************************************
 *                                  PERI_PCLK
 *******************************************************************************/
-#if defined(_MSC_VER) /* #CUSTOM@NDRS */
-#include "mcu_reg_stub.h"
-#endif
-
 #if defined(_MSC_VER) /* #CUSTOM@NDRS */
 #define PERI_PCLK0_BASE                         ((PERI_PCLK_Type*)ut_mcu_peri_pclk0_ptr)
 #define PERI_PCLK1_BASE                         ((PERI_PCLK_Type*)ut_mcu_peri_pclk1_ptr)

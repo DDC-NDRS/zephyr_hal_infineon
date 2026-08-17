@@ -760,6 +760,10 @@ typedef enum {
 #include "pse84_config.h"
 #include "gpio_pse84_bga_220.h"
 
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#include "mcu_reg_stub.h"
+#endif
+
 /*******************************************************************************
 *                                   MAIN_NVM
 *******************************************************************************/
@@ -777,9 +781,14 @@ typedef enum {
 /*******************************************************************************
 *                                     PERI
 *******************************************************************************/
-
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#define PERI0_BASE                              ((PERI_Type*)ut_mcu_peri0_ptr)
+#define PERI1_BASE                              ((PERI_Type*)ut_mcu_peri1_ptr)
+#else
 #define PERI0_BASE                              0x52000000UL
 #define PERI1_BASE                              0x54000000UL
+#endif
+
 #define PERI0                                   ((PERI_Type*) PERI0_BASE)                                         /* 0x52000000 */
 #define PERI1                                   ((PERI_Type*) PERI1_BASE)                                         /* 0x54000000 */
 #define PERI0_GR0                               ((PERI_GR_Type*) &PERI0->GR[0])                                   /* 0x52004000 */
@@ -1783,8 +1792,6 @@ typedef enum {
 *                                  PERI_PCLK
 *******************************************************************************/
 #if defined(_MSC_VER) /* #CUSTOM@NDRS */
-#include "mcu_reg_stub.h"
-
 #define PERI_PCLK0_BASE                         ((PERI_PCLK_Type*)ut_mcu_peri_pclk0_ptr)
 #define PERI_PCLK1_BASE                         ((PERI_PCLK_Type*)ut_mcu_peri_pclk1_ptr)
 #else
@@ -2017,8 +2024,12 @@ typedef enum {
 /*******************************************************************************
 *                                     SRSS
 *******************************************************************************/
-
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#define SRSS_BASE                               ((SRSS_Type*)ut_mcu_srss_ptr)
+#else
 #define SRSS_BASE                               0x52400000UL
+#endif
+
 #define SRSS                                    ((SRSS_Type*) SRSS_BASE)                                          /* 0x52400000 */
 #define CLK_ECO                                 ((CLK_ECO_Type*) &SRSS->CLK_ECO_STRUCT)                           /* 0x52401360 */
 #define CSV_HF                                  ((CSV_HF_Type*) &SRSS->CSV_HF_STRUCT)                             /* 0x52401400 */
