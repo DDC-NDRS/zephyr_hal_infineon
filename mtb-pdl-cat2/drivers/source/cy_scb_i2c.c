@@ -35,22 +35,21 @@ extern "C" {
 /***************************************
 *        Function Prototypes
 ***************************************/
-
-static void SlaveHandleAddress     (CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
-static void SlaveHandleDataReceive (CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
+static void SlaveHandleAddress(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
+static void SlaveHandleDataReceive(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
 static void SlaveHandleDataTransmit(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
-static void SlaveHandleStop        (CySCB_Type *base, bool slaveAddrInFifo,
-                                    cy_stc_scb_i2c_context_t *context);
+static void SlaveHandleStop(CySCB_Type *base, bool slaveAddrInFifo,
+                            cy_stc_scb_i2c_context_t *context);
 static void SlaveHandleAck(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
 #ifdef CY_IP_MXSCB
-static void SlaveHandleHsMode      (CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
+static void SlaveHandleHsMode(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
 #endif /* CY_IP_MXSCB */
 
-static void MasterHandleEvents      (CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
+static void MasterHandleEvents(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
 static void MasterHandleDataTransmit(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
-static void MasterHandleDataReceive (CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
-static void MasterHandleStop        (CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
-static void MasterHandleComplete    (CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
+static void MasterHandleDataReceive(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
+static void MasterHandleStop(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
+static void MasterHandleComplete(CySCB_Type *base, cy_stc_scb_i2c_context_t *context);
 
 static cy_en_scb_i2c_status_t HandleStatus(CySCB_Type *base, uint32_t status,
                                            cy_stc_scb_i2c_context_t *context);
@@ -1357,13 +1356,8 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterRead(CySCB_Type *base,
     {
         uint32_t intrState;
 
-        /* Set address byte (bit0 = 1, read direction) */
-        uint32_t address = _VAL2FLD(CY_SCB_I2C_ADDRESS, xferConfig->slaveAddress) |
-                         (uint32_t) CY_SCB_I2C_READ_XFER;
-
         /* Setup context */
         context->masterStatus     = CY_SCB_I2C_MASTER_BUSY;
-
         context->masterBuffer     = xferConfig->buffer;
         context->masterBufferSize = xferConfig->bufferSize;
         context->masterBufferIdx  = 0UL;
@@ -1371,30 +1365,37 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterRead(CySCB_Type *base,
         context->masterPause      = xferConfig->xferPending;
         context->masterRdDir      = true;
 
-        /* Clean-up hardware before transfer. Note RX FIFO is empty at here. */
-        Cy_SCB_ClearMasterInterrupt(base, CY_SCB_I2C_MASTER_INTR_ALL);
-        Cy_SCB_ClearTxFifo(base);
-
-        if (CY_SCB_I2C_IDLE == context->state)
+        if (!((xferConfig->continueXfer) && (CY_SCB_I2C_MASTER_WAIT == context->state)))
         {
-            /* Put the address in the TX FIFO, then generate a Start condition.
-            * This sequence ensures that after the Start condition generation
-            * the address is available to be sent onto the bus.
-            */
-            Cy_SCB_WriteTxFifo(base, address);
-            SCB_I2C_M_CMD(base) = SCB_I2C_M_CMD_M_START_ON_IDLE_Msk;
-        }
-        else
-        {
-            /* Generate a ReStart condition.
-            * If the previous transfer was read, NACK is generated before
-            * ReStart to complete the previous transfer.
-            */
-            SCB_I2C_M_CMD(base) = (SCB_I2C_M_CMD_M_START_Msk | (_FLD2BOOL(SCB_I2C_STATUS_M_READ, SCB_I2C_STATUS(base)) ?
-                                  SCB_I2C_M_CMD_M_NACK_Msk : 0UL));
+            /* Set address byte (bit0 = 1, read direction) */
+            uint32_t address = _VAL2FLD(CY_SCB_I2C_ADDRESS, xferConfig->slaveAddress) |
+                               (uint32_t) CY_SCB_I2C_READ_XFER;
 
-            /* Put address in TX FIFO */
-            Cy_SCB_WriteTxFifo(base, address);
+            /* Clean-up hardware before transfer. Note RX FIFO is empty at here. */
+            Cy_SCB_ClearMasterInterrupt(base, CY_SCB_I2C_MASTER_INTR_ALL);
+            Cy_SCB_ClearTxFifo(base);
+
+            if (CY_SCB_I2C_IDLE == context->state)
+            {
+                /* Put the address in the TX FIFO, then generate a Start condition.
+                * This sequence ensures that after the Start condition generation
+                * the address is available to be sent onto the bus.
+                */
+                Cy_SCB_WriteTxFifo(base, address);
+                SCB_I2C_M_CMD(base) = SCB_I2C_M_CMD_M_START_ON_IDLE_Msk;
+            }
+            else
+            {
+                /* Generate a ReStart condition.
+                * If the previous transfer was read, NACK is generated before
+                * ReStart to complete the previous transfer.
+                */
+                SCB_I2C_M_CMD(base) = (SCB_I2C_M_CMD_M_START_Msk | (_FLD2BOOL(SCB_I2C_STATUS_M_READ, SCB_I2C_STATUS(base)) ?
+                                      SCB_I2C_M_CMD_M_NACK_Msk : 0UL));
+
+                /* Put address in TX FIFO */
+                Cy_SCB_WriteTxFifo(base, address);
+            }
         }
 
         /* Configure interrupt for data reception */
@@ -1422,7 +1423,7 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterRead(CySCB_Type *base,
         * interrupt sources.
         */
         intrState = Cy_SysLib_EnterCriticalSection();
-        Cy_SCB_SetRxInterruptMask    (base, CY_SCB_RX_INTR_LEVEL);
+        Cy_SCB_SetRxInterruptMask(base, CY_SCB_RX_INTR_LEVEL);
         Cy_SCB_SetMasterInterruptMask(base, CY_SCB_I2C_MASTER_INTR);
         Cy_SysLib_ExitCriticalSection(intrState);
 
@@ -1587,12 +1588,8 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterWrite(CySCB_Type *base,
     {
         uint32_t intrState;
 
-        /* Set address byte (bit0 = 0, write direction) */
-        uint32_t address = _VAL2FLD(CY_SCB_I2C_ADDRESS, xferConfig->slaveAddress);
-
         /* Setup context */
         context->masterStatus     = CY_SCB_I2C_MASTER_BUSY;
-
         context->masterBuffer     = xferConfig->buffer;
         context->masterBufferSize = xferConfig->bufferSize;
         context->masterBufferIdx  = 0UL;
@@ -1600,49 +1597,55 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterWrite(CySCB_Type *base,
         context->masterPause      = xferConfig->xferPending;
         context->masterRdDir      = false;
 
-        /* Clean-up hardware before transfer. Note RX FIFO is empty at here. */
-        Cy_SCB_ClearMasterInterrupt(base, CY_SCB_I2C_MASTER_INTR_ALL);
-        Cy_SCB_ClearTxFifo(base);
-
-        if (CY_SCB_I2C_IDLE == context->state)
+        if (!((xferConfig->continueXfer) && (CY_SCB_I2C_MASTER_WAIT == context->state)))
         {
-            /* Put the address in the TX FIFO, then generate a Start condition.
-            * This sequence ensures that after the Start condition generation
-            * the address is available to be sent onto the bus.
-            */
-            Cy_SCB_WriteTxFifo     (base, address);
-            Cy_SCB_ClearTxInterrupt(base, CY_SCB_TX_INTR_UNDERFLOW);
-            SCB_I2C_M_CMD(base) = SCB_I2C_M_CMD_M_START_ON_IDLE_Msk;
-        }
-        else
-        {
-            /* Generate a ReStart condition.
-            * If the previous transfer was read, NACK is generated before
-            * ReStart to complete the previous transfer.
-            */
-            SCB_I2C_M_CMD(base) = (SCB_I2C_M_CMD_M_START_Msk | (_FLD2BOOL(SCB_I2C_STATUS_M_READ, SCB_I2C_STATUS(base)) ?
-                               SCB_I2C_M_CMD_M_NACK_Msk : 0UL));
+            /* Set address byte (bit0 = 0, write direction) */
+            uint32_t address = _VAL2FLD(CY_SCB_I2C_ADDRESS, xferConfig->slaveAddress);
 
-            if (0U == context->masterBufferSize)
+            /* Clean-up hardware before transfer. Note RX FIFO is empty at here. */
+            Cy_SCB_ClearMasterInterrupt(base, CY_SCB_I2C_MASTER_INTR_ALL);
+            Cy_SCB_ClearTxFifo(base);
+
+            if (CY_SCB_I2C_IDLE == context->state)
             {
-                /* The address is the last byte to transfer.
-                * Put the address byte in the TX FIFO and clear the TX
-                * Underflow interrupt source inside the critical section
-                * to ensure that the TX Underflow interrupt will trigger
-                * after the address byte is sent onto the bus.
+                /* Put the address in the TX FIFO, then generate a Start condition.
+                * This sequence ensures that after the Start condition generation
+                * the address is available to be sent onto the bus.
                 */
-                intrState = Cy_SysLib_EnterCriticalSection();
-
-                /* Put address in TX FIFO */
-                Cy_SCB_WriteTxFifo     (base, address);
+                Cy_SCB_WriteTxFifo(base, address);
                 Cy_SCB_ClearTxInterrupt(base, CY_SCB_TX_INTR_UNDERFLOW);
-
-                Cy_SysLib_ExitCriticalSection(intrState);
+                SCB_I2C_M_CMD(base) = SCB_I2C_M_CMD_M_START_ON_IDLE_Msk;
             }
             else
             {
-                /* Put address in TX FIFO */
-                Cy_SCB_WriteTxFifo(base, address);
+                /* Generate a ReStart condition.
+                * If the previous transfer was read, NACK is generated before
+                * ReStart to complete the previous transfer.
+                */
+                SCB_I2C_M_CMD(base) = (SCB_I2C_M_CMD_M_START_Msk | (_FLD2BOOL(SCB_I2C_STATUS_M_READ, SCB_I2C_STATUS(base)) ?
+                                   SCB_I2C_M_CMD_M_NACK_Msk : 0UL));
+
+                if (0U == context->masterBufferSize)
+                {
+                    /* The address is the last byte to transfer.
+                    * Put the address byte in the TX FIFO and clear the TX
+                    * Underflow interrupt source inside the critical section
+                    * to ensure that the TX Underflow interrupt will trigger
+                    * after the address byte is sent onto the bus.
+                    */
+                    intrState = Cy_SysLib_EnterCriticalSection();
+
+                    /* Put address in TX FIFO */
+                    Cy_SCB_WriteTxFifo(base, address);
+                    Cy_SCB_ClearTxInterrupt(base, CY_SCB_TX_INTR_UNDERFLOW);
+
+                    Cy_SysLib_ExitCriticalSection(intrState);
+                }
+                else
+                {
+                    /* Put address in TX FIFO */
+                    Cy_SCB_WriteTxFifo(base, address);
+                }
             }
         }
 
@@ -1656,7 +1659,7 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterWrite(CySCB_Type *base,
         * interrupt sources.
         */
         intrState = Cy_SysLib_EnterCriticalSection();
-        Cy_SCB_SetTxInterruptMask    (base, CY_SCB_TX_INTR_LEVEL);
+        Cy_SCB_SetTxInterruptMask(base, CY_SCB_TX_INTR_LEVEL);
         Cy_SCB_SetMasterInterruptMask(base, CY_SCB_I2C_MASTER_INTR);
         Cy_SysLib_ExitCriticalSection(intrState);
 
@@ -1861,7 +1864,7 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterSendStart(CySCB_Type *base,
                             uint32_t timeoutMs,
                             cy_stc_scb_i2c_context_t *context)
 {
-    CY_ASSERT_L2(CY_SCB_IS_I2C_ADDR_VALID   (address));
+    CY_ASSERT_L2(CY_SCB_IS_I2C_ADDR_VALID(address));
     CY_ASSERT_L2(CY_SCB_I2C_IS_TIMEOUT_VALID(timeoutMs));
     CY_ASSERT_L3(CY_SCB_I2C_IS_RW_BIT_VALID (bitRnW));
 
@@ -1881,7 +1884,7 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterSendStart(CySCB_Type *base,
 
         /* Clean up the hardware before a transfer. Note RX FIFO is empty at here */
         Cy_SCB_ClearMasterInterrupt(base, CY_SCB_I2C_MASTER_INTR_ALL);
-        Cy_SCB_ClearRxInterrupt    (base, CY_SCB_RX_INTR_NOT_EMPTY);
+        Cy_SCB_ClearRxInterrupt(base, CY_SCB_RX_INTR_NOT_EMPTY);
         Cy_SCB_ClearTxFifo(base);
 
         /* Generate a Start and send address byte */
@@ -1962,7 +1965,7 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterSendReStart(CySCB_Type *base,
                         uint32_t timeoutMs,
                         cy_stc_scb_i2c_context_t *context)
 {
-    CY_ASSERT_L2(CY_SCB_IS_I2C_ADDR_VALID   (address));
+    CY_ASSERT_L2(CY_SCB_IS_I2C_ADDR_VALID(address));
     CY_ASSERT_L2(CY_SCB_I2C_IS_TIMEOUT_VALID(timeoutMs));
     CY_ASSERT_L3(CY_SCB_I2C_IS_RW_BIT_VALID (bitRnW));
 
@@ -2137,7 +2140,7 @@ cy_en_scb_i2c_status_t Cy_SCB_I2C_MasterReadByte(CySCB_Type *base,
                             uint32_t timeoutMs,
                             cy_stc_scb_i2c_context_t *context)
 {
-    CY_ASSERT_L1(CY_SCB_IS_BUFFER_VALID      (byte, 1UL));
+    CY_ASSERT_L1(CY_SCB_IS_BUFFER_VALID(byte, 1UL));
     CY_ASSERT_L2(CY_SCB_I2C_IS_TIMEOUT_VALID (timeoutMs));
     CY_ASSERT_L3(CY_SCB_I2C_IS_RESPONSE_VALID(ackNack));
 
@@ -2352,7 +2355,7 @@ void Cy_SCB_I2C_SlaveInterrupt(CySCB_Type *base, cy_stc_scb_i2c_context_t *conte
             */
             if ((Cy_SCB_GetNumInRxFifo(base) > 0UL) && (context->slaveRxBufferSize > 0UL))
             {
-                Cy_SCB_SetRxInterrupt    (base, CY_SCB_RX_INTR_LEVEL);
+                Cy_SCB_SetRxInterrupt(base, CY_SCB_RX_INTR_LEVEL);
                 Cy_SCB_SetRxInterruptMask(base, CY_SCB_RX_INTR_LEVEL);
             }
         }
@@ -2820,7 +2823,7 @@ static void SlaveHandleDataTransmit(CySCB_Type *base, cy_stc_scb_i2c_context_t *
             */
             intrStatus = Cy_SysLib_EnterCriticalSection();
 
-            Cy_SCB_WriteTxFifo     (base, (uint32_t) context->slaveTxBuffer[0UL]);
+            Cy_SCB_WriteTxFifo(base, (uint32_t) context->slaveTxBuffer[0UL]);
             Cy_SCB_ClearTxInterrupt(base, CY_SCB_TX_INTR_UNDERFLOW);
 
             Cy_SysLib_ExitCriticalSection(intrStatus);
@@ -3322,7 +3325,7 @@ static void MasterHandleDataTransmit(CySCB_Type *base, cy_stc_scb_i2c_context_t 
             */
             intrStatus = Cy_SysLib_EnterCriticalSection();
 
-            Cy_SCB_WriteTxFifo     (base, (uint32_t) context->masterBuffer[0UL]);
+            Cy_SCB_WriteTxFifo(base, (uint32_t) context->masterBuffer[0UL]);
             Cy_SCB_ClearTxInterrupt(base, CY_SCB_TX_INTR_UNDERFLOW);
 
             Cy_SysLib_ExitCriticalSection(intrStatus);
@@ -3437,8 +3440,8 @@ static void MasterHandleComplete(CySCB_Type *base, cy_stc_scb_i2c_context_t *con
     SCB_I2C_CTRL(base) &= (uint32_t) ~SCB_I2C_CTRL_M_READY_DATA_ACK_Msk;
 
     /* Disable the interrupt source for master operation */
-    Cy_SCB_SetRxInterruptMask    (base, CY_SCB_CLEAR_ALL_INTR_SRC);
-    Cy_SCB_SetTxInterruptMask    (base, CY_SCB_CLEAR_ALL_INTR_SRC);
+    Cy_SCB_SetRxInterruptMask(base, CY_SCB_CLEAR_ALL_INTR_SRC);
+    Cy_SCB_SetTxInterruptMask(base, CY_SCB_CLEAR_ALL_INTR_SRC);
     Cy_SCB_SetMasterInterruptMask(base, CY_SCB_CLEAR_ALL_INTR_SRC);
 
     Cy_SCB_ClearMasterInterrupt(base, CY_SCB_I2C_MASTER_INTR_ALL);
