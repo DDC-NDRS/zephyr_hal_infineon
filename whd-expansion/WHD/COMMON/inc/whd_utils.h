@@ -63,7 +63,7 @@ static const unsigned char aad[20] =  { 0xfe, 0xed, 0xfa, 0xce, 0xde, 0xad, 0xbe
 #endif /* BUS_ENC */
 
 #ifdef CONFIG_WIFI_NM_WPA_SUPPLICANT
-#define WPA_PROTO_WPA3 BIT(4) /* Local define if SAE and RNS support */ 
+#define WPA_PROTO_WPA3 BIT(4) /* Local define if SAE and RNS support */
 
 /* channel info structure */
 typedef struct {
