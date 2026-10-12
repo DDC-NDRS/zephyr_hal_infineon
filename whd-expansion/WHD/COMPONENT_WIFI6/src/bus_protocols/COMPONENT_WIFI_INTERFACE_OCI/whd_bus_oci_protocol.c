@@ -652,6 +652,7 @@ static whd_result_t whd_bus_oci_blhs(whd_driver_t whd_driver, whd_bus_blhs_stage
         case POST_WATCHDOG_RESET:
             CHECK_RETURN(whd_bus_oci_blhs_write_h2d(whd_driver, OCI_BLHS_H2D_BL_INIT) );
             CHECK_RETURN(whd_bus_oci_blhs_wait_d2h(whd_driver, OCI_BLHS_D2H_READY) );
+            break;
         default:
             return 1;
     }
