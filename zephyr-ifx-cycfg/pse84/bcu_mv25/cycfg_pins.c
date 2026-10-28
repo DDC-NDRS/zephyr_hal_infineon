@@ -27,6 +27,9 @@
  ******************************************************************************/
 
 #include "cycfg_pins.h"
+// CUSTOM@NDRS: this PDL (mtb-dsl-pse8xxgp) has Cy_GPIO_Write, not Cy_GPIO_WriteDirectOut (psc3m6 only).
+// Re-add after regenerating this file.
+#define Cy_GPIO_WriteDirectOut Cy_GPIO_Write
 
 const cy_stc_gpio_pin_config_t SCB3_SPI_CS0_PMIC_config =
 {

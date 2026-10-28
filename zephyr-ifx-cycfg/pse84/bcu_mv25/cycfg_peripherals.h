@@ -234,6 +234,9 @@ extern "C" {
 #define CAN1_IF_CHANNEL_NUM 1U
 #define SMIF0_QSPI_NOR_ENABLED 1U
 #define SMIF0_QSPI_NOR_HW SMIF0_CORE
+// CUSTOM@NDRS: TF-M's board layer (ifx_s_peripherals_def.h) uses the Infineon BSP name for SMIF0.
+// Re-add after regenerating this file, or rename the SMIF instance in Device Configurator.
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_HW SMIF0_CORE
 #define SMIF0_QSPI_NOR_IRQ smif_0_smif0_interrupt_nsec_IRQn
 #define SMIF0_QSPI_NOR_MEMORY_MODE_ALIGMENT_ERROR (0UL)
 #define SMIF0_QSPI_NOR_RX_DATA_FIFO_UNDERFLOW (0UL)
