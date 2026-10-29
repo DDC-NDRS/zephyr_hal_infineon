@@ -4,8 +4,8 @@
  * Description:
  * Connectivity Wi-Fi configuration
  * This file was automatically generated and should not be modified.
- * Configurator Backend 3.80.0
- * device-db 4.37.0.10260
+ * Configurator Backend 3.90.0
+ * device-db 4.41.0.11271
  * mtb-dsl-pse8xxgp 1.5.0.1072
  *
  *******************************************************************************

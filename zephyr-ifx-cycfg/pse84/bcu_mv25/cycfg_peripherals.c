@@ -4,8 +4,8 @@
  * Description:
  * Analog configuration
  * This file was automatically generated and should not be modified.
- * Configurator Backend 3.80.0
- * device-db 4.37.0.10260
+ * Configurator Backend 3.90.0
+ * device-db 4.41.0.11271
  * mtb-dsl-pse8xxgp 1.5.0.1072
  *
  *******************************************************************************
@@ -1218,10 +1218,10 @@ cy_stc_canfd_tx_buffer_t CAN1_IF_txBuffer_0 =
     .t1_f = &CAN1_IF_T1RegisterBuffer_0,
     .data_area_f = CAN1_IF_dataBuffer_0,
 };
-const cy_stc_smif_config_t SMIF0_QSPI_NOR_config =
+const cy_stc_smif_config_t CYBSP_SMIF_CORE_0_XSPI_FLASH_config =
 {
     .mode = (uint32_t)CY_SMIF_NORMAL,
-    .deselectDelay = SMIF0_QSPI_NOR_DESELECT_DELAY,
+    .deselectDelay = CYBSP_SMIF_CORE_0_XSPI_FLASH_DESELECT_DELAY,
     .blockEvent = (uint32_t)CY_SMIF_BUS_ERROR,
     .inputFrequencyMHz = 160,
     .enable_internal_dll = false,
@@ -1236,33 +1236,33 @@ const cy_stc_smif_config_t SMIF0_QSPI_NOR_config =
 };
 
 #if defined (COMPONENT_MTB_HAL)
-const mtb_hal_hf_clock_t SMIF0_QSPI_NOR_clock_ref =
+const mtb_hal_hf_clock_t CYBSP_SMIF_CORE_0_XSPI_FLASH_clock_ref =
 {
     .inst_num = 3U,
 };
-const mtb_hal_clock_t SMIF0_QSPI_NOR_hal_clock =
+const mtb_hal_clock_t CYBSP_SMIF_CORE_0_XSPI_FLASH_hal_clock =
 {
-    .clock_ref = &SMIF0_QSPI_NOR_clock_ref,
+    .clock_ref = &CYBSP_SMIF_CORE_0_XSPI_FLASH_clock_ref,
     .interface = &mtb_hal_clock_hf_interface,
 };
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI)
-const mtb_hal_memoryspi_configurator_t SMIF0_QSPI_NOR_hal_config =
+const mtb_hal_memoryspi_configurator_t CYBSP_SMIF_CORE_0_XSPI_FLASH_hal_config =
 {
     .base = SMIF0_CORE,
-    .clock = &SMIF0_QSPI_NOR_hal_clock,
-    .config = &SMIF0_QSPI_NOR_config,
+    .clock = &CYBSP_SMIF_CORE_0_XSPI_FLASH_hal_clock,
+    .config = &CYBSP_SMIF_CORE_0_XSPI_FLASH_config,
     .csel = {true, false, false, false},
-    .irqs = SMIF0_QSPI_NOR_MEMORY_MODE_ALIGMENT_ERROR << 5 | SMIF0_QSPI_NOR_RX_DATA_FIFO_UNDERFLOW << 4 | SMIF0_QSPI_NOR_TX_COMMAND_FIFO_OVERFLOW << 3 | SMIF0_QSPI_NOR_TX_DATA_FIFO_OVERFLOW << 2 | (uint8_t)(SMIF0_QSPI_NOR_RX_FIFO_TRIGGER_LEVEL != 0) << 1 | (uint8_t)(SMIF0_QSPI_NOR_TX_FIFO_TRIGGER_LEVEL != 0) << 0,
-    .dmas = SMIF0_QSPI_NOR_RX_DMA_TRIGGER_OUT_USED << 1 | SMIF0_QSPI_NOR_TX_DMA_TRIGGER_OUT_USED << 0,
+    .irqs = CYBSP_SMIF_CORE_0_XSPI_FLASH_MEMORY_MODE_ALIGMENT_ERROR << 5 | CYBSP_SMIF_CORE_0_XSPI_FLASH_RX_DATA_FIFO_UNDERFLOW << 4 | CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_COMMAND_FIFO_OVERFLOW << 3 | CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_DATA_FIFO_OVERFLOW << 2 | (uint8_t)(CYBSP_SMIF_CORE_0_XSPI_FLASH_RX_FIFO_TRIGGER_LEVEL != 0) << 1 | (uint8_t)(CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_FIFO_TRIGGER_LEVEL != 0) << 0,
+    .dmas = CYBSP_SMIF_CORE_0_XSPI_FLASH_RX_DMA_TRIGGER_OUT_USED << 1 | CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_DMA_TRIGGER_OUT_USED << 0,
 };
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI) */
 
-const cy_stc_smif_config_t SMIF1_HYPERRAM_config =
+const cy_stc_smif_config_t CYBSP_SMIF_CORE_1_PSRAM_config =
 {
     .mode = (uint32_t)CY_SMIF_NORMAL,
-    .deselectDelay = SMIF1_HYPERRAM_DESELECT_DELAY,
+    .deselectDelay = CYBSP_SMIF_CORE_1_PSRAM_DESELECT_DELAY,
     .blockEvent = (uint32_t)CY_SMIF_BUS_ERROR,
     .inputFrequencyMHz = 160,
     .enable_internal_dll = false,
@@ -1277,26 +1277,26 @@ const cy_stc_smif_config_t SMIF1_HYPERRAM_config =
 };
 
 #if defined (COMPONENT_MTB_HAL)
-const mtb_hal_hf_clock_t SMIF1_HYPERRAM_clock_ref =
+const mtb_hal_hf_clock_t CYBSP_SMIF_CORE_1_PSRAM_clock_ref =
 {
     .inst_num = 4U,
 };
-const mtb_hal_clock_t SMIF1_HYPERRAM_hal_clock =
+const mtb_hal_clock_t CYBSP_SMIF_CORE_1_PSRAM_hal_clock =
 {
-    .clock_ref = &SMIF1_HYPERRAM_clock_ref,
+    .clock_ref = &CYBSP_SMIF_CORE_1_PSRAM_clock_ref,
     .interface = &mtb_hal_clock_hf_interface,
 };
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI)
-const mtb_hal_memoryspi_configurator_t SMIF1_HYPERRAM_hal_config =
+const mtb_hal_memoryspi_configurator_t CYBSP_SMIF_CORE_1_PSRAM_hal_config =
 {
     .base = SMIF1_CORE,
-    .clock = &SMIF1_HYPERRAM_hal_clock,
-    .config = &SMIF1_HYPERRAM_config,
+    .clock = &CYBSP_SMIF_CORE_1_PSRAM_hal_clock,
+    .config = &CYBSP_SMIF_CORE_1_PSRAM_config,
     .csel = {false, false, true, false},
-    .irqs = SMIF1_HYPERRAM_MEMORY_MODE_ALIGMENT_ERROR << 5 | SMIF1_HYPERRAM_RX_DATA_FIFO_UNDERFLOW << 4 | SMIF1_HYPERRAM_TX_COMMAND_FIFO_OVERFLOW << 3 | SMIF1_HYPERRAM_TX_DATA_FIFO_OVERFLOW << 2 | (uint8_t)(SMIF1_HYPERRAM_RX_FIFO_TRIGGER_LEVEL != 0) << 1 | (uint8_t)(SMIF1_HYPERRAM_TX_FIFO_TRIGGER_LEVEL != 0) << 0,
-    .dmas = SMIF1_HYPERRAM_RX_DMA_TRIGGER_OUT_USED << 1 | SMIF1_HYPERRAM_TX_DMA_TRIGGER_OUT_USED << 0,
+    .irqs = CYBSP_SMIF_CORE_1_PSRAM_MEMORY_MODE_ALIGMENT_ERROR << 5 | CYBSP_SMIF_CORE_1_PSRAM_RX_DATA_FIFO_UNDERFLOW << 4 | CYBSP_SMIF_CORE_1_PSRAM_TX_COMMAND_FIFO_OVERFLOW << 3 | CYBSP_SMIF_CORE_1_PSRAM_TX_DATA_FIFO_OVERFLOW << 2 | (uint8_t)(CYBSP_SMIF_CORE_1_PSRAM_RX_FIFO_TRIGGER_LEVEL != 0) << 1 | (uint8_t)(CYBSP_SMIF_CORE_1_PSRAM_TX_FIFO_TRIGGER_LEVEL != 0) << 0,
+    .dmas = CYBSP_SMIF_CORE_1_PSRAM_RX_DMA_TRIGGER_OUT_USED << 1 | CYBSP_SMIF_CORE_1_PSRAM_TX_DMA_TRIGGER_OUT_USED << 0,
 };
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI) */
 

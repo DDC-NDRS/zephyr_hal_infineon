@@ -4,8 +4,8 @@
  * Description:
  * Pin configuration
  * This file was automatically generated and should not be modified.
- * Configurator Backend 3.80.0
- * device-db 4.37.0.10260
+ * Configurator Backend 3.90.0
+ * device-db 4.41.0.11271
  * mtb-dsl-pse8xxgp 1.5.0.1072
  *
  *******************************************************************************
@@ -30,11 +30,13 @@
 // CUSTOM@NDRS: this PDL (mtb-dsl-pse8xxgp) has Cy_GPIO_Write, not Cy_GPIO_WriteDirectOut (psc3m6 only).
 // Re-add after regenerating this file.
 #define Cy_GPIO_WriteDirectOut Cy_GPIO_Write
+// CUSTOM@NDRS: application pins are Hi-Z (CY_GPIO_DM_ANALOG, out 0) here; Zephyr pinctrl / dt_cfg() owns them.
+// Equivalent to tools/tfm_design/make_design_tfm.py applied to the design. Regenerating from design_tfm.modus replaces this.
 
 const cy_stc_gpio_pin_config_t SCB3_SPI_CS0_PMIC_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB3_SPI_CS0_PMIC_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -159,8 +161,8 @@ const cy_stc_gpio_pin_config_t ENT_BTN_config =
 };
 const cy_stc_gpio_pin_config_t RTC_TS_L_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = RTC_TS_L_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -195,8 +197,8 @@ const cy_stc_gpio_pin_config_t RTC_INT_L_config =
 };
 const cy_stc_gpio_pin_config_t SECURE_RST_L_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SECURE_RST_L_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -213,8 +215,8 @@ const cy_stc_gpio_pin_config_t SECURE_RST_L_config =
 };
 const cy_stc_gpio_pin_config_t BMS_COM1_RST_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM1_RST_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -231,8 +233,8 @@ const cy_stc_gpio_pin_config_t BMS_COM1_RST_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_I3C_SCL_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_CFGOUT3_STRONG_PULLUP_HIGHZ,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_I3C_SCL_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -249,8 +251,8 @@ const cy_stc_gpio_pin_config_t CYBSP_I3C_SCL_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_I3C_SDA_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_CFGOUT3_STRONG_PULLUP_HIGHZ,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_I3C_SDA_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -501,8 +503,8 @@ const cy_stc_gpio_pin_config_t CYBSP_SWDCK_config =
 };
 const cy_stc_gpio_pin_config_t K1_FDO_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = K1_FDO_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -537,8 +539,8 @@ const cy_stc_gpio_pin_config_t SCB2_UART_RX_UART_HS_config =
 };
 const cy_stc_gpio_pin_config_t K3_FDO_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = K3_FDO_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -555,8 +557,8 @@ const cy_stc_gpio_pin_config_t K3_FDO_config =
 };
 const cy_stc_gpio_pin_config_t SCB2_UART_TX_UART_HS_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB2_UART_TX_UART_HS_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -591,8 +593,8 @@ const cy_stc_gpio_pin_config_t F1_FS_config =
 };
 const cy_stc_gpio_pin_config_t F3_FS_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = F3_FS_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -609,8 +611,8 @@ const cy_stc_gpio_pin_config_t F3_FS_config =
 };
 const cy_stc_gpio_pin_config_t PWM_IL_OUT_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = PWM_IL_OUT_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -627,8 +629,8 @@ const cy_stc_gpio_pin_config_t PWM_IL_OUT_config =
 };
 const cy_stc_gpio_pin_config_t LOAD_SW_IN3_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = LOAD_SW_IN3_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -735,8 +737,8 @@ const cy_stc_gpio_pin_config_t BMS_COM2_DIO2_config =
 };
 const cy_stc_gpio_pin_config_t BMS_COM2_DIO2_DIR_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM2_DIO2_DIR_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -753,8 +755,8 @@ const cy_stc_gpio_pin_config_t BMS_COM2_DIO2_DIR_config =
 };
 const cy_stc_gpio_pin_config_t FRAM_WP_L_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = FRAM_WP_L_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -789,8 +791,8 @@ const cy_stc_gpio_pin_config_t SEL_BTN_config =
 };
 const cy_stc_gpio_pin_config_t LOAD_SW_RST_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = LOAD_SW_RST_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -825,8 +827,8 @@ const cy_stc_gpio_pin_config_t LOAD_SW_FAULT_config =
 };
 const cy_stc_gpio_pin_config_t LOAD_SW_IN4_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = LOAD_SW_IN4_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -843,8 +845,8 @@ const cy_stc_gpio_pin_config_t LOAD_SW_IN4_config =
 };
 const cy_stc_gpio_pin_config_t LOAD_SW_LHM_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = LOAD_SW_LHM_HSIOM,
     .intEdge = CY_GPIO_INTR_FALLING,
     .intMask = 1UL,
@@ -861,8 +863,8 @@ const cy_stc_gpio_pin_config_t LOAD_SW_LHM_config =
 };
 const cy_stc_gpio_pin_config_t K_ENBL_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = K_ENBL_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -879,8 +881,8 @@ const cy_stc_gpio_pin_config_t K_ENBL_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_USER_LED3_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_USER_LED3_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -897,8 +899,8 @@ const cy_stc_gpio_pin_config_t CYBSP_USER_LED3_config =
 };
 const cy_stc_gpio_pin_config_t SCB1_UART_TX_UART_LS_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB1_UART_TX_UART_LS_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -951,8 +953,8 @@ const cy_stc_gpio_pin_config_t CYBSP_BT_UART_RX_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_BT_UART_TX_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_BT_UART_TX_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -988,7 +990,7 @@ const cy_stc_gpio_pin_config_t CYBSP_BT_UART_CTS_config =
 const cy_stc_gpio_pin_config_t CYBSP_BT_UART_RTS_config =
 {
     .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_BT_UART_RTS_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1006,7 +1008,7 @@ const cy_stc_gpio_pin_config_t CYBSP_BT_UART_RTS_config =
 const cy_stc_gpio_pin_config_t CYBSP_BT_POWER_config =
 {
     .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_BT_POWER_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1077,8 +1079,8 @@ const cy_stc_gpio_pin_config_t RMII_ETH_RXD1_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_I2C_SCL_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_OD_DRIVESLOW,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_I2C_SCL_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1095,8 +1097,8 @@ const cy_stc_gpio_pin_config_t CYBSP_I2C_SCL_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_I2C_SDA_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_OD_DRIVESLOW,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_I2C_SDA_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1113,8 +1115,8 @@ const cy_stc_gpio_pin_config_t CYBSP_I2C_SDA_config =
 };
 const cy_stc_gpio_pin_config_t RMII_ETH_TXD0_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = RMII_ETH_TXD0_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1131,8 +1133,8 @@ const cy_stc_gpio_pin_config_t RMII_ETH_TXD0_config =
 };
 const cy_stc_gpio_pin_config_t RMII_ETH_TXD1_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = RMII_ETH_TXD1_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1149,8 +1151,8 @@ const cy_stc_gpio_pin_config_t RMII_ETH_TXD1_config =
 };
 const cy_stc_gpio_pin_config_t RMII_ETH_TX_CTL_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = RMII_ETH_TX_CTL_HSIOM,
     .intEdge = CY_GPIO_INTR_FALLING,
     .intMask = 1UL,
@@ -1167,8 +1169,8 @@ const cy_stc_gpio_pin_config_t RMII_ETH_TX_CTL_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_BT_DEVICE_WAKE_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_BT_DEVICE_WAKE_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1186,7 +1188,7 @@ const cy_stc_gpio_pin_config_t CYBSP_BT_DEVICE_WAKE_config =
 const cy_stc_gpio_pin_config_t CYBSP_WIFI_WL_REG_ON_config =
 {
     .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_WIFI_WL_REG_ON_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1221,8 +1223,8 @@ const cy_stc_gpio_pin_config_t RMII_ETH_REF_CLK_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_CLK_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_WIFI_SDIO_CLK_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1239,8 +1241,8 @@ const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_CLK_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D0_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_WIFI_SDIO_D0_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1257,8 +1259,8 @@ const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D0_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D1_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_WIFI_SDIO_D1_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1275,8 +1277,8 @@ const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D1_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_WL_DEV_WAKE_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_WL_DEV_WAKE_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1293,8 +1295,8 @@ const cy_stc_gpio_pin_config_t CYBSP_WL_DEV_WAKE_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D2_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_WIFI_SDIO_D2_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1311,8 +1313,8 @@ const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D2_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D3_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_WIFI_SDIO_D3_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1347,8 +1349,8 @@ const cy_stc_gpio_pin_config_t CYBSP_BT_HOST_WAKE_config =
 };
 const cy_stc_gpio_pin_config_t ETH_MDC_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = ETH_MDC_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1365,8 +1367,8 @@ const cy_stc_gpio_pin_config_t ETH_MDC_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_USER_LED1_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_USER_LED1_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1383,8 +1385,8 @@ const cy_stc_gpio_pin_config_t CYBSP_USER_LED1_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_USER_LED2_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_USER_LED2_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1401,8 +1403,8 @@ const cy_stc_gpio_pin_config_t CYBSP_USER_LED2_config =
 };
 const cy_stc_gpio_pin_config_t RMII_ETH_NRST_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = RMII_ETH_NRST_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1455,8 +1457,8 @@ const cy_stc_gpio_pin_config_t ETH_MDIO_config =
 };
 const cy_stc_gpio_pin_config_t RS485_DE_RE_L_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = RS485_DE_RE_L_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1491,8 +1493,8 @@ const cy_stc_gpio_pin_config_t PMIC_INT_config =
 };
 const cy_stc_gpio_pin_config_t PMIC_WDI_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = PMIC_WDI_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1509,8 +1511,8 @@ const cy_stc_gpio_pin_config_t PMIC_WDI_config =
 };
 const cy_stc_gpio_pin_config_t BMS_COM2_RST_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM2_RST_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1527,8 +1529,8 @@ const cy_stc_gpio_pin_config_t BMS_COM2_RST_config =
 };
 const cy_stc_gpio_pin_config_t SCB8_UART_TX_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB8_UART_TX_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1581,8 +1583,8 @@ const cy_stc_gpio_pin_config_t BMS_COM2_INT_config =
 };
 const cy_stc_gpio_pin_config_t CAN1_STB_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CAN1_STB_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1599,8 +1601,8 @@ const cy_stc_gpio_pin_config_t CAN1_STB_config =
 };
 const cy_stc_gpio_pin_config_t CAN0_STB_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CAN0_STB_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1617,8 +1619,8 @@ const cy_stc_gpio_pin_config_t CAN0_STB_config =
 };
 const cy_stc_gpio_pin_config_t SCB9_SPI_CLK_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB9_SPI_CLK_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1635,8 +1637,8 @@ const cy_stc_gpio_pin_config_t SCB9_SPI_CLK_config =
 };
 const cy_stc_gpio_pin_config_t SCB9_SPI_MOSI_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB9_SPI_MOSI_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1671,8 +1673,8 @@ const cy_stc_gpio_pin_config_t SCB9_SPI_MISO_config =
 };
 const cy_stc_gpio_pin_config_t SCB9_SPI_CS0_K1_CSB_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB9_SPI_CS0_K1_CSB_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1689,8 +1691,8 @@ const cy_stc_gpio_pin_config_t SCB9_SPI_CS0_K1_CSB_config =
 };
 const cy_stc_gpio_pin_config_t SCB9_SPI_CS1_K3_CSB_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB9_SPI_CS1_K3_CSB_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1779,8 +1781,8 @@ const cy_stc_gpio_pin_config_t CAN0_RX_config =
 };
 const cy_stc_gpio_pin_config_t CAN0_TX_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CAN0_TX_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1815,8 +1817,8 @@ const cy_stc_gpio_pin_config_t CAN1_RX_config =
 };
 const cy_stc_gpio_pin_config_t CAN1_TX_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CAN1_TX_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1833,8 +1835,8 @@ const cy_stc_gpio_pin_config_t CAN1_TX_config =
 };
 const cy_stc_gpio_pin_config_t BMS_COM2_DIO1_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM2_DIO1_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1870,7 +1872,7 @@ const cy_stc_gpio_pin_config_t BMS_COM2_SPI_MISO_config =
 const cy_stc_gpio_pin_config_t BMS_COM2_CS0_config =
 {
     .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM2_CS0_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1888,7 +1890,7 @@ const cy_stc_gpio_pin_config_t BMS_COM2_CS0_config =
 const cy_stc_gpio_pin_config_t BMS_COM2_CS1_MC33XS2410_config =
 {
     .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM2_CS1_MC33XS2410_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1906,7 +1908,7 @@ const cy_stc_gpio_pin_config_t BMS_COM2_CS1_MC33XS2410_config =
 const cy_stc_gpio_pin_config_t BMS_COM2_SPI_CLK_config =
 {
     .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM2_SPI_CLK_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1924,7 +1926,7 @@ const cy_stc_gpio_pin_config_t BMS_COM2_SPI_CLK_config =
 const cy_stc_gpio_pin_config_t BMS_COM2_SPI_MOSI_config =
 {
     .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM2_SPI_MOSI_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1942,7 +1944,7 @@ const cy_stc_gpio_pin_config_t BMS_COM2_SPI_MOSI_config =
 const cy_stc_gpio_pin_config_t BMS_COM1_SPI_CLK_config =
 {
     .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM1_SPI_CLK_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1960,7 +1962,7 @@ const cy_stc_gpio_pin_config_t BMS_COM1_SPI_CLK_config =
 const cy_stc_gpio_pin_config_t BMS_COM1_SPI_MOSI_config =
 {
     .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM1_SPI_MOSI_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -1977,8 +1979,8 @@ const cy_stc_gpio_pin_config_t BMS_COM1_SPI_MOSI_config =
 };
 const cy_stc_gpio_pin_config_t BMS_COM1_DIO1_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM1_DIO1_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -2013,8 +2015,8 @@ const cy_stc_gpio_pin_config_t BMS_COM1_MISO_config =
 };
 const cy_stc_gpio_pin_config_t BMS_COM1_CS0_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = BMS_COM1_CS0_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -2193,8 +2195,8 @@ const cy_stc_gpio_pin_config_t BMS_COM1_INT_config =
 };
 const cy_stc_gpio_pin_config_t K1_PWM_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = K1_PWM_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -2211,8 +2213,8 @@ const cy_stc_gpio_pin_config_t K1_PWM_config =
 };
 const cy_stc_gpio_pin_config_t K3_PWM_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = K3_PWM_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -2229,8 +2231,8 @@ const cy_stc_gpio_pin_config_t K3_PWM_config =
 };
 const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_CMD_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = CYBSP_WIFI_SDIO_CMD_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -2265,8 +2267,8 @@ const cy_stc_gpio_pin_config_t CYBSP_MEMORY_RESET_config =
 };
 const cy_stc_gpio_pin_config_t LOAD_SW_IN1_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = LOAD_SW_IN1_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -2283,8 +2285,8 @@ const cy_stc_gpio_pin_config_t LOAD_SW_IN1_config =
 };
 const cy_stc_gpio_pin_config_t LOAD_SW_IN2_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = LOAD_SW_IN2_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -2319,8 +2321,8 @@ const cy_stc_gpio_pin_config_t SCB3_SPI_MISO_config =
 };
 const cy_stc_gpio_pin_config_t SCB3_SPI_MOSI_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB3_SPI_MOSI_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -2337,8 +2339,8 @@ const cy_stc_gpio_pin_config_t SCB3_SPI_MOSI_config =
 };
 const cy_stc_gpio_pin_config_t SCB3_SPI_CLK_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB3_SPI_CLK_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -2355,8 +2357,8 @@ const cy_stc_gpio_pin_config_t SCB3_SPI_CLK_config =
 };
 const cy_stc_gpio_pin_config_t SCB3_SPI_CS1_FRAM_config =
 {
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .outVal = 0,
+    .driveMode = CY_GPIO_DM_ANALOG,
     .hsiom = SCB3_SPI_CS1_FRAM_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
@@ -2392,8 +2394,8 @@ void init_cycfg_pins(void)
     Cy_SysClk_PeriGroupSlaveInit(CY_MMIO_SMIF0_PERI_NR, CY_MMIO_SMIF0_GROUP_NR, CY_MMIO_SMIF0_SLAVE_NR, CY_MMIO_SMIF0_CLK_HF_NR);
     Cy_GPIO_SetHSIOM((GPIO_PRT_Type*)SMIF0_CORE_SMIF_GPIO_SMIF_PRT0, RTC_TS_L_PIN, HSIOM_SEL_ACT_14);
     Cy_GPIO_SetHSIOM(RTC_TS_L_PORT, RTC_TS_L_PIN, RTC_TS_L_HSIOM);
-    Cy_GPIO_SetDrivemode(RTC_TS_L_PORT, RTC_TS_L_PIN, CY_GPIO_DM_STRONG_IN_OFF);
-    Cy_GPIO_WriteDirectOut(RTC_TS_L_PORT, RTC_TS_L_PIN, 1);
+    Cy_GPIO_SetDrivemode(RTC_TS_L_PORT, RTC_TS_L_PIN, CY_GPIO_DM_ANALOG);
+    Cy_GPIO_WriteDirectOut(RTC_TS_L_PORT, RTC_TS_L_PIN, 0);
 #endif /* defined(CY_MMIO_SMIF0_PERI_NR) */
     Cy_GPIO_SetHSIOM_SecPin(GPIO_PRT1, RTC_TS_L_PIN, 1);
 #if defined(CY_MMIO_SMIF0_PERI_NR)
@@ -2411,8 +2413,8 @@ void init_cycfg_pins(void)
     Cy_SysClk_PeriGroupSlaveInit(CY_MMIO_SMIF0_PERI_NR, CY_MMIO_SMIF0_GROUP_NR, CY_MMIO_SMIF0_SLAVE_NR, CY_MMIO_SMIF0_CLK_HF_NR);
     Cy_GPIO_SetHSIOM((GPIO_PRT_Type*)SMIF0_CORE_SMIF_GPIO_SMIF_PRT0, SECURE_RST_L_PIN, HSIOM_SEL_ACT_14);
     Cy_GPIO_SetHSIOM(SECURE_RST_L_PORT, SECURE_RST_L_PIN, SECURE_RST_L_HSIOM);
-    Cy_GPIO_SetDrivemode(SECURE_RST_L_PORT, SECURE_RST_L_PIN, CY_GPIO_DM_STRONG_IN_OFF);
-    Cy_GPIO_WriteDirectOut(SECURE_RST_L_PORT, SECURE_RST_L_PIN, 1);
+    Cy_GPIO_SetDrivemode(SECURE_RST_L_PORT, SECURE_RST_L_PIN, CY_GPIO_DM_ANALOG);
+    Cy_GPIO_WriteDirectOut(SECURE_RST_L_PORT, SECURE_RST_L_PIN, 0);
 #endif /* defined(CY_MMIO_SMIF0_PERI_NR) */
     Cy_GPIO_SetHSIOM_SecPin(GPIO_PRT1, SECURE_RST_L_PIN, 1);
     Cy_GPIO_Pin_Init(BMS_COM1_RST_PORT, BMS_COM1_RST_PIN, &BMS_COM1_RST_config);

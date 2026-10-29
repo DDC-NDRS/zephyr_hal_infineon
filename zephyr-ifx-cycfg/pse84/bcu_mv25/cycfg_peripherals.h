@@ -4,8 +4,8 @@
  * Description:
  * Analog configuration
  * This file was automatically generated and should not be modified.
- * Configurator Backend 3.80.0
- * device-db 4.37.0.10260
+ * Configurator Backend 3.90.0
+ * device-db 4.41.0.11271
  * mtb-dsl-pse8xxgp 1.5.0.1072
  *
  *******************************************************************************
@@ -232,49 +232,46 @@ extern "C" {
 #define CAN1_IF_IRQ_0 canfd_0_interrupts0_1_IRQn
 #define CAN1_IF_IRQ_1 canfd_0_interrupts1_1_IRQn
 #define CAN1_IF_CHANNEL_NUM 1U
-#define SMIF0_QSPI_NOR_ENABLED 1U
-#define SMIF0_QSPI_NOR_HW SMIF0_CORE
-// CUSTOM@NDRS: TF-M's board layer (ifx_s_peripherals_def.h) uses the Infineon BSP name for SMIF0.
-// Re-add after regenerating this file, or rename the SMIF instance in Device Configurator.
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_ENABLED 1U
 #define CYBSP_SMIF_CORE_0_XSPI_FLASH_HW SMIF0_CORE
-#define SMIF0_QSPI_NOR_IRQ smif_0_smif0_interrupt_nsec_IRQn
-#define SMIF0_QSPI_NOR_MEMORY_MODE_ALIGMENT_ERROR (0UL)
-#define SMIF0_QSPI_NOR_RX_DATA_FIFO_UNDERFLOW (0UL)
-#define SMIF0_QSPI_NOR_TX_COMMAND_FIFO_OVERFLOW (0UL)
-#define SMIF0_QSPI_NOR_TX_DATA_FIFO_OVERFLOW (0UL)
-#define SMIF0_QSPI_NOR_RX_DMA_TRIGGER_OUT_USED (0UL)
-#define SMIF0_QSPI_NOR_TX_DMA_TRIGGER_OUT_USED (0UL)
-#define SMIF0_QSPI_NOR_RX_FIFO_TRIGGER_LEVEL (0UL)
-#define SMIF0_QSPI_NOR_TX_FIFO_TRIGGER_LEVEL (0UL)
-#define SMIF0_QSPI_NOR_DATALINES0_1 (1UL)
-#define SMIF0_QSPI_NOR_DATALINES2_3 (1UL)
-#define SMIF0_QSPI_NOR_DATALINES4_5 (0UL)
-#define SMIF0_QSPI_NOR_DATALINES6_7 (0UL)
-#define SMIF0_QSPI_NOR_SS0 (1UL)
-#define SMIF0_QSPI_NOR_SS1 (0UL)
-#define SMIF0_QSPI_NOR_SS2 (0UL)
-#define SMIF0_QSPI_NOR_SS3 (0UL)
-#define SMIF0_QSPI_NOR_DESELECT_DELAY 7
-#define SMIF1_HYPERRAM_ENABLED 1U
-#define SMIF1_HYPERRAM_HW SMIF1_CORE
-#define SMIF1_HYPERRAM_IRQ smif_1_smif0_interrupt_nsec_IRQn
-#define SMIF1_HYPERRAM_MEMORY_MODE_ALIGMENT_ERROR (0UL)
-#define SMIF1_HYPERRAM_RX_DATA_FIFO_UNDERFLOW (0UL)
-#define SMIF1_HYPERRAM_TX_COMMAND_FIFO_OVERFLOW (0UL)
-#define SMIF1_HYPERRAM_TX_DATA_FIFO_OVERFLOW (0UL)
-#define SMIF1_HYPERRAM_RX_DMA_TRIGGER_OUT_USED (0UL)
-#define SMIF1_HYPERRAM_TX_DMA_TRIGGER_OUT_USED (0UL)
-#define SMIF1_HYPERRAM_RX_FIFO_TRIGGER_LEVEL (0UL)
-#define SMIF1_HYPERRAM_TX_FIFO_TRIGGER_LEVEL (0UL)
-#define SMIF1_HYPERRAM_DATALINES0_1 (1UL)
-#define SMIF1_HYPERRAM_DATALINES2_3 (1UL)
-#define SMIF1_HYPERRAM_DATALINES4_5 (1UL)
-#define SMIF1_HYPERRAM_DATALINES6_7 (1UL)
-#define SMIF1_HYPERRAM_SS0 (0UL)
-#define SMIF1_HYPERRAM_SS1 (0UL)
-#define SMIF1_HYPERRAM_SS2 (1UL)
-#define SMIF1_HYPERRAM_SS3 (0UL)
-#define SMIF1_HYPERRAM_DESELECT_DELAY 7
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_IRQ smif_0_smif0_interrupt_nsec_IRQn
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_MEMORY_MODE_ALIGMENT_ERROR (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_RX_DATA_FIFO_UNDERFLOW (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_COMMAND_FIFO_OVERFLOW (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_DATA_FIFO_OVERFLOW (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_RX_DMA_TRIGGER_OUT_USED (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_DMA_TRIGGER_OUT_USED (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_RX_FIFO_TRIGGER_LEVEL (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_TX_FIFO_TRIGGER_LEVEL (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_DATALINES0_1 (1UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_DATALINES2_3 (1UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_DATALINES4_5 (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_DATALINES6_7 (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_SS0 (1UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_SS1 (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_SS2 (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_SS3 (0UL)
+#define CYBSP_SMIF_CORE_0_XSPI_FLASH_DESELECT_DELAY 7
+#define CYBSP_SMIF_CORE_1_PSRAM_ENABLED 1U
+#define CYBSP_SMIF_CORE_1_PSRAM_HW SMIF1_CORE
+#define CYBSP_SMIF_CORE_1_PSRAM_IRQ smif_1_smif0_interrupt_nsec_IRQn
+#define CYBSP_SMIF_CORE_1_PSRAM_MEMORY_MODE_ALIGMENT_ERROR (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_RX_DATA_FIFO_UNDERFLOW (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_TX_COMMAND_FIFO_OVERFLOW (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_TX_DATA_FIFO_OVERFLOW (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_RX_DMA_TRIGGER_OUT_USED (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_TX_DMA_TRIGGER_OUT_USED (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_RX_FIFO_TRIGGER_LEVEL (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_TX_FIFO_TRIGGER_LEVEL (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_DATALINES0_1 (1UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_DATALINES2_3 (1UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_DATALINES4_5 (1UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_DATALINES6_7 (1UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_SS0 (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_SS1 (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_SS2 (1UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_SS3 (0UL)
+#define CYBSP_SMIF_CORE_1_PSRAM_DESELECT_DELAY 7
 #define CYBSP_CM33_LPTIMER_0_ENABLED 1U
 #define CYBSP_CM33_LPTIMER_0_HW MCWDT_STRUCT0
 #define CYBSP_CM33_LPTIMER_0_IRQ srss_interrupt_mcwdt_0_IRQn
@@ -541,26 +538,26 @@ extern cy_stc_canfd_t0_t CAN1_IF_T0RegisterBuffer_0;
 extern cy_stc_canfd_t1_t CAN1_IF_T1RegisterBuffer_0;
 extern uint32_t CAN1_IF_dataBuffer_0[];
 extern cy_stc_canfd_tx_buffer_t CAN1_IF_txBuffer_0;
-extern const cy_stc_smif_config_t SMIF0_QSPI_NOR_config;
+extern const cy_stc_smif_config_t CYBSP_SMIF_CORE_0_XSPI_FLASH_config;
 
 #if defined (COMPONENT_MTB_HAL)
-extern const mtb_hal_hf_clock_t SMIF0_QSPI_NOR_clock_ref;
-extern const mtb_hal_clock_t SMIF0_QSPI_NOR_hal_clock;
+extern const mtb_hal_hf_clock_t CYBSP_SMIF_CORE_0_XSPI_FLASH_clock_ref;
+extern const mtb_hal_clock_t CYBSP_SMIF_CORE_0_XSPI_FLASH_hal_clock;
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI)
-extern const mtb_hal_memoryspi_configurator_t SMIF0_QSPI_NOR_hal_config;
+extern const mtb_hal_memoryspi_configurator_t CYBSP_SMIF_CORE_0_XSPI_FLASH_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI) */
 
-extern const cy_stc_smif_config_t SMIF1_HYPERRAM_config;
+extern const cy_stc_smif_config_t CYBSP_SMIF_CORE_1_PSRAM_config;
 
 #if defined (COMPONENT_MTB_HAL)
-extern const mtb_hal_hf_clock_t SMIF1_HYPERRAM_clock_ref;
-extern const mtb_hal_clock_t SMIF1_HYPERRAM_hal_clock;
+extern const mtb_hal_hf_clock_t CYBSP_SMIF_CORE_1_PSRAM_clock_ref;
+extern const mtb_hal_clock_t CYBSP_SMIF_CORE_1_PSRAM_hal_clock;
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI)
-extern const mtb_hal_memoryspi_configurator_t SMIF1_HYPERRAM_hal_config;
+extern const mtb_hal_memoryspi_configurator_t CYBSP_SMIF_CORE_1_PSRAM_hal_config;
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_MEMORYSPI) */
 
 extern const cy_stc_mcwdt_config_t CYBSP_CM33_LPTIMER_0_config;
