@@ -1398,4 +1398,22 @@ void tfm_uart_use_ns_alias(void)
 {
     tfm_spm_uart = (CySCB_Type *) 0x42D00000UL;
 }
+
+// CUSTOM@NDRS: SRSS RES_CAUSE is Secure, so the Non-Secure hwinfo driver cannot read it. Read and clear it here and
+// leave the value in Non-Secure RAM (the last 16 bytes of the M33 shared region), written through the Non-Secure
+// alias. The address and the magic must match drivers/hwinfo/hwinfo_infineon.c in the Zephyr tree.
+#define TFM_RESET_CAUSE_MAILBOX_ADDR 0x240FEFF0UL
+#define TFM_RESET_CAUSE_MAGIC        0x52534354UL
+
+void tfm_publish_reset_cause(void)
+{
+    volatile uint32_t * const mailbox = (volatile uint32_t *) TFM_RESET_CAUSE_MAILBOX_ADDR;
+    uint32_t reason = Cy_SysLib_GetResetReason();
+
+    Cy_SysLib_ClearResetReason();
+
+    mailbox[1] = reason;
+    mailbox[2] = ~reason;
+    mailbox[0] = TFM_RESET_CAUSE_MAGIC;
+}
 #endif /* defined(COMPONENT_SECURE_DEVICE) */

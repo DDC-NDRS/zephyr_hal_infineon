@@ -192,6 +192,7 @@ extern const cy_stc_ppc_attribute_t M33S_ppc_0_cfg;
 extern const cy_stc_ppc_attribute_t M33_M55_ppc_0_cfg;
 #if defined(COMPONENT_SECURE_DEVICE)
 void tfm_uart_use_ns_alias(void); // CUSTOM@NDRS
+void tfm_publish_reset_cause(void); // CUSTOM@NDRS
 #endif
 extern const cy_stc_ppc_attribute_t TFM_SP_INITIAL_ATTESTATION_ppc_0_cfg;
 extern const cy_stc_ppc_attribute_t TFM_SP_CRYPTO_ppc_0_cfg;
