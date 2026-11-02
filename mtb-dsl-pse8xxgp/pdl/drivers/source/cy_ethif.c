@@ -62,7 +62,10 @@ static void* cyp_ethif_pd[CY_ETH_DEFINE_NUM_IP];
 static CEDI_Statistics* cyp_ethif_statistic[CY_ETH_DEFINE_NUM_IP];
 
 /** Private data memory allocation  */
-static uint8_t cy_ethif_privatedata[CY_ETH_DEFINE_NUM_IP][1800] = {{0,},};
+/* CUSTOM@NDRS: the Cadence driver casts this byte array to a struct, so it needs the struct's alignment. A plain
+ * uint8_t array only gets 1-byte alignment and its address changes with every other object in .bss, which made
+ * the Ethernet init fault in a -Os build. */
+CY_ALIGN(8) static uint8_t cy_ethif_privatedata[CY_ETH_DEFINE_NUM_IP][1800] = {{0,},};
 
 /** Tx descriptors */
 /** CY_ETH_DEFINE_NUM_TXQS * CY_ETH_DEFINE_NUM_IP to avoid race condition in hardware; each BD list for particular queue must have 1 more BD */
@@ -77,7 +80,8 @@ CY_SECTION_SHAREDMEM
 CY_ALIGN(32) static uint8_t cy_ethif_rx_desc_list[CY_ETH_DEFINE_NUM_IP][CY_ETH_DEFINE_NUM_RXQS][((CY_ETH_DEFINE_TOTAL_BD_PER_TXQUEUE + 1) * 2)][CY_ETH_BD_SIZE] = {{{{0,},},},};
 
 /** Statistics registers    */
-static uint8_t cy_ethif_statistic[CY_ETH_DEFINE_NUM_IP][160] = {{0, },};
+/* CUSTOM@NDRS: cast to CEDI_Statistics*, same alignment need as cy_ethif_privatedata above */
+CY_ALIGN(8) static uint8_t cy_ethif_statistic[CY_ETH_DEFINE_NUM_IP][160] = {{0, },};
 
 static cy_stc_ethif_cb_t stccallbackfunctions[CY_ETH_DEFINE_NUM_IP] = {{NULL, NULL, NULL, NULL, NULL},};
 static cy_stc_ethif_queue_disablestatus_t stcQueueDisStatus[CY_ETH_DEFINE_NUM_IP] = {{{0,},{0,}},};
