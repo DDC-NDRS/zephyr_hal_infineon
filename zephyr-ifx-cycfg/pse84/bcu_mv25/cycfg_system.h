@@ -136,8 +136,8 @@ extern "C" {
 #define TFM_SP_INITIAL_ATTESTATION_ppc_0_REGION_COUNT 2U
 #define TFM_SP_CRYPTO_ppc_0_REGION_COUNT 6U
 #define peri_1_ENABLED 1U
-#define M33S_ppc_1_REGION_COUNT 69U
-#define M33_M55_ppc_1_REGION_COUNT 93U
+#define M33S_ppc_1_REGION_COUNT 66U
+#define M33_M55_ppc_1_REGION_COUNT 96U
 #define m33syscpuss_0_cm33_0_sau_0_ENABLED 1U
 #define mxrramc_0_mpc_0_RESPONSE CY_MPC_BUS_ERR
 #define mxrramc_0_mpc_0_REGION_COUNT 7U
@@ -190,6 +190,9 @@ extern const cy_en_prot_region_t TFM_SP_INITIAL_ATTESTATION_ppc_0_regions[];
 extern const cy_en_prot_region_t TFM_SP_CRYPTO_ppc_0_regions[];
 extern const cy_stc_ppc_attribute_t M33S_ppc_0_cfg;
 extern const cy_stc_ppc_attribute_t M33_M55_ppc_0_cfg;
+#if defined(COMPONENT_SECURE_DEVICE)
+void tfm_uart_use_ns_alias(void); // CUSTOM@NDRS
+#endif
 extern const cy_stc_ppc_attribute_t TFM_SP_INITIAL_ATTESTATION_ppc_0_cfg;
 extern const cy_stc_ppc_attribute_t TFM_SP_CRYPTO_ppc_0_cfg;
 extern const cy_stc_ppc_cfg_t cycfg_ppc_0_domains_config[];

@@ -27,15 +27,15 @@ CYMEM_CM55_0_m33_m55_shared_OFFSET = 0x002FC000;
 CYMEM_CM55_0_gfx_mem_START = 0x2633C000;
 CYMEM_CM55_0_gfx_mem_SIZE = 0x001C4000;
 CYMEM_CM55_0_gfx_mem_OFFSET = 0x0033C000;
-CYMEM_CM55_0_m33_data_START = 0x240BD000;
-CYMEM_CM55_0_m33_data_SIZE = 0x00040000;
-CYMEM_CM55_0_m33_data_OFFSET = 0x000BD000;
-CYMEM_CM55_0_m33s_allocatable_shared_START = 0x240FD000;
-CYMEM_CM55_0_m33s_allocatable_shared_SIZE = 0x00001000;
-CYMEM_CM55_0_m33s_allocatable_shared_OFFSET = 0x000FD000;
-CYMEM_CM55_0_m33_allocatable_shared_START = 0x240FE000;
-CYMEM_CM55_0_m33_allocatable_shared_SIZE = 0x00001000;
-CYMEM_CM55_0_m33_allocatable_shared_OFFSET = 0x000FE000;
+CYMEM_CM55_0_m33_data_START = 0x24046000;
+CYMEM_CM55_0_m33_data_SIZE = 0x000AC000;
+CYMEM_CM55_0_m33_data_OFFSET = 0x00046000;
+CYMEM_CM55_0_m33s_allocatable_shared_START = 0x240F2000;
+CYMEM_CM55_0_m33s_allocatable_shared_SIZE = 0x00004000;
+CYMEM_CM55_0_m33s_allocatable_shared_OFFSET = 0x000F2000;
+CYMEM_CM55_0_m33_allocatable_shared_START = 0x240F6000;
+CYMEM_CM55_0_m33_allocatable_shared_SIZE = 0x00009000;
+CYMEM_CM55_0_m33_allocatable_shared_OFFSET = 0x000F6000;
 CYMEM_CM55_0_m55_allocatable_shared_START = 0x240FF000;
 CYMEM_CM55_0_m55_allocatable_shared_SIZE = 0x00001000;
 CYMEM_CM55_0_m55_allocatable_shared_OFFSET = 0x000FF000;
@@ -51,9 +51,9 @@ MEMORY
     m55_data_secondary : ORIGIN = 0x26040000, LENGTH = 0x002BC000
     m33_m55_shared : ORIGIN = 0x262FC000, LENGTH = 0x00040000
     gfx_mem : ORIGIN = 0x2633C000, LENGTH = 0x001C4000
-    m33_data : ORIGIN = 0x240BD000, LENGTH = 0x00040000
-    m33s_allocatable_shared : ORIGIN = 0x240FD000, LENGTH = 0x00001000
-    m33_allocatable_shared : ORIGIN = 0x240FE000, LENGTH = 0x00001000
+    m33_data : ORIGIN = 0x24046000, LENGTH = 0x000AC000
+    m33s_allocatable_shared : ORIGIN = 0x240F2000, LENGTH = 0x00004000
+    m33_allocatable_shared : ORIGIN = 0x240F6000, LENGTH = 0x00009000
     m55_allocatable_shared : ORIGIN = 0x240FF000, LENGTH = 0x00001000
 }
 

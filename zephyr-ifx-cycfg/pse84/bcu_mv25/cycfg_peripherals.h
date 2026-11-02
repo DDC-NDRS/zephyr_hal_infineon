@@ -126,10 +126,16 @@ extern "C" {
 #define CYBSP_I3C_CONTROLLER_IRQ i3c_interrupt_IRQn
 #define CYBSP_DEBUG_UART_ENABLED 1U
 #define UART_LS_ENABLED CYBSP_DEBUG_UART_ENABLED
+#define IFX_TFM_SPM_UART_ENABLED CYBSP_DEBUG_UART_ENABLED // CUSTOM@NDRS: TF-M SPM log on SCB1
 #define CYBSP_DEBUG_UART_HW SCB1
 #define UART_LS_HW CYBSP_DEBUG_UART_HW
+// CUSTOM@NDRS: TF-M reaches SCB1 through a pointer (cycfg_system.c): Secure alias until the PPC makes SCB1
+// Non-Secure, Non-Secure alias after.
+extern CySCB_Type * volatile tfm_spm_uart;
+#define IFX_TFM_SPM_UART_HW (tfm_spm_uart)
 #define CYBSP_DEBUG_UART_IRQ scb_1_interrupt_IRQn
 #define UART_LS_IRQ CYBSP_DEBUG_UART_IRQ
+#define IFX_TFM_SPM_UART_IRQ CYBSP_DEBUG_UART_IRQ
 #define UART_HS_ENABLED 1U
 #define UART_HS_HW SCB2
 #define UART_HS_IRQ scb_2_interrupt_IRQn
@@ -321,17 +327,21 @@ extern const cy_stc_i3c_config_t CYBSP_I3C_CONTROLLER_config;
 extern const cy_stc_scb_uart_config_t CYBSP_DEBUG_UART_config;
 
 #define UART_LS_config CYBSP_DEBUG_UART_config
+#define IFX_TFM_SPM_UART_config CYBSP_DEBUG_UART_config
 
 #if defined (COMPONENT_MTB_HAL)
 extern const mtb_hal_peri_div_t CYBSP_DEBUG_UART_clock_ref;
 #define UART_LS_clock_ref CYBSP_DEBUG_UART_clock_ref
+#define IFX_TFM_SPM_UART_clock_ref CYBSP_DEBUG_UART_clock_ref
 extern const mtb_hal_clock_t CYBSP_DEBUG_UART_hal_clock;
 #define UART_LS_hal_clock CYBSP_DEBUG_UART_hal_clock
+#define IFX_TFM_SPM_UART_hal_clock CYBSP_DEBUG_UART_hal_clock
 #endif /* defined (COMPONENT_MTB_HAL) */
 
 #if defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_UART)
 extern const mtb_hal_uart_configurator_t CYBSP_DEBUG_UART_hal_config;
 #define UART_LS_hal_config CYBSP_DEBUG_UART_hal_config
+#define IFX_TFM_SPM_UART_hal_config CYBSP_DEBUG_UART_hal_config
 #endif /* defined (COMPONENT_MTB_HAL) && (MTB_HAL_DRIVER_AVAILABLE_UART) */
 
 extern const cy_stc_scb_uart_config_t UART_HS_config;

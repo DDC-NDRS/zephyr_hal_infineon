@@ -900,7 +900,7 @@ const cy_stc_gpio_pin_config_t CYBSP_USER_LED3_config =
 const cy_stc_gpio_pin_config_t SCB1_UART_TX_UART_LS_config =
 {
     .outVal = 0,
-    .driveMode = CY_GPIO_DM_ANALOG,
+    .driveMode = CY_GPIO_DM_STRONG_IN_OFF, // CUSTOM@NDRS: TF-M SPM log drives the console TX before Zephyr takes over
     .hsiom = SCB1_UART_TX_UART_LS_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,

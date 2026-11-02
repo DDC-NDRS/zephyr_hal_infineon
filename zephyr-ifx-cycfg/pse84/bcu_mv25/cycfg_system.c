@@ -243,7 +243,7 @@ const cy_stc_mpc_regions_t M33S_mpc_regions[] =
     {
         .base = (MPC_Type*)RAMC0_MPC0,
         .offset = 0x00001000,
-        .size = 0x00057000,
+        .size = 0x00035000, // CUSTOM@NDRS: RAM map of bcu-mv25_memory_map.dtsi (M33S shared, code guard, TF-M data)
     },
 };
 const cy_stc_mpc_regions_t M33_mpc_regions[] =
@@ -260,13 +260,8 @@ const cy_stc_mpc_regions_t M33_mpc_regions[] =
     },
     {
         .base = (MPC_Type*)RAMC0_MPC0,
-        .offset = 0x00058000,
-        .size = 0x00028000,
-    },
-    {
-        .base = (MPC_Type*)RAMC1_MPC0,
-        .offset = 0x00000000,
-        .size = 0x0003D000,
+        .offset = 0x00036000,
+        .size = 0x00010000, // CUSTOM@NDRS: M33 NS code only; the data range is in M33_M55 (DMA masters run in PC6)
     },
 };
 const cy_stc_mpc_regions_t M55_mpc_regions[] =
@@ -301,9 +296,14 @@ const cy_stc_mpc_regions_t M33_M55_mpc_regions[] =
         .size = 0x004C0000,
     },
     {
+        .base = (MPC_Type*)RAMC0_MPC0,
+        .offset = 0x00046000, // CUSTOM@NDRS: M33 NS data. The SDHC DMA master reads it as PC6, which M33 does not allow
+        .size = 0x0003A000,
+    },
+    {
         .base = (MPC_Type*)RAMC1_MPC0,
-        .offset = 0x0003D000,
-        .size = 0x00043000,
+        .offset = 0x00000000,
+        .size = 0x00080000,
     },
 };
 const cy_stc_mpc_regions_t M33S_CODE_mpc_regions[] =
@@ -833,19 +833,16 @@ const cy_en_prot_region_t M33S_ppc_1_regions[] =
     PROT_PERI1_SMIF1_CORE_AXI_MPC0_PPC_MPC_PC,
     PROT_PERI1_SMIF0_CORE_AXI_MPC0_PPC_MPC_ROT,
     PROT_PERI1_SMIF1_CORE_AXI_MPC0_PPC_MPC_ROT,
-    PROT_PERI1_SMIF0_CORE_SMIF_HSIOM_SMIF_PRT0_PRT,
     PROT_PERI1_SMIF0_CORE_SMIF_HSIOM_SMIF_PRT1_PRT,
     PROT_PERI1_SMIF0_CORE_SMIF_HSIOM_SMIF_PRT2_PRT,
     PROT_PERI1_SMIF1_CORE_SMIF_HSIOM_SMIF_PRT0_PRT,
     PROT_PERI1_SMIF1_CORE_SMIF_HSIOM_SMIF_PRT1_PRT,
     PROT_PERI1_SMIF1_CORE_SMIF_HSIOM_SMIF_PRT2_PRT,
-    PROT_PERI1_SMIF0_CORE_SMIF_GPIO_SMIF_PRT0_PRT,
     PROT_PERI1_SMIF0_CORE_SMIF_GPIO_SMIF_PRT1_PRT,
     PROT_PERI1_SMIF0_CORE_SMIF_GPIO_SMIF_PRT2_PRT,
     PROT_PERI1_SMIF1_CORE_SMIF_GPIO_SMIF_PRT0_PRT,
     PROT_PERI1_SMIF1_CORE_SMIF_GPIO_SMIF_PRT1_PRT,
     PROT_PERI1_SMIF1_CORE_SMIF_GPIO_SMIF_PRT2_PRT,
-    PROT_PERI1_SMIF0_CORE_SMIF_GPIO_SMIF_PRT0_CFG,
     PROT_PERI1_SMIF0_CORE_SMIF_GPIO_SMIF_PRT1_CFG,
     PROT_PERI1_SMIF0_CORE_SMIF_GPIO_SMIF_PRT2_CFG,
     PROT_PERI1_SMIF1_CORE_SMIF_GPIO_SMIF_PRT0_CFG,
@@ -955,6 +952,9 @@ const cy_en_prot_region_t M33_M55_ppc_1_regions[] =
     PROT_PERI1_USBHS_SS_SUBSYSTEM,
     PROT_PERI1_ITCM,
     PROT_PERI1_DTCM, 
+    PROT_PERI1_SMIF0_CORE_SMIF_HSIOM_SMIF_PRT0_PRT, // CUSTOM@NDRS: SMIF0 port 0 pins belong to the NS app
+    PROT_PERI1_SMIF0_CORE_SMIF_GPIO_SMIF_PRT0_PRT, // CUSTOM@NDRS: SMIF0 port 0 pins belong to the NS app
+    PROT_PERI1_SMIF0_CORE_SMIF_GPIO_SMIF_PRT0_CFG, // CUSTOM@NDRS: SMIF0 port 0 pins belong to the NS app
 };
 const cy_stc_ppc_attribute_t M33S_ppc_1_cfg =
 {
@@ -1046,12 +1046,12 @@ const mtb_srf_protection_range_s_t mxsramc_0_mpc_0_srf_protection_range_s[mxsram
 {
     {
         .start = (void *) 0x24001000 ,
-        .length = 0x57000U,
+        .length = 0x35000U,
         .is_secure = true,
     },
     {
-        .start = (void *) 0x24058000 ,
-        .length = 0x28000U,
+        .start = (void *) 0x24036000 ,
+        .length = 0x4A000U,
         .is_secure = false,
     },
 };
@@ -1059,12 +1059,12 @@ const mtb_srf_protection_range_s_t mxsramc_1_mpc_0_srf_protection_range_s[mxsram
 {
     {
         .start = (void *) 0x24080000 ,
-        .length = 0x3D000U,
+        .length = 0x72000U,
         .is_secure = false,
     },
     {
-        .start = (void *) 0x240BD000 ,
-        .length = 0x43000U,
+        .start = (void *) 0x240F2000 ,
+        .length = 0x0E000U,
         .is_secure = false,
     },
 };
@@ -1388,3 +1388,14 @@ void init_cycfg_system(void)
     init_cycfg_power();
 #endif /* defined (CY_CFG_PWR_ENABLED) && defined (CY_CFG_PWR_INIT) */
 }
+
+#if defined(COMPONENT_SECURE_DEVICE)
+// CUSTOM@NDRS: TF-M logs on SCB1. The PPC region is Secure until ifx_ppc_init_cfg() makes it Non-Secure (Zephyr owns
+// it), and it only accepts the matching address alias: Secure alias before, Non-Secure alias after.
+CySCB_Type * volatile tfm_spm_uart = SCB1;
+
+void tfm_uart_use_ns_alias(void)
+{
+    tfm_spm_uart = (CySCB_Type *) 0x42D00000UL;
+}
+#endif /* defined(COMPONENT_SECURE_DEVICE) */
