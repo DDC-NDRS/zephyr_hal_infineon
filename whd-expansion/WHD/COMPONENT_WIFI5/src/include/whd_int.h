@@ -85,7 +85,7 @@ struct whd_interface
 };
 struct whd_bt_dev
 {
-    void     *bt_data;
+    void* bt_data;
     void (*bt_int_cb)(void *data);
     uint32_t bt_use_count;
     whd_bool_t intr;
@@ -105,7 +105,7 @@ struct whd_driver
     uint8_t if2ifp[WHD_INTERFACE_MAX];
 
     /* Bus variables */
-    struct whd_bus_info *bus_if;
+    struct whd_bus_info const* bus_if;
     struct whd_bus_priv *bus_priv;
     struct whd_bus_common_info *bus_common_info;
     struct whd_proto *proto;

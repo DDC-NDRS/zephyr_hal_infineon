@@ -6197,6 +6197,7 @@ whd_wifi_deregister_ds_callback(whd_interface_t ifp, whd_ds_callback_t callback)
 whd_result_t
 whd_configure_scanmac_randomisation(whd_interface_t ifp, whd_bool_t config) {
     whd_result_t result;
+
     /* set */
     uint8_t buffer[offsetof(wl_scanmac_t, data) + sizeof(wl_scanmac_enable_t)];
     wl_scanmac_t* sm  = (wl_scanmac_t*)buffer;
