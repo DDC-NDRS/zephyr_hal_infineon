@@ -258,11 +258,32 @@ const cy_stc_mpc_regions_t M33_mpc_regions[] =
         .offset = 0x00340000,
         .size = 0x00240000,
     },
+#if defined(BCU_MV25_M33_RAM_ISOLATED)
+    // CUSTOM@NDRS: dual-core build. All M33 NS RAM (code and data) is PC 2, 5, 7 only, so the M55 (PC 6) cannot touch it. Nothing
+    // that runs as PC 6 needs it here: the SDHC and the DMA of the M55 use SOCMEM, and the DW DMA takes the PC of the core that
+    // programs it. The windows the M55 does reach are in M33_M55 below. docs/ipc/M33_M55_IPC_DESIGN.md, section 9.1.
+    {
+        .base = (MPC_Type*)RAMC0_MPC0,
+        .offset = 0x00036000,
+        .size = 0x0004A000,
+    },
+    {
+        .base = (MPC_Type*)RAMC1_MPC0,
+        .offset = 0x00000000,
+        .size = 0x00072000,
+    },
+    {
+        .base = (MPC_Type*)RAMC1_MPC0,
+        .offset = 0x00077000, // the rest of M33SHARED, with the reset-cause mailbox at 0x240FEFF0
+        .size = 0x00008000,
+    },
+#else
     {
         .base = (MPC_Type*)RAMC0_MPC0,
         .offset = 0x00036000,
         .size = 0x00010000, // CUSTOM@NDRS: M33 NS code only; the data range is in M33_M55 (DMA masters run in PC6)
     },
+#endif
 };
 const cy_stc_mpc_regions_t M55_mpc_regions[] =
 {
@@ -295,6 +316,22 @@ const cy_stc_mpc_regions_t M33_M55_mpc_regions[] =
         .offset = 0x00040000,
         .size = 0x004C0000,
     },
+#if defined(BCU_MV25_M33_RAM_ISOLATED)
+    // CUSTOM@NDRS: the RAM windows that both cores use, 4 KB blocks. 0x240F2000 + 20 KB is SECSHARED and the first block of
+    // M33SHARED (.cy_sharedmem of the M33 NS image, the IPC semaphore). 0x240FF000 + 4 KB is M55SHARED (the M55's .cy_sharedmem:
+    // the SRF mailbox, the Ethernet private data, the IPC semaphore). Anything else that the M55 must reach goes in M55SHARED or
+    // SOCMEMSHARED, not in these.
+    {
+        .base = (MPC_Type*)RAMC1_MPC0,
+        .offset = 0x00072000,
+        .size = 0x00005000,
+    },
+    {
+        .base = (MPC_Type*)RAMC1_MPC0,
+        .offset = 0x0007F000,
+        .size = 0x00001000,
+    },
+#else
     {
         .base = (MPC_Type*)RAMC0_MPC0,
         .offset = 0x00046000, // CUSTOM@NDRS: M33 NS data. The SDHC DMA master reads it as PC6, which M33 does not allow
@@ -305,6 +342,7 @@ const cy_stc_mpc_regions_t M33_M55_mpc_regions[] =
         .offset = 0x00000000,
         .size = 0x00080000,
     },
+#endif
 };
 const cy_stc_mpc_regions_t M33S_CODE_mpc_regions[] =
 {
@@ -503,7 +541,9 @@ const cy_en_prot_region_t M33_M55_ppc_0_regions[] =
     PROT_PERI0_RRAMC0_RRAMC0_RRAMC_USER,
     PROT_PERI0_RRAMC0_RRAMC0_RRAMC_ALLUSER,
     PROT_PERI0_RRAMC0_RRAM_SFR_RRAMC_SFR_USER,
+#if !defined(BCU_MV25_M33_PERIPH_ISOLATED)
     PROT_PERI0_PASS,
+#endif
     PROT_PERI0_MXCM33_CM33_NS,
     PROT_PERI0_DW0_DW,
     PROT_PERI0_DW1_DW,
@@ -673,6 +713,7 @@ const cy_en_prot_region_t M33_M55_ppc_0_regions[] =
     PROT_PERI0_GPIO_TEST,
     PROT_PERI0_SMARTIO_PRT11_PRT,
     PROT_PERI0_SMARTIO_PRT17_PRT,
+#if !defined(BCU_MV25_M33_PERIPH_ISOLATED)
     PROT_PERI0_CANFD0_CH0_CH,
     PROT_PERI0_CANFD0_CH1_CH,
     PROT_PERI0_CANFD0_MAIN,
@@ -709,23 +750,87 @@ const cy_en_prot_region_t M33_M55_ppc_0_regions[] =
     PROT_PERI0_TCPWM0_GRP1_CNT21_CNT,
     PROT_PERI0_TCPWM0_GRP1_CNT22_CNT,
     PROT_PERI0_TCPWM0_GRP1_CNT23_CNT,
+#endif
     PROT_PERI0_LPCOMP,
+#if !defined(BCU_MV25_M33_PERIPH_ISOLATED)
     PROT_PERI0_SCB0,
     PROT_PERI0_SCB2,
     PROT_PERI0_SCB3,
+#endif
     PROT_PERI0_SCB4,
+#if !defined(BCU_MV25_M33_PERIPH_ISOLATED)
     PROT_PERI0_SCB5,
     PROT_PERI0_SCB6,
     PROT_PERI0_SCB7,
+#endif
     PROT_PERI0_SCB8,
+#if !defined(BCU_MV25_M33_PERIPH_ISOLATED)
     PROT_PERI0_SCB9,
     PROT_PERI0_SCB10,
     PROT_PERI0_SCB11,
     PROT_PERI0_SCB1,
+#endif
     PROT_PERI0_I3C,
     PROT_PERI0_ETH0,
     PROT_PERI0_MXNNLITE_2_0, 
 };
+#if defined(BCU_MV25_M33_PERIPH_ISOLATED)
+// CUSTOM@NDRS: dual-core build. The peripherals only the M33 uses are PC 1, 2, 5, 7: the M55 (PC 6) gets a bus error on them.
+// The M55 devicetree has none of them enabled (dt_cfg.c BUILD_ASSERTs most): SCB0 to SCB3 and SCB5 to SCB11 except
+// SCB4 (Bluetooth HCI) and SCB8 (Modbus), TCPWM0, the analog subsystem, and CANFD0 until P4 gives CAN0 to the M55.
+// docs/ipc/M33_M55_IPC_DESIGN.md, section 9.1, option B.
+const cy_en_prot_region_t M33_ppc_0_regions[] =
+{
+    PROT_PERI0_PASS,
+    PROT_PERI0_CANFD0_CH0_CH,
+    PROT_PERI0_CANFD0_CH1_CH,
+    PROT_PERI0_CANFD0_MAIN,
+    PROT_PERI0_CANFD0_BUF,
+    PROT_PERI0_TCPWM0_GRP0_CNT0_CNT,
+    PROT_PERI0_TCPWM0_GRP0_CNT1_CNT,
+    PROT_PERI0_TCPWM0_GRP0_CNT2_CNT,
+    PROT_PERI0_TCPWM0_GRP0_CNT3_CNT,
+    PROT_PERI0_TCPWM0_GRP0_CNT4_CNT,
+    PROT_PERI0_TCPWM0_GRP0_CNT5_CNT,
+    PROT_PERI0_TCPWM0_GRP0_CNT6_CNT,
+    PROT_PERI0_TCPWM0_GRP0_CNT7_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT0_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT1_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT2_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT3_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT4_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT5_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT6_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT7_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT8_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT9_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT10_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT11_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT12_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT13_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT14_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT15_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT16_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT17_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT18_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT19_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT20_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT21_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT22_CNT,
+    PROT_PERI0_TCPWM0_GRP1_CNT23_CNT,
+    PROT_PERI0_SCB0,
+    PROT_PERI0_SCB2,
+    PROT_PERI0_SCB3,
+    PROT_PERI0_SCB5,
+    PROT_PERI0_SCB6,
+    PROT_PERI0_SCB7,
+    PROT_PERI0_SCB9,
+    PROT_PERI0_SCB10,
+    PROT_PERI0_SCB11,
+    PROT_PERI0_SCB1,
+};
+#endif
+
 const cy_en_prot_region_t TFM_SP_INITIAL_ATTESTATION_ppc_0_regions[] =
 {
     PROT_PERI0_SRSS_GENERAL,
@@ -752,6 +857,14 @@ const cy_stc_ppc_attribute_t M33_M55_ppc_0_cfg =
     .secAttribute = CY_PPC_NON_SECURE,
     .privAttribute = CY_PPC_NONPRIV,
 };
+#if defined(BCU_MV25_M33_PERIPH_ISOLATED)
+const cy_stc_ppc_attribute_t M33_ppc_0_cfg =
+{
+    .pcMask = 0xA6,
+    .secAttribute = CY_PPC_NON_SECURE,
+    .privAttribute = CY_PPC_NONPRIV,
+};
+#endif
 const cy_stc_ppc_attribute_t TFM_SP_INITIAL_ATTESTATION_ppc_0_cfg =
 {
     .pcMask = 0x86,
@@ -776,6 +889,13 @@ const cy_stc_ppc_cfg_t cycfg_ppc_0_domains_config[] =
         .region_count = M33_M55_ppc_0_REGION_COUNT,
         .cfg = &M33_M55_ppc_0_cfg,
     },
+#if defined(BCU_MV25_M33_PERIPH_ISOLATED)
+    {
+        .regions = &M33_ppc_0_regions[0],
+        .region_count = M33_ppc_0_REGION_COUNT,
+        .cfg = &M33_ppc_0_cfg,
+    },
+#endif
     {
         .regions = &TFM_SP_INITIAL_ATTESTATION_ppc_0_regions[0],
         .region_count = TFM_SP_INITIAL_ATTESTATION_ppc_0_REGION_COUNT,

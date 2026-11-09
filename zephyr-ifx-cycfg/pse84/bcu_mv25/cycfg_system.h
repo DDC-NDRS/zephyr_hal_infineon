@@ -132,7 +132,13 @@ extern "C" {
 #define Cy_PPC1_Init init_cycfg_ppc1
 #define peri_0_ENABLED 1U
 #define M33S_ppc_0_REGION_COUNT 32U
+#if defined(BCU_MV25_M33_PERIPH_ISOLATED)
+// CUSTOM@NDRS: 47 regions move to M33_ppc_0_regions (PC 6 closed), see cycfg_system.c
+#define M33_M55_ppc_0_REGION_COUNT 187U
+#define M33_ppc_0_REGION_COUNT 47U
+#else
 #define M33_M55_ppc_0_REGION_COUNT 234U
+#endif
 #define TFM_SP_INITIAL_ATTESTATION_ppc_0_REGION_COUNT 2U
 #define TFM_SP_CRYPTO_ppc_0_REGION_COUNT 6U
 #define peri_1_ENABLED 1U
@@ -186,6 +192,9 @@ extern const uint8_t mtb_srf_protection_range_s_count;
 
 extern const cy_en_prot_region_t M33S_ppc_0_regions[];
 extern const cy_en_prot_region_t M33_M55_ppc_0_regions[];
+#if defined(BCU_MV25_M33_PERIPH_ISOLATED)
+extern const cy_en_prot_region_t M33_ppc_0_regions[];
+#endif
 extern const cy_en_prot_region_t TFM_SP_INITIAL_ATTESTATION_ppc_0_regions[];
 extern const cy_en_prot_region_t TFM_SP_CRYPTO_ppc_0_regions[];
 extern const cy_stc_ppc_attribute_t M33S_ppc_0_cfg;
