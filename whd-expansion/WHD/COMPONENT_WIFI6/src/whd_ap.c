@@ -192,7 +192,7 @@ static void *whd_handle_apsta_event(whd_interface_t ifp, const whd_event_header_
 
 /* All chips */
 whd_result_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t auth_type,
-                          const uint8_t *security_key, uint8_t key_length, uint16_t chanspec)
+                          const uint8_t *security_key, size_t key_length, uint16_t chanspec)
 {
     whd_driver_t whd_driver;
     whd_bool_t wait_for_interface = WHD_FALSE;

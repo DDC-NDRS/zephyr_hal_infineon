@@ -536,7 +536,7 @@ whd_result_t whd_bus_sdio_init(whd_driver_t whd_driver)
         chip_rev = (chip_data & 0x000f0000) >> 16;
         whd_chip_set_chip_id(whd_driver, (uint16_t)chip_id);
         whd_chip_set_chiprev_id(whd_driver, (uint8_t)chip_rev);
-        WPRINT_MACRO( ("chip ID: %d, chip rev: %d, Support ChipId Read from SDIO Core \n", (uint16_t) chip_id, (uint8_t)chip_rev) );
+        WPRINT_MACRO( ("chip ID: %d, chip rev: %d, Support ChipId Read from SDIO Core", (uint16_t) chip_id, (uint8_t)chip_rev) );
     }
     else
     {

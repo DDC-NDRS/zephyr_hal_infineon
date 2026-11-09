@@ -365,7 +365,7 @@ extern whd_result_t whd_wifi_stop_external_auth_request(whd_interface_t ifp);
  *           Error code    if an error occurred
  */
 extern whd_result_t whd_wifi_join(whd_interface_t ifp, const whd_ssid_t *ssid, whd_security_t auth_type,
-                              const uint8_t *security_key, uint8_t key_length);
+                                  const uint8_t *security_key, size_t key_length);
 
 /** Joins a specific Wi-Fi network
  *
@@ -383,7 +383,7 @@ extern whd_result_t whd_wifi_join(whd_interface_t ifp, const whd_ssid_t *ssid, w
  *           Error code    if an error occurred
  */
 extern whd_result_t whd_wifi_join_specific(whd_interface_t ifp, const whd_scan_result_t *ap, const uint8_t *security_key,
-                                       uint8_t key_length);
+                                           size_t key_length);
 
 /** Check whether the platform supports triband or not
  *
@@ -462,7 +462,7 @@ extern whd_result_t whd_wifi_get_channels(whd_interface_t ifp, whd_list_t *chann
  *  @return  WHD_SUCCESS    when the key is set
  *           Error code     if an error occurred
  */
-extern whd_result_t whd_wifi_set_passphrase(whd_interface_t ifp, const uint8_t *security_key, uint8_t key_length);
+extern whd_result_t whd_wifi_set_passphrase(whd_interface_t ifp, const uint8_t *security_key, size_t key_length);
 
 /** Set the SAE password
  *
@@ -473,7 +473,7 @@ extern whd_result_t whd_wifi_set_passphrase(whd_interface_t ifp, const uint8_t *
  *  @return  WHD_SUCCESS    when the key is set
  *           Error code     if an error occurred
  */
-extern whd_result_t whd_wifi_sae_password(whd_interface_t ifp, const uint8_t *security_key, uint8_t key_length);
+extern whd_result_t whd_wifi_sae_password(whd_interface_t ifp, const uint8_t *security_key, size_t key_length);
 
 /** Set the offload configuration
  *
@@ -585,7 +585,7 @@ extern whd_result_t whd_wifi_enable_sup_set_passphrase(whd_interface_t ifp, cons
  *  @return  WHD_SUCCESS    when the key is set
  *           Error code     if an error occurred
  */
-extern whd_result_t whd_wifi_set_pmk(whd_interface_t ifp, const uint8_t *security_key, uint8_t key_length);
+extern whd_result_t whd_wifi_set_pmk(whd_interface_t ifp, const uint8_t *security_key, size_t key_length);
 
 /** Set the Roam time threshold
  *
@@ -719,7 +719,7 @@ extern whd_result_t whd_wifi_get_bssid(whd_interface_t ifp, whd_mac_t *bssid);
  *           Error code    if an error occurred
  */
 extern whd_result_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t auth_type,
-                                 const uint8_t *security_key, uint8_t key_length, uint16_t chanspec);
+                                     const uint8_t *security_key, size_t key_length, uint16_t chanspec);
 
 /** Start the infrastructure WiFi network (SoftAP)
  *  using the parameter set by whd_wifi_init_ap() and optionaly by whd_wifi_manage_custom_ie()
