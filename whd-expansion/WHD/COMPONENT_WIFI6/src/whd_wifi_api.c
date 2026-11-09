@@ -4936,22 +4936,23 @@ whd_result_t whd_wifi_get_iovar_buffer(whd_interface_t ifp, const char *iovar_na
 static whd_result_t
 whd_iovar_mkbuf(const char *name, char *data, uint32_t datalen, char *iovar_buf, uint16_t buflen)
 {
-    uint32_t iovar_len;
+    size_t iovar_len;
 
-    iovar_len = strlen(name) + 1;
+    iovar_len = strlen(name) + 1U;
 
-    /* check for overflow */
-    if ( (iovar_len + datalen) > buflen )
+    if ((iovar_len > (size_t)buflen) || ((size_t)datalen > ((size_t)buflen - iovar_len)))
     {
         return WHD_BADARG;
     }
 
     /* copy data to the buffer past the end of the iovar name string */
-    if (datalen > 0)
+    if (datalen > 0U)
+    {
         memmove(&iovar_buf[iovar_len], data, datalen);
+    }
 
     /* copy the name to the beginning of the buffer */
-    strncpy(iovar_buf, name, (iovar_len - 1) );
+    memmove(iovar_buf, name, iovar_len);
 
     return WHD_SUCCESS;
 }
@@ -6377,7 +6378,7 @@ whd_set_wowl_pattern(whd_interface_t ifp, char* opt, uint32_t offset, uint8_t ma
          return WHD_BUFFER_ALLOC_FAIL;
     }
 
-    strncpy(data, opt, strlen(opt));
+    memcpy(data, opt, strlen(opt) + 1U);
     data += strlen(opt) + 1;
 
     wl_pattern = (wl_wowl_pattern_t *)data;
