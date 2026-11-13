@@ -133,9 +133,9 @@ extern "C" {
 #define peri_0_ENABLED 1U
 #define M33S_ppc_0_REGION_COUNT 32U
 #if defined(BCU_MV25_M33_PERIPH_ISOLATED)
-// CUSTOM@NDRS: 47 regions move to M33_ppc_0_regions (PC 6 closed), see cycfg_system.c
-#define M33_M55_ppc_0_REGION_COUNT 187U
-#define M33_ppc_0_REGION_COUNT 47U
+// CUSTOM@NDRS: 44 regions move to M33_ppc_0_regions (PC 6 closed), see cycfg_system.c
+#define M33_M55_ppc_0_REGION_COUNT 190U
+#define M33_ppc_0_REGION_COUNT 44U
 #else
 #define M33_M55_ppc_0_REGION_COUNT 234U
 #endif

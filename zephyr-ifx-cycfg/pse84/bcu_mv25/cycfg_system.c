@@ -713,11 +713,13 @@ const cy_en_prot_region_t M33_M55_ppc_0_regions[] =
     PROT_PERI0_GPIO_TEST,
     PROT_PERI0_SMARTIO_PRT11_PRT,
     PROT_PERI0_SMARTIO_PRT17_PRT,
-#if !defined(BCU_MV25_M33_PERIPH_ISOLATED)
     PROT_PERI0_CANFD0_CH0_CH,
+    #if !defined(BCU_MV25_M33_PERIPH_ISOLATED)
     PROT_PERI0_CANFD0_CH1_CH,
+    #endif
     PROT_PERI0_CANFD0_MAIN,
     PROT_PERI0_CANFD0_BUF,
+    #if !defined(BCU_MV25_M33_PERIPH_ISOLATED)
     PROT_PERI0_TCPWM0_GRP0_CNT0_CNT,
     PROT_PERI0_TCPWM0_GRP0_CNT1_CNT,
     PROT_PERI0_TCPWM0_GRP0_CNT2_CNT,
@@ -777,15 +779,13 @@ const cy_en_prot_region_t M33_M55_ppc_0_regions[] =
 #if defined(BCU_MV25_M33_PERIPH_ISOLATED)
 // CUSTOM@NDRS: dual-core build. The peripherals only the M33 uses are PC 1, 2, 5, 7: the M55 (PC 6) gets a bus error on them.
 // The M55 devicetree has none of them enabled (dt_cfg.c BUILD_ASSERTs most): SCB0 to SCB3 and SCB5 to SCB11 except
-// SCB4 (Bluetooth HCI) and SCB8 (Modbus), TCPWM0, the analog subsystem, and CANFD0 until P4 gives CAN0 to the M55.
+// SCB4 (Bluetooth HCI) and SCB8 (Modbus), TCPWM0, the analog subsystem, and CANFD0 CH1 (CAN1). P4: CANFD0 CH0, MAIN and
+// BUF are the M55's.
 // docs/ipc/M33_M55_IPC_DESIGN.md, section 9.1, option B.
 const cy_en_prot_region_t M33_ppc_0_regions[] =
 {
     PROT_PERI0_PASS,
-    PROT_PERI0_CANFD0_CH0_CH,
     PROT_PERI0_CANFD0_CH1_CH,
-    PROT_PERI0_CANFD0_MAIN,
-    PROT_PERI0_CANFD0_BUF,
     PROT_PERI0_TCPWM0_GRP0_CNT0_CNT,
     PROT_PERI0_TCPWM0_GRP0_CNT1_CNT,
     PROT_PERI0_TCPWM0_GRP0_CNT2_CNT,
