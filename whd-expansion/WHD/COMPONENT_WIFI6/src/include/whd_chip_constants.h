@@ -25,8 +25,7 @@ extern "C" {
 #endif
 
 #define WRAPPER_REGISTER_OFFSET     (0x100000)
-typedef enum chip_var
-{
+typedef enum chip_var {
     ARM_CORE_BASE_ADDRESS = 1,
     SOCSRAM_BASE_ADDRESS,
     SOCSRAM_WRAPPER_BASE_ADDRESS,
@@ -59,44 +58,47 @@ typedef enum chip_var
     CHANSPEC_CTL_SB_MASK,
     NVRAM_DNLD_ADDR
 } chip_var_t;
-#define CHANSPEC_CTL_SB_LL          CHANSPEC_CTL_SB_LLL
-#define CHANSPEC_CTL_SB_LU          CHANSPEC_CTL_SB_LLU
-#define CHANSPEC_CTL_SB_UL          CHANSPEC_CTL_SB_LUL
-#define CHANSPEC_CTL_SB_UU          CHANSPEC_CTL_SB_LUU
-#define CHANSPEC_CTL_SB_L           CHANSPEC_CTL_SB_LLL
-#define CHANSPEC_CTL_SB_U           CHANSPEC_CTL_SB_LLU
 
-#define VERIFY_RESULT(x) { whd_result_t verify_result = WHD_SUCCESS; verify_result = (x); \
-                           if (verify_result != WHD_SUCCESS){ \
-                               WPRINT_WHD_ERROR( ("Function %s failed at line %d \n", __func__, __LINE__) ); \
-                               return verify_result; } }
-#define GET_C_VAR(whd_driver, var) get_whd_var(whd_driver, var)
+#define CHANSPEC_CTL_SB_LL      CHANSPEC_CTL_SB_LLL
+#define CHANSPEC_CTL_SB_LU      CHANSPEC_CTL_SB_LLU
+#define CHANSPEC_CTL_SB_UL      CHANSPEC_CTL_SB_LUL
+#define CHANSPEC_CTL_SB_UU      CHANSPEC_CTL_SB_LUU
+#define CHANSPEC_CTL_SB_L       CHANSPEC_CTL_SB_LLL
+#define CHANSPEC_CTL_SB_U       CHANSPEC_CTL_SB_LLU
 
-#define WL_CHANSPEC_CHAN_MASK           (0x00ff)
-#define CHSPEC_IS6G(chspec)          ( (chspec & \
-                                        GET_C_VAR(whd_driver, \
-                                                  CHANSPEC_BAND_MASK) ) == GET_C_VAR(whd_driver, CHANSPEC_BAND_6G) )
-#define CHSPEC_IS5G(chspec)          ( (chspec & \
-                                        GET_C_VAR(whd_driver, \
-                                                  CHANSPEC_BAND_MASK) ) == GET_C_VAR(whd_driver, CHANSPEC_BAND_5G) )
-#define CHSPEC_IS2G(chspec)          ( (chspec & \
-                                        GET_C_VAR(whd_driver, \
-                                                  CHANSPEC_BAND_MASK) ) == GET_C_VAR(whd_driver, CHANSPEC_BAND_2G) )
-#define CHSPEC_CHANNEL(chspec)          ( (chanspec_t)( (chspec) & WL_CHANSPEC_CHAN_MASK ) )
-#define CH20MHZ_CHSPEC(chspec)          (chanspec_t)( (chanspec_t)CHSPEC_CHANNEL(chspec) | \
-                                                      GET_C_VAR(whd_driver, CHANSPEC_BW_20) | \
-                                                      GET_C_VAR(whd_driver, CHANSPEC_CTL_SB_NONE) | \
-                                                      (CHSPEC_IS2G(chspec) ? GET_C_VAR(whd_driver, CHANSPEC_BAND_2G) \
-                                                       : (CHSPEC_IS5G(chspec) ? GET_C_VAR(whd_driver, CHANSPEC_BAND_5G) \
-                                                          : GET_C_VAR(whd_driver, CHANSPEC_BAND_6G) ) ) )
-#define CH_70MHZ_APART              14
-#define CH_50MHZ_APART              10
-#define CH_30MHZ_APART              6
-#define CH_20MHZ_APART              4
-#define CH_10MHZ_APART              2
-#define CH_5MHZ_APART               1 /* 2G band channels are 5 Mhz apart */
+#define VERIFY_RESULT(x) {      \
+    whd_result_t verify_result = WHD_SUCCESS; verify_result = (x); \
+    if (verify_result != WHD_SUCCESS){ \
+        WPRINT_WHD_ERROR(("Function %s failed at line %d \n", __func__, __LINE__)); \
+                         return verify_result; } }
 
-uint32_t get_whd_var(whd_driver_t whd_driver, chip_var_t var);
+#define GET_C_VAR(driver, var) get_whd_var(driver, var)
+
+#define WL_CHANSPEC_CHAN_MASK   (0x00FF)
+#define CHSPEC_IS6G(chspec)     ((chspec & \
+                                  GET_C_VAR(driver, \
+                                            CHANSPEC_BAND_MASK)) == GET_C_VAR(driver, CHANSPEC_BAND_6G))
+#define CHSPEC_IS5G(chspec)     ((chspec & \
+                                  GET_C_VAR(driver, \
+                                            CHANSPEC_BAND_MASK) ) == GET_C_VAR(driver, CHANSPEC_BAND_5G))
+#define CHSPEC_IS2G(chspec)     ((chspec & \
+                                  GET_C_VAR(driver, \
+                                            CHANSPEC_BAND_MASK) ) == GET_C_VAR(driver, CHANSPEC_BAND_2G))
+#define CHSPEC_CHANNEL(chspec)  ((chanspec_t)((chspec) & WL_CHANSPEC_CHAN_MASK ) )
+#define CH20MHZ_CHSPEC(chspec)  (chanspec_t)((chanspec_t)CHSPEC_CHANNEL(chspec) |       \
+                                             GET_C_VAR(driver, CHANSPEC_BW_20)  |       \
+                                             GET_C_VAR(driver, CHANSPEC_CTL_SB_NONE) |  \
+                                             (CHSPEC_IS2G(chspec) ? GET_C_VAR(driver, CHANSPEC_BAND_2G) \
+                                              : (CHSPEC_IS5G(chspec) ? GET_C_VAR(driver, CHANSPEC_BAND_5G) \
+                                                                     : GET_C_VAR(driver, CHANSPEC_BAND_6G))))
+#define CH_70MHZ_APART          14
+#define CH_50MHZ_APART          10
+#define CH_30MHZ_APART          6
+#define CH_20MHZ_APART          4
+#define CH_10MHZ_APART          2
+#define CH_5MHZ_APART           1           /* 2G band channels are 5 Mhz apart */
+
+uint32_t get_whd_var(whd_driver_t driver, chip_var_t var);
 
 whd_result_t get_arm_core_base_address(uint16_t, uint32_t *);
 whd_result_t get_socsram_base_address(uint16_t, uint32_t *, whd_bool_t);
@@ -129,12 +131,12 @@ whd_result_t get_wl_chanspec_ctl_sb_UUU(uint16_t, uint32_t *);
 whd_result_t get_wl_chanspec_ctl_sb_mask(uint16_t, uint32_t *);
 whd_result_t get_nvram_dwnld_start_address(uint16_t wlan_chip_id, uint32_t *addr);
 
-uint32_t whd_chip_set_chip_id(whd_driver_t whd_driver, uint16_t id);
-uint16_t whd_chip_get_chip_id(whd_driver_t whd_driver);
-uint32_t whd_chip_set_chiprev_id(whd_driver_t whd_driver, uint8_t id);
-uint8_t whd_chip_get_chiprev_id(whd_driver_t whd_driver);
+uint32_t whd_chip_set_chip_id(whd_driver_t driver, uint16_t id);
+uint16_t whd_chip_get_chip_id(whd_driver_t driver);
+uint32_t whd_chip_set_chiprev_id(whd_driver_t driver, uint8_t id);
+uint8_t  whd_chip_get_chiprev_id(whd_driver_t driver);
 
-whd_result_t whd_chip_get_chanspec_ctl_channel_num(whd_driver_t whd_driver, uint16_t chanspec, uint16_t *ctrl_ch_num);
+whd_result_t whd_chip_get_chanspec_ctl_channel_num(whd_driver_t driver, uint16_t chanspec, uint16_t* ctrl_ch_num);
 
 #undef CHIP_FIRMWARE_SUPPORTS_PM_LIMIT_IOVAR
 

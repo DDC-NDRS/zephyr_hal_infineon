@@ -24,24 +24,24 @@
 #include "whd_proto.h"
 
 /******************************************************
- *  * @cond               Constants
- *   ******************************************************/
+ *              Constants
+ ******************************************************/
 
 /******************************************************
- *  *                   Enumerations
- *   ******************************************************/
+ *              Enumerations
+ ******************************************************/
 
 /******************************************************
-**               Function Declarations
-*******************************************************/
+ *              Function Declarations
+ ******************************************************/
 
 /******************************************************
- *        Variables Definitions
+ *              Variables Definitions
  *****************************************************/
 
 /******************************************************
-*               Function Definitions
-******************************************************/
+ *              Function Definitions
+ ******************************************************/
 /** Called by WHD to pass received data to the network stack
  *
  *
@@ -69,19 +69,18 @@
  *                    releasing this buffer is transferred from WHD at this point.
  *
  */
-whd_result_t whd_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
-{
-    whd_driver_t whd_driver = ifp->whd_driver;
-    if (whd_driver->network_if->whd_network_process_ethernet_data)
-    {
-        whd_driver->network_if->whd_network_process_ethernet_data(ifp, buffer);
-        return WHD_SUCCESS;
+whd_result_t whd_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer) {
+    whd_driver_t driver = ifp->whd_driver;
+
+    if (driver->network_if->whd_network_process_ethernet_data) {
+        driver->network_if->whd_network_process_ethernet_data(ifp, buffer);
+        return (WHD_SUCCESS);
     }
-    else
-    {
-        WPRINT_WHD_INFO( ("Function pointers not provided .\n") );
+    else {
+        WPRINT_WHD_INFO(("Function pointers not provided .\n"));
     }
-    return WHD_WLAN_NOFUNCTION;
+
+    return (WHD_WLAN_NOFUNCTION);
 }
 
 /** Sends a data packet.
@@ -89,17 +88,18 @@ whd_result_t whd_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t
  * @param buffer  : The ethernet packet buffer to be sent
  * @param interface : the interface over which to send the packet (AP or STA)
  *
- * @return    WHD result code
+ * @return WHD result code
  */
-whd_result_t whd_network_send_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
-{
-#ifdef COMPONENT_SDIO_HM
+whd_result_t whd_network_send_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer) {
+    #ifdef COMPONENT_SDIO_HM
     whd_result_t status;
+
     cy_rtos_get_mutex(&ifp->whd_driver->whd_hm_tx_lock, CY_RTOS_NEVER_TIMEOUT);
     status = whd_proto_tx_queue_data(ifp, buffer);
     cy_rtos_set_mutex(&ifp->whd_driver->whd_hm_tx_lock);
-    return status;
-#else
+
+    return (status);
+    #else
     return whd_proto_tx_queue_data(ifp, buffer);
-#endif
+    #endif
 }

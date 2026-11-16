@@ -38,31 +38,27 @@
 #define INCLUDED_WHD_THREAD_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /******************************************************
-*             Constants
-******************************************************/
-#define WHD_THREAD_RX_BOUND           (20)
-#define WHD_MAX_BUS_FAIL              (10)
+ *             Constants
+ ******************************************************/
+#define WHD_THREAD_RX_BOUND (20)
+#define WHD_MAX_BUS_FAIL    (10)
 
-typedef struct whd_thread_info
-{
-
+typedef struct whd_thread_info {
     volatile whd_bool_t thread_quit_flag;
     volatile whd_bool_t whd_inited;
     cy_thread_t whd_thread;
     cy_semaphore_t transceive_semaphore;
     volatile whd_bool_t bus_interrupt;
-    void *thread_stack_start;
+    void* thread_stack_start;
     uint32_t thread_stack_size;
     cy_thread_priority_t thread_priority;
-
 } whd_thread_info_t;
 
-void whd_thread_info_init(whd_driver_t whd_driver, whd_init_config_t *whd_init_config);
+void whd_thread_info_init(whd_driver_t driver, whd_init_config_t const* whd_init_config);
 
 /** Initialises the whd Thread
  *
@@ -71,19 +67,17 @@ void whd_thread_info_init(whd_driver_t whd_driver, whd_init_config_t *whd_init_c
  *
  * @return    whd result code
  */
-extern whd_result_t whd_thread_init(whd_driver_t whd_driver);
-
+whd_result_t whd_thread_init(whd_driver_t driver);
 
 /** Terminates the whd Thread
  *
  * Sets a flag then wakes the whd Thread to force it to terminate.
  *
  */
-extern void whd_thread_quit(whd_driver_t whd_driver);
+void whd_thread_quit(whd_driver_t driver);
 
-
-extern void whd_thread_notify(whd_driver_t whd_driver);
-extern void whd_thread_notify_irq(whd_driver_t whd_driver);
+void whd_thread_notify(whd_driver_t driver);
+void whd_thread_notify_irq(whd_driver_t driver);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -112,8 +112,8 @@ struct whd_driver {
     struct whd_proto* proto;
     whd_bt_dev_t bt_dev;
 
-    whd_buffer_funcs_t* buffer_if;
-    whd_netif_funcs_t* network_if;
+    whd_buffer_funcs_t const* buffer_if;
+    whd_netif_funcs_t const* network_if;
     whd_resource_source_t* resource_if;
     uint8_t* aligned_addr;
 

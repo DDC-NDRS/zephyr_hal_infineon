@@ -611,8 +611,7 @@ typedef struct
 /**
  * Enumerated list of country codes
  */
-typedef enum
-{
+typedef enum {
     WHD_COUNTRY_AFGHANISTAN                           = MK_CNTRY('A', 'F', 0),   /**< AF Afghanistan */
     WHD_COUNTRY_ALBANIA                               = MK_CNTRY('A', 'L', 0),   /**< AL Albania */
     WHD_COUNTRY_ALGERIA                               = MK_CNTRY('D', 'Z', 0),   /**< DZ Algeria */

@@ -1089,7 +1089,7 @@ static void HandleReceive(CySCB_Type* base, cy_stc_scb_spi_context_t* context) {
 
         #if ((defined(CY_IP_MXSCB_VERSION) && (CY_IP_MXSCB_VERSION >= 2)) || defined(CY_IP_MXS22SCB))
         mem_width = _FLD2VAL(SCB_CTRL_MEM_WIDTH, SCB_CTRL(base));
-        buf       = &buf[((1UL << mem_width) * numToCopy)];
+        buf = &buf[((1UL << mem_width) * numToCopy)];
         #elif ((defined(CY_IP_MXSCB_VERSION) && CY_IP_MXSCB_VERSION == 1))
         buf = &buf[(Cy_SCB_IsRxDataWidthByte(base) ? (numToCopy) : (2UL * numToCopy))];
         #endif /* CY_IP_MXSCB_VERSION */
@@ -1106,8 +1106,8 @@ static void HandleReceive(CySCB_Type* base, cy_stc_scb_spi_context_t* context) {
             Cy_SCB_SetRxInterruptMask(base, (Cy_SCB_GetRxInterruptMask(base) & (uint32_t)~CY_SCB_RX_INTR_LEVEL));
         }
         else {
-            context->rxBuf         = NULL;
-            rxRemain               = context->DiscardRxSize;
+            context->rxBuf = NULL;
+            rxRemain = context->DiscardRxSize;
             context->DiscardRxSize = 0UL;
 
             uint32_t fifoSize = Cy_SCB_GetFifoSize(base);
@@ -1164,7 +1164,7 @@ static void HandleTransmit(CySCB_Type* base, cy_stc_scb_spi_context_t* context) 
     txRemain -= numToCopy;
 
     /* Load TX FIFO with data */
-    if (NULL != context->txBuf) {
+    if (context->txBuf != NULL) {
         context->txBufIdx += numToCopy;
 
         uint8_t* buf = (uint8_t*)context->txBuf;
@@ -1183,8 +1183,8 @@ static void HandleTransmit(CySCB_Type* base, cy_stc_scb_spi_context_t* context) 
         Cy_SCB_WriteDefaultArrayNoCheck(base, context->writeFill, numToCopy);
     }
 
-    if (0UL == txRemain) {
-        if (0UL == context->WriteFillSize) {
+    if (txRemain == 0UL) {
+        if (context->WriteFillSize == 0UL) {
             /* Data is transferred into TX FIFO */
             context->status |= CY_SCB_SPI_TRANSFER_IN_FIFO;
 
@@ -1198,8 +1198,8 @@ static void HandleTransmit(CySCB_Type* base, cy_stc_scb_spi_context_t* context) 
         else {
             uint32_t fillSize   = context->WriteFillSize;
             uint32_t txFifoUsed = Cy_SCB_GetNumInTxFifo(base);
-            numToCopy           = fifoSize - txFifoUsed;
 
+            numToCopy = (fifoSize - txFifoUsed);
             if (numToCopy > fillSize) {
                 numToCopy = fillSize;
             }

@@ -21,729 +21,741 @@
 #include "whd_types_int.h"
 #include "bus_protocols/whd_chip_reg.h"
 
+typedef whd_result_t (*chip_var_getter_t)(uint16_t wlan_chip_id, uint32_t* val);
+static whd_result_t get_socsram_base_address_plain(uint16_t wlan_chip_id, uint32_t* addr);
+static whd_result_t get_socsram_base_address_wrapper(uint16_t wlan_chip_id, uint32_t* addr);
+
+/* Indexed by chip_var_t, slot 0 is unused */
+static const chip_var_getter_t chip_var_getters[NVRAM_DNLD_ADDR + 1] = {
+    [ARM_CORE_BASE_ADDRESS]          = get_arm_core_base_address,
+    [SOCSRAM_BASE_ADDRESS]           = get_socsram_base_address_plain,
+    [SOCSRAM_WRAPPER_BASE_ADDRESS]   = get_socsram_base_address_wrapper,
+    [SDIOD_CORE_BASE_ADDRESS]        = get_sdiod_core_base_address,
+    [PMU_BASE_ADDRESS]               = get_pmu_base_address,
+    [CHIP_RAM_SIZE]                  = get_chip_ram_size,
+    [ATCM_RAM_BASE_ADDRESS]          = get_atcm_ram_base_address,
+    [SOCRAM_SRMEM_SIZE]              = get_socsram_srmem_size,
+    [CHANSPEC_BAND_MASK]             = get_wl_chanspec_band_mask,
+    [CHANSPEC_BAND_2G]               = get_wl_chanspec_band_2G,
+    [CHANSPEC_BAND_5G]               = get_wl_chanspec_band_5G,
+    [CHANSPEC_BAND_6G]               = get_wl_chanspec_band_6G,
+    [CHANSPEC_BAND_SHIFT]            = get_wl_chanspec_band_shift,
+    [CHANSPEC_BW_10]                 = get_wl_chanspec_bw_10,
+    [CHANSPEC_BW_20]                 = get_wl_chanspec_bw_20,
+    [CHANSPEC_BW_40]                 = get_wl_chanspec_bw_40,
+    [CHANSPEC_BW_80]                 = get_wl_chanspec_bw_80,
+    [CHANSPEC_BW_160]                = get_wl_chanspec_bw_160,
+    [CHANSPEC_BW_MASK]               = get_wl_chanspec_bw_mask,
+    [CHANSPEC_BW_SHIFT]              = get_wl_chanspec_bw_shift,
+    [CHANSPEC_CTL_SB_NONE]           = get_wl_chanspec_ctl_sb_none,
+    [CHANSPEC_CTL_SB_LLL]            = get_wl_chanspec_ctl_sb_LLL,
+    [CHANSPEC_CTL_SB_LLU]            = get_wl_chanspec_ctl_sb_LLU,
+    [CHANSPEC_CTL_SB_LUL]            = get_wl_chanspec_ctl_sb_LUL,
+    [CHANSPEC_CTL_SB_LUU]            = get_wl_chanspec_ctl_sb_LUU,
+    [CHANSPEC_CTL_SB_ULL]            = get_wl_chanspec_ctl_sb_ULL,
+    [CHANSPEC_CTL_SB_ULU]            = get_wl_chanspec_ctl_sb_ULU,
+    [CHANSPEC_CTL_SB_UUL]            = get_wl_chanspec_ctl_sb_UUL,
+    [CHANSPEC_CTL_SB_UUU]            = get_wl_chanspec_ctl_sb_UUU,
+    [CHANSPEC_CTL_SB_MASK]           = get_wl_chanspec_ctl_sb_mask,
+    [NVRAM_DNLD_ADDR]                = get_nvram_dwnld_start_address
+};
+
 /******************************************************
-*               Function Definitions
-******************************************************/
+ *               Function Definitions
+ ******************************************************/
+uint32_t whd_chip_set_chip_id(whd_driver_t driver, uint16_t id) {
+    driver->chip_info.chip_id = id;
 
-uint32_t whd_chip_set_chip_id(whd_driver_t whd_driver, uint16_t id)
-{
-    whd_driver->chip_info.chip_id = id;
-
-    return 0;
+    return (0);
 }
 
-uint16_t whd_chip_get_chip_id(whd_driver_t whd_driver)
-{
-    return whd_driver->chip_info.chip_id;
+uint16_t whd_chip_get_chip_id(whd_driver_t driver) {
+    return driver->chip_info.chip_id;
 }
 
-uint32_t whd_chip_set_chiprev_id(whd_driver_t whd_driver, uint8_t id)
-{
-    whd_driver->chip_info.chiprev_id = id;
+uint32_t whd_chip_set_chiprev_id(whd_driver_t driver, uint8_t id) {
+    driver->chip_info.chiprev_id = id;
 
-    return 0;
+    return (0);
 }
 
-uint8_t whd_chip_get_chiprev_id(whd_driver_t whd_driver)
-{
-    return whd_driver->chip_info.chiprev_id;
+uint8_t whd_chip_get_chiprev_id(whd_driver_t driver) {
+    return driver->chip_info.chiprev_id;
 }
 
-whd_result_t whd_chip_get_chanspec_ctl_channel_num(whd_driver_t whd_driver, uint16_t chanspec, uint16_t *ctrl_ch_num)
-{
-    uint16_t wlan_chip_id = whd_chip_get_chip_id(whd_driver);
-    uint16_t bw = chanspec & get_whd_var(whd_driver, CHANSPEC_BW_MASK);
-    uint16_t sb = chanspec & get_whd_var(whd_driver, CHANSPEC_CTL_SB_MASK);
+/* Older chips (43362, 4334, 43340, 43342) use the legacy chanspec bit layout */
+static whd_bool_t whd_is_legacy_chanspec_chip(uint16_t wlan_chip_id) {
+    whd_bool_t is_legacy = WHD_FALSE;
 
-    *ctrl_ch_num = CHSPEC_CHANNEL(chanspec);
-
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        return WHD_SUCCESS;
-    }
-    else
-    {
-        if (bw == get_whd_var(whd_driver, CHANSPEC_BW_20) )
-        {
-            return WHD_SUCCESS;
-        }
-        else if (bw == get_whd_var(whd_driver, CHANSPEC_BW_40) )
-        {
-            if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_L) )
-                *ctrl_ch_num -= CH_10MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_U) )
-                *ctrl_ch_num += CH_10MHZ_APART;
-            else
-            {
-                WPRINT_WHD_ERROR( ("Error: Invalid chanspec 0x%04x\n", chanspec) );
-                return WHD_BADARG;
-            }
-        }
-        else if (bw == get_whd_var(whd_driver, CHANSPEC_BW_80) )
-        {
-            if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_LL) )
-                *ctrl_ch_num -= CH_30MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_LU) )
-                *ctrl_ch_num -= CH_10MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_UL) )
-                *ctrl_ch_num += CH_10MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_UU) )
-                *ctrl_ch_num += CH_30MHZ_APART;
-            else
-            {
-                WPRINT_WHD_ERROR( ("Error: Invalid chanspec 0x%04x\n", chanspec) );
-                return WHD_BADARG;
-            }
-        }
-        else if (bw == get_whd_var(whd_driver, CHANSPEC_BW_160) )
-        {
-            if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_LLL) )
-                *ctrl_ch_num -= CH_70MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_LLU) )
-                *ctrl_ch_num -= CH_50MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_LUL) )
-                *ctrl_ch_num -= CH_30MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_LUU) )
-                *ctrl_ch_num -= CH_10MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_ULL) )
-                *ctrl_ch_num += CH_10MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_ULU) )
-                *ctrl_ch_num += CH_30MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_UUL) )
-                *ctrl_ch_num += CH_50MHZ_APART;
-            else if (sb == get_whd_var(whd_driver, CHANSPEC_CTL_SB_UUU) )
-                *ctrl_ch_num += CH_70MHZ_APART;
-            else
-            {
-                WPRINT_WHD_ERROR( ("Error: Invalid chanspec 0x%04x\n", chanspec) );
-                return WHD_BADARG;
-            }
-        }
-        else
-        {
-            WPRINT_WHD_ERROR( ("Error: Invalid chanspec 0x%04x\n", chanspec) );
-            return WHD_BADARG;
-        }
+    if ((wlan_chip_id == 43362) || (wlan_chip_id == 4334) ||
+        (wlan_chip_id == 43340) || (wlan_chip_id == 43342)) {
+        is_legacy = WHD_TRUE;
     }
 
-    return WHD_SUCCESS;
+    return (is_legacy);
 }
 
-uint32_t get_whd_var(whd_driver_t whd_driver, chip_var_t var)
-{
+whd_result_t whd_chip_get_chanspec_ctl_channel_num(whd_driver_t driver, uint16_t chanspec, uint16_t* ctrl_ch_num) {
+    uint16_t wlan_chip_id = whd_chip_get_chip_id(driver);
+    uint16_t bw = chanspec & get_whd_var(driver, CHANSPEC_BW_MASK);
+    uint16_t sb = chanspec & get_whd_var(driver, CHANSPEC_CTL_SB_MASK);
+    uint16_t ctrl_ch = CHSPEC_CHANNEL(chanspec);
+
+    /* Error paths keep the unadjusted channel, so store it first and the adjusted one once at the end */
+    *ctrl_ch_num = ctrl_ch;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        return (WHD_SUCCESS);
+    }
+    else {
+        if (bw == get_whd_var(driver, CHANSPEC_BW_20)) {
+            return (WHD_SUCCESS);
+        }
+        else if (bw == get_whd_var(driver, CHANSPEC_BW_40)) {
+            if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_L)) {
+                ctrl_ch -= CH_10MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_U)) {
+                ctrl_ch += CH_10MHZ_APART;
+            }
+            else {
+                WPRINT_WHD_ERROR(("Error: Invalid chanspec 0x%04x\n", chanspec));
+                return (WHD_BADARG);
+            }
+        }
+        else if (bw == get_whd_var(driver, CHANSPEC_BW_80)) {
+            if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_LL)) {
+                ctrl_ch -= CH_30MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_LU)) {
+                ctrl_ch -= CH_10MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_UL)) {
+                ctrl_ch += CH_10MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_UU)) {
+                ctrl_ch += CH_30MHZ_APART;
+            }
+            else {
+                WPRINT_WHD_ERROR(("Error: Invalid chanspec 0x%04x\n", chanspec));
+                return (WHD_BADARG);
+            }
+        }
+        else if (bw == get_whd_var(driver, CHANSPEC_BW_160)) {
+            if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_LLL)) {
+                ctrl_ch -= CH_70MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_LLU)) {
+                ctrl_ch -= CH_50MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_LUL)) {
+                ctrl_ch -= CH_30MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_LUU)) {
+                ctrl_ch -= CH_10MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_ULL)) {
+                ctrl_ch += CH_10MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_ULU)) {
+                ctrl_ch += CH_30MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_UUL)) {
+                ctrl_ch += CH_50MHZ_APART;
+            }
+            else if (sb == get_whd_var(driver, CHANSPEC_CTL_SB_UUU)) {
+                ctrl_ch += CH_70MHZ_APART;
+            }
+            else {
+                WPRINT_WHD_ERROR(("Error: Invalid chanspec 0x%04x\n", chanspec));
+                return (WHD_BADARG);
+            }
+        }
+        else {
+            WPRINT_WHD_ERROR(("Error: Invalid chanspec 0x%04x\n", chanspec));
+            return (WHD_BADARG);
+        }
+    }
+
+    *ctrl_ch_num = ctrl_ch;
+
+    return (WHD_SUCCESS);
+}
+
+static whd_result_t get_socsram_base_address_plain(uint16_t wlan_chip_id, uint32_t* addr) {
+    return (get_socsram_base_address(wlan_chip_id, addr, WHD_FALSE));
+}
+
+static whd_result_t get_socsram_base_address_wrapper(uint16_t wlan_chip_id, uint32_t* addr) {
+    return (get_socsram_base_address(wlan_chip_id, addr, WHD_TRUE));
+}
+
+uint32_t get_whd_var(whd_driver_t driver, chip_var_t var) {
     uint32_t val = 0;
+    whd_result_t result;
+    chip_var_getter_t getter = NULL;
+    uint16_t wlan_chip_id = whd_chip_get_chip_id(driver);
 
-    uint16_t wlan_chip_id = whd_chip_get_chip_id(whd_driver);
-    switch (var)
-    {
-        case ARM_CORE_BASE_ADDRESS:
-            CHECK_RETURN(get_arm_core_base_address(wlan_chip_id, &val) );
-            break;
-        case SOCSRAM_BASE_ADDRESS:
-            CHECK_RETURN(get_socsram_base_address(wlan_chip_id, &val, WHD_FALSE) );
-            break;
-        case SOCSRAM_WRAPPER_BASE_ADDRESS:
-            CHECK_RETURN(get_socsram_base_address(wlan_chip_id, &val, WHD_TRUE) );
-            break;
-        case SDIOD_CORE_BASE_ADDRESS:
-            CHECK_RETURN(get_sdiod_core_base_address(wlan_chip_id, &val) );
-            break;
-        case PMU_BASE_ADDRESS:
-            CHECK_RETURN(get_pmu_base_address(wlan_chip_id, &val) );
-            break;
-        case CHIP_RAM_SIZE:
-            CHECK_RETURN(get_chip_ram_size(wlan_chip_id, &val) );
-            break;
-        case ATCM_RAM_BASE_ADDRESS:
-            CHECK_RETURN(get_atcm_ram_base_address(wlan_chip_id, &val) );
-            break;
-        case SOCRAM_SRMEM_SIZE:
-            CHECK_RETURN(get_socsram_srmem_size(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BAND_MASK:
-            CHECK_RETURN(get_wl_chanspec_band_mask(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BAND_2G:
-            CHECK_RETURN(get_wl_chanspec_band_2G(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BAND_5G:
-            CHECK_RETURN(get_wl_chanspec_band_5G(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BAND_6G:
-            CHECK_RETURN(get_wl_chanspec_band_6G(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BAND_SHIFT:
-            CHECK_RETURN(get_wl_chanspec_band_shift(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BW_10:
-            CHECK_RETURN(get_wl_chanspec_bw_10(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BW_20:
-            CHECK_RETURN(get_wl_chanspec_bw_20(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BW_40:
-            CHECK_RETURN(get_wl_chanspec_bw_40(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BW_80:
-            CHECK_RETURN(get_wl_chanspec_bw_80(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BW_160:
-            CHECK_RETURN(get_wl_chanspec_bw_160(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BW_MASK:
-            CHECK_RETURN(get_wl_chanspec_bw_mask(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_BW_SHIFT:
-            CHECK_RETURN(get_wl_chanspec_bw_shift(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_CTL_SB_NONE:
-            CHECK_RETURN(get_wl_chanspec_ctl_sb_none(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_CTL_SB_LLL:
-            CHECK_RETURN(get_wl_chanspec_ctl_sb_LLL(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_CTL_SB_LLU:
-            CHECK_RETURN(get_wl_chanspec_ctl_sb_LLU(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_CTL_SB_LUL:
-            CHECK_RETURN(get_wl_chanspec_ctl_sb_LUL(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_CTL_SB_LUU:
-            CHECK_RETURN(get_wl_chanspec_ctl_sb_LUU(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_CTL_SB_ULL:
-            CHECK_RETURN(get_wl_chanspec_ctl_sb_ULL(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_CTL_SB_ULU:
-            CHECK_RETURN(get_wl_chanspec_ctl_sb_ULU(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_CTL_SB_UUL:
-            CHECK_RETURN(get_wl_chanspec_ctl_sb_UUL(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_CTL_SB_UUU:
-            CHECK_RETURN(get_wl_chanspec_ctl_sb_UUU(wlan_chip_id, &val) );
-            break;
-        case CHANSPEC_CTL_SB_MASK:
-            CHECK_RETURN(get_wl_chanspec_ctl_sb_mask(wlan_chip_id, &val) );
-            break;
-        case NVRAM_DNLD_ADDR:
-            CHECK_RETURN(get_nvram_dwnld_start_address(wlan_chip_id, &val) );
-            break;
-        default:
-            break;
+    if ((var >= ARM_CORE_BASE_ADDRESS) && (var <= NVRAM_DNLD_ADDR)) {
+        getter = chip_var_getters[var];
     }
-    return val;
+
+    if (getter != NULL) {
+        result = getter(wlan_chip_id, &val);
+
+        /* The error code must not leak out as a value, e.g. as a base address */
+        if (result != WHD_SUCCESS) {
+            WPRINT_WHD_ERROR(("%s: var %d not available for chip %u, result = %u\n", __func__, (int)var,
+                              (unsigned int)wlan_chip_id, (unsigned int)result));
+            val = 0;
+        }
+    }
+
+    return (val);
 }
 
-whd_result_t get_arm_core_base_address(uint16_t wlan_chip_id, uint32_t *addr)
-{
-    switch (wlan_chip_id)
-    {
-        case 0x4373:
-        case 55560:
-        case 55500:
-        case 55530:
+whd_result_t get_arm_core_base_address(uint16_t wlan_chip_id, uint32_t* addr) {
+    switch (wlan_chip_id) {
+        case 0x4373 :
+        case 55560 :
+        case 55500 :
+        case 55530 :
             *addr = 0x18002000 + WRAPPER_REGISTER_OFFSET;
             break;
-        case 43012:
-        case 43022:
-        case 43430:
-        case 43439:
+
+        case 43012 :
+        case 43022 :
+        case 43430 :
+        case 43439 :
             *addr = 0x18003000 + WRAPPER_REGISTER_OFFSET;
             break;
-        case 43909:
-        case 43907:
-        case 54907:
+
+        case 43909 :
+        case 43907 :
+        case 54907 :
             *addr = 0x18011000 + WRAPPER_REGISTER_OFFSET;
             break;
-        default:
-            return WHD_BADARG;
+
+        default :
+            return (WHD_BADARG);
     }
-    return WHD_SUCCESS;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_socsram_base_address(uint16_t wlan_chip_id, uint32_t *addr, whd_bool_t wrapper)
-{
+whd_result_t get_socsram_base_address(uint16_t wlan_chip_id, uint32_t* addr, whd_bool_t wrapper) {
     uint32_t offset = 0;
-    if (wrapper)
-    {
+
+    if (wrapper) {
         offset = WRAPPER_REGISTER_OFFSET;
     }
-    switch (wlan_chip_id)
-    {
-        case 43012:
-        case 43022:
-        case 43430:
-        case 43439:
+    switch (wlan_chip_id) {
+        case 43012 :
+        case 43022 :
+        case 43430 :
+        case 43439 :
             *addr = 0x18004000 + offset;
             break;
-        default:
-            return WHD_BADARG;
+
+        default :
+            return (WHD_BADARG);
     }
-    return WHD_SUCCESS;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_sdiod_core_base_address(uint16_t wlan_chip_id, uint32_t *addr)
-{
-    switch (wlan_chip_id)
-    {
-        case 55560:
+whd_result_t get_sdiod_core_base_address(uint16_t wlan_chip_id, uint32_t* addr) {
+    switch (wlan_chip_id) {
+        case 55560 :
             *addr = 0x18004000;
             break;
-        case 55500:
-        case 55530:
+
+        case 55500 :
+        case 55530 :
             *addr = 0x18003000;
             break;
-        case 0x4373:
+
+        case 0x4373 :
             *addr = 0x18005000;
             break;
-        case 43012:
-        case 43022:
-        case 43430:
-        case 43439:
+
+        case 43012 :
+        case 43022 :
+        case 43430 :
+        case 43439 :
             *addr = 0x18002000;
             break;
-        default:
-            return WHD_BADARG;
+
+        default :
+            return (WHD_BADARG);
     }
-    return WHD_SUCCESS;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_pmu_base_address(uint16_t wlan_chip_id, uint32_t *addr)
-{
-    switch (wlan_chip_id)
-    {
-        case 0x4373:
-        case 43430:
-        case 43439:
+whd_result_t get_pmu_base_address(uint16_t wlan_chip_id, uint32_t* addr) {
+    switch (wlan_chip_id) {
+        case 0x4373 :
+        case 43430 :
+        case 43439 :
             *addr = CHIPCOMMON_BASE_ADDRESS;
             break;
-        case 43012:
-        case 43022:
-        case 55560:
-        case 55500:
-        case 55530:
+
+        case 43012 :
+        case 43022 :
+        case 55560 :
+        case 55500 :
+        case 55530 :
             *addr = 0x18012000;
             break;
-        case 43909:
-        case 43907:
-        case 54907:
+
+        case 43909 :
+        case 43907 :
+        case 54907 :
             *addr = 0x18011000;
             break;
-        default:
-            return WHD_BADARG;
+
+        default :
+            return (WHD_BADARG);
     }
-    return WHD_SUCCESS;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_chip_ram_size(uint16_t wlan_chip_id, uint32_t *size)
-{
-    *size = 0;
-    if ( (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) || (wlan_chip_id == 43430) ||
-         (wlan_chip_id == 43439) )
-    {
-        *size = (512 * 1024);
+whd_result_t get_chip_ram_size(uint16_t wlan_chip_id, uint32_t* size) {
+    uint32_t ram_size;
+
+    if ((wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) || (wlan_chip_id == 43430) ||
+        (wlan_chip_id == 43439)) {
+        ram_size = (512 * 1024);
     }
-    else if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4390) )
-    {
-        *size = 0x3C000;
+    else if ((wlan_chip_id == 43362) || (wlan_chip_id == 4390)) {
+        ram_size = 0x3C000;
     }
-    else if ( (wlan_chip_id == 43909) || (wlan_chip_id == 43907) || (wlan_chip_id == 54907) )
-    {
-        *size = 0x90000;
+    else if ((wlan_chip_id == 43909) || (wlan_chip_id == 43907) || (wlan_chip_id == 54907)) {
+        ram_size = 0x90000;
     }
-    else if ( (wlan_chip_id == 43012) || (wlan_chip_id == 43022) )
-    {
-        *size = 0xA0000;
+    else if ((wlan_chip_id == 43012) || (wlan_chip_id == 43022)) {
+        ram_size = 0xA0000;
     }
-    else if (wlan_chip_id == 0x4373)
-    {
-        *size = 0xE0000;
+    else if (wlan_chip_id == 0x4373) {
+        ram_size = 0xE0000;
     }
-    else if (wlan_chip_id == 55560)
-    {
-        *size = 0x150000 - 0x800 - 0x2b4;
+    else if (wlan_chip_id == 55560) {
+        ram_size = 0x150000 - 0x800 - 0x2b4;
     }
-    else if ((wlan_chip_id == 55500) || (wlan_chip_id == 55900) || (wlan_chip_id == 55530)) /* Hatchet1-A1 and Hatchet1-CP supports TRXv5 */
-    {
-#ifndef DOWNLOAD_RAM_BOOTLOADER
-        *size = 0xE0000 - 0x20 - 0x1000;
-#else
-        *size = 0xE0000 - 0x20 - 0x800;
-#endif
+    else if ((wlan_chip_id == 55500) || (wlan_chip_id == 55900) ||
+             (wlan_chip_id == 55530)) { /* Hatchet1-A1 and Hatchet1-CP supports TRXv5 */
+        #ifndef DOWNLOAD_RAM_BOOTLOADER
+        ram_size = 0xE0000 - 0x20 - 0x1000;
+        #else
+        ram_size = 0xE0000 - 0x20 - 0x800;
+        #endif
     }
-    else
-    {
-        *size = 0x80000;
+    else {
+        ram_size = 0x80000;
     }
-    return WHD_SUCCESS;
+
+    *size = ram_size;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_atcm_ram_base_address(uint16_t wlan_chip_id, uint32_t *size)
-{
-    *size = 0;
-    if (wlan_chip_id == 0x4373)
-    {
-        *size = 0x160000;
+whd_result_t get_atcm_ram_base_address(uint16_t wlan_chip_id, uint32_t* size) {
+    uint32_t base_addr = 0;
+
+    if (wlan_chip_id == 0x4373) {
+        base_addr = 0x160000;
     }
-    else if ( (wlan_chip_id == 43909) || (wlan_chip_id == 43907) || (wlan_chip_id == 54907) )
-    {
-        *size = 0x1B0000;
+    else if ((wlan_chip_id == 43909) || (wlan_chip_id == 43907) || (wlan_chip_id == 54907)) {
+        base_addr = 0x1B0000;
     }
-    else if (wlan_chip_id == 55560)
-    {
-        *size = 0x370000 + 0x2b4 + 0x800;
+    else if (wlan_chip_id == 55560) {
+        base_addr = 0x370000 + 0x2b4 + 0x800;
     }
-    else if ((wlan_chip_id == 55500) || (wlan_chip_id == 55900) || (wlan_chip_id == 55530)) /* Hatchet1-A1 and Hatchet1-CP supports TRXv5 */
-    {
-#ifndef DOWNLOAD_RAM_BOOTLOADER
-        *size = 0x3a0000 + 0x20 + 0x1000;
-#else
-        *size = 0x3a0000 + 0x20 + 0x800;
-#endif
+    else if ((wlan_chip_id == 55500) || (wlan_chip_id == 55900) ||
+             (wlan_chip_id == 55530)) { /* Hatchet1-A1 and Hatchet1-CP supports TRXv5 */
+        #ifndef DOWNLOAD_RAM_BOOTLOADER
+        base_addr = 0x3a0000 + 0x20 + 0x1000;
+        #else
+        base_addr = 0x3a0000 + 0x20 + 0x800;
+        #endif
     }
-    else
-    {
-        *size = 0;
+    else {
+        base_addr = 0;
     }
-    return WHD_SUCCESS;
+
+    *size = base_addr;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_socsram_srmem_size(uint16_t wlan_chip_id, uint32_t *mem_size)
-{
-    *mem_size = 0;
-    if ( (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *mem_size = (32 * 1024);
+whd_result_t get_socsram_srmem_size(uint16_t wlan_chip_id, uint32_t* mem_size) {
+    uint32_t val;
+
+    if ((wlan_chip_id == 43340) || (wlan_chip_id == 43342)) {
+        val = (32 * 1024);
     }
-    else if ( (wlan_chip_id == 43430) || (wlan_chip_id == 43439) )
-    {
-        *mem_size = (64 * 1024);
+    else if ((wlan_chip_id == 43430) || (wlan_chip_id == 43439)) {
+        val = (64 * 1024);
     }
-    else
-    {
-        *mem_size = 0;
+    else {
+        val = 0;
     }
-    return WHD_SUCCESS;
+
+    *mem_size = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_band_mask(uint16_t wlan_chip_id, uint32_t *band_mask)
-{
-    *band_mask = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *band_mask = 0xf000;
+whd_result_t get_wl_chanspec_band_mask(uint16_t wlan_chip_id, uint32_t* band_mask) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0xf000;
     }
-    else
-    {
-        *band_mask = 0xc000;
+    else {
+        val = 0xc000;
     }
-    return WHD_SUCCESS;
+
+    *band_mask = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_band_2G(uint16_t wlan_chip_id, uint32_t *band_2g)
-{
-    *band_2g = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *band_2g = 0x2000;
+whd_result_t get_wl_chanspec_band_2G(uint16_t wlan_chip_id, uint32_t* band_2g) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0x2000;
     }
-    else
-    {
-        *band_2g = 0x0000;
+    else {
+        val = 0x0000;
     }
-    return WHD_SUCCESS;
+
+    *band_2g = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_band_5G(uint16_t wlan_chip_id, uint32_t *band_5g)
-{
-    *band_5g = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *band_5g = 0x1000;
+whd_result_t get_wl_chanspec_band_5G(uint16_t wlan_chip_id, uint32_t* band_5g) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0x1000;
     }
-    else
-    {
-        *band_5g = 0xc000;
+    else {
+        val = 0xc000;
     }
-    return WHD_SUCCESS;
+
+    *band_5g = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_band_6G(uint16_t wlan_chip_id, uint32_t *band_6g)
-{
-    *band_6g = 0;
-    if ( (wlan_chip_id == 55500) || (wlan_chip_id == 55560) || (wlan_chip_id == 55900) || (wlan_chip_id == 55530) )
-    {
-        *band_6g = 0x8000;
+whd_result_t get_wl_chanspec_band_6G(uint16_t wlan_chip_id, uint32_t* band_6g) {
+    uint32_t val;
+
+    if ((wlan_chip_id == 55500) || (wlan_chip_id == 55560) ||
+        (wlan_chip_id == 55900) || (wlan_chip_id == 55530)) {
+        val = 0x8000;
     }
-    else
-    {
-        *band_6g = 0;
+    else {
+        val = 0;
     }
-    return WHD_SUCCESS;
+
+    *band_6g = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_band_shift(uint16_t wlan_chip_id, uint32_t *band_shift)
-{
-    *band_shift = 0;
-    if ( (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *band_shift = 12;
+whd_result_t get_wl_chanspec_band_shift(uint16_t wlan_chip_id, uint32_t* band_shift) {
+    uint32_t val;
+
+    if ((wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342)) {
+        val = 12;
     }
-    else
-    {
-        *band_shift = 14;
+    else {
+        val = 14;
     }
-    return WHD_SUCCESS;
+
+    *band_shift = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_bw_10(uint16_t wlan_chip_id, uint32_t *bw_10)
-{
-    *bw_10 = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *bw_10 = 0x0400;
+whd_result_t get_wl_chanspec_bw_10(uint16_t wlan_chip_id, uint32_t* bw_10) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0x0400;
     }
-    else
-    {
-        *bw_10 = 0x0800;
+    else {
+        val = 0x0800;
     }
-    return WHD_SUCCESS;
+
+    *bw_10 = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_bw_20(uint16_t wlan_chip_id, uint32_t *bw_20)
-{
-    *bw_20 = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *bw_20 = 0x0800;
+whd_result_t get_wl_chanspec_bw_20(uint16_t wlan_chip_id, uint32_t* bw_20) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0x0800;
     }
-    else
-    {
-        *bw_20 = 0x1000;
+    else {
+        val = 0x1000;
     }
-    return WHD_SUCCESS;
+
+    *bw_20 = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_bw_40(uint16_t wlan_chip_id, uint32_t *bw_40)
-{
-    *bw_40 = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *bw_40 = 0x0C00;
+whd_result_t get_wl_chanspec_bw_40(uint16_t wlan_chip_id, uint32_t* bw_40) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0x0C00;
     }
-    else
-    {
-        *bw_40 = 0x1800;
+    else {
+        val = 0x1800;
     }
-    return WHD_SUCCESS;
+
+    *bw_40 = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_bw_80(uint16_t wlan_chip_id, uint32_t *bw_80)
-{
-    *bw_80 = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        return WHD_UNSUPPORTED;
+whd_result_t get_wl_chanspec_bw_80(uint16_t wlan_chip_id, uint32_t* bw_80) {
+    uint32_t val = 0;
+    whd_result_t result = WHD_SUCCESS;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        result = WHD_UNSUPPORTED;
     }
-    else
-    {
-        *bw_80 = 0x2000;
+    else {
+        val = 0x2000;
     }
-    return WHD_SUCCESS;
+
+    *bw_80 = val;
+
+    return (result);
 }
 
-whd_result_t get_wl_chanspec_bw_160(uint16_t wlan_chip_id, uint32_t *bw_160)
-{
-    *bw_160 = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        return WHD_UNSUPPORTED;
+whd_result_t get_wl_chanspec_bw_160(uint16_t wlan_chip_id, uint32_t* bw_160) {
+    uint32_t val = 0;
+    whd_result_t result = WHD_SUCCESS;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        result = WHD_UNSUPPORTED;
     }
-    else
-    {
-        *bw_160 = 0x2800;
+    else {
+        val = 0x2800;
     }
-    return WHD_SUCCESS;
+
+    *bw_160 = val;
+
+    return (result);
 }
 
-whd_result_t get_wl_chanspec_bw_mask(uint16_t wlan_chip_id, uint32_t *bw_mask)
-{
-    *bw_mask = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *bw_mask = 0x0C00;
+whd_result_t get_wl_chanspec_bw_mask(uint16_t wlan_chip_id, uint32_t* bw_mask) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0x0C00;
     }
-    else
-    {
-        *bw_mask = 0x3800;
+    else {
+        val = 0x3800;
     }
-    return WHD_SUCCESS;
+
+    *bw_mask = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_bw_shift(uint16_t wlan_chip_id, uint32_t *bw_shift)
-{
-    *bw_shift = 0;
-    if ( (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *bw_shift = 10;
+whd_result_t get_wl_chanspec_bw_shift(uint16_t wlan_chip_id, uint32_t* bw_shift) {
+    uint32_t val;
+
+    if ((wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342)) {
+        val = 10;
     }
-    else
-    {
-        *bw_shift = 11;
+    else {
+        val = 11;
     }
-    return WHD_SUCCESS;
+
+    *bw_shift = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_ctl_sb_none(uint16_t wlan_chip_id, uint32_t *sb_none)
-{
-    *sb_none = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *sb_none = 0x0300;
+whd_result_t get_wl_chanspec_ctl_sb_none(uint16_t wlan_chip_id, uint32_t* sb_none) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0x0300;
     }
-    else
-    {
-        *sb_none = WL_CHANSPEC_CTL_SB_LLL;
+    else {
+        val = WL_CHANSPEC_CTL_SB_LLL;
     }
-    return WHD_SUCCESS;
+
+    *sb_none = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_ctl_sb_LLL(uint16_t wlan_chip_id, uint32_t *sb_lll)
-{
-    *sb_lll = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *sb_lll = 0x0100;
+whd_result_t get_wl_chanspec_ctl_sb_LLL(uint16_t wlan_chip_id, uint32_t* sb_lll) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0x0100;
     }
-    else
-    {
-        *sb_lll = WL_CHANSPEC_CTL_SB_LLL;
+    else {
+        val = WL_CHANSPEC_CTL_SB_LLL;
     }
-    return WHD_SUCCESS;
+
+    *sb_lll = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_ctl_sb_LLU(uint16_t wlan_chip_id, uint32_t *sb_llu)
-{
-    *sb_llu = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *sb_llu = 0x0200;
+whd_result_t get_wl_chanspec_ctl_sb_LLU(uint16_t wlan_chip_id, uint32_t* sb_llu) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0x0200;
     }
-    else
-    {
-        *sb_llu = WL_CHANSPEC_CTL_SB_LLU;
+    else {
+        val = WL_CHANSPEC_CTL_SB_LLU;
     }
-    return WHD_SUCCESS;
+
+    *sb_llu = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_wl_chanspec_ctl_sb_LUL(uint16_t wlan_chip_id, uint32_t *sb_lul)
-{
-    *sb_lul = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        return WHD_UNSUPPORTED;
+whd_result_t get_wl_chanspec_ctl_sb_LUL(uint16_t wlan_chip_id, uint32_t* sb_lul) {
+    uint32_t val = 0;
+    whd_result_t result = WHD_SUCCESS;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        result = WHD_UNSUPPORTED;
     }
-    else
-    {
-        *sb_lul = WL_CHANSPEC_CTL_SB_LUL;
+    else {
+        val = WL_CHANSPEC_CTL_SB_LUL;
     }
-    return WHD_SUCCESS;
+
+    *sb_lul = val;
+
+    return (result);
 }
 
-whd_result_t get_wl_chanspec_ctl_sb_LUU(uint16_t wlan_chip_id, uint32_t *sb_luu)
-{
-    *sb_luu = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        return WHD_UNSUPPORTED;
+whd_result_t get_wl_chanspec_ctl_sb_LUU(uint16_t wlan_chip_id, uint32_t* sb_luu) {
+    uint32_t val = 0;
+    whd_result_t result = WHD_SUCCESS;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        result = WHD_UNSUPPORTED;
     }
-    else
-    {
-        *sb_luu = WL_CHANSPEC_CTL_SB_LUU;
+    else {
+        val = WL_CHANSPEC_CTL_SB_LUU;
     }
-    return WHD_SUCCESS;
+
+    *sb_luu = val;
+
+    return (result);
 }
 
-whd_result_t get_wl_chanspec_ctl_sb_ULL(uint16_t wlan_chip_id, uint32_t *sb_ull)
-{
-    *sb_ull = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        return WHD_UNSUPPORTED;
+whd_result_t get_wl_chanspec_ctl_sb_ULL(uint16_t wlan_chip_id, uint32_t* sb_ull) {
+    uint32_t val = 0;
+    whd_result_t result = WHD_SUCCESS;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        result = WHD_UNSUPPORTED;
     }
-    else
-    {
-        *sb_ull = WL_CHANSPEC_CTL_SB_ULL;
+    else {
+        val = WL_CHANSPEC_CTL_SB_ULL;
     }
-    return WHD_SUCCESS;
+
+    *sb_ull = val;
+
+    return (result);
 }
 
-whd_result_t get_wl_chanspec_ctl_sb_ULU(uint16_t wlan_chip_id, uint32_t *sb_ulu)
-{
-    *sb_ulu = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        return WHD_UNSUPPORTED;
+whd_result_t get_wl_chanspec_ctl_sb_ULU(uint16_t wlan_chip_id, uint32_t* sb_ulu) {
+    uint32_t val = 0;
+    whd_result_t result = WHD_SUCCESS;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        result = WHD_UNSUPPORTED;
     }
-    else
-    {
-        *sb_ulu = WL_CHANSPEC_CTL_SB_ULU;
+    else {
+        val = WL_CHANSPEC_CTL_SB_ULU;
     }
-    return WHD_SUCCESS;
+
+    *sb_ulu = val;
+
+    return (result);
 }
 
-whd_result_t get_wl_chanspec_ctl_sb_UUL(uint16_t wlan_chip_id, uint32_t *sb_uul)
-{
-    *sb_uul = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        return WHD_UNSUPPORTED;
+whd_result_t get_wl_chanspec_ctl_sb_UUL(uint16_t wlan_chip_id, uint32_t* sb_uul) {
+    uint32_t val = 0;
+    whd_result_t result = WHD_SUCCESS;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        result = WHD_UNSUPPORTED;
     }
-    else
-    {
-        *sb_uul = WL_CHANSPEC_CTL_SB_UUL;
+    else {
+        val = WL_CHANSPEC_CTL_SB_UUL;
     }
-    return WHD_SUCCESS;
+
+    *sb_uul = val;
+
+    return (result);
 }
 
-whd_result_t get_wl_chanspec_ctl_sb_UUU(uint16_t wlan_chip_id, uint32_t *sb_uuu)
-{
-    *sb_uuu = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        return WHD_UNSUPPORTED;
+whd_result_t get_wl_chanspec_ctl_sb_UUU(uint16_t wlan_chip_id, uint32_t* sb_uuu) {
+    uint32_t val = 0;
+    whd_result_t result = WHD_SUCCESS;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        result = WHD_UNSUPPORTED;
     }
-    else
-    {
-        *sb_uuu = WL_CHANSPEC_CTL_SB_UUU;
+    else {
+        val = WL_CHANSPEC_CTL_SB_UUU;
     }
-    return WHD_SUCCESS;
+
+    *sb_uuu = val;
+
+    return (result);
 }
 
-whd_result_t get_wl_chanspec_ctl_sb_mask(uint16_t wlan_chip_id, uint32_t *sb_mask)
-{
-    *sb_mask = 0;
-    if ( (wlan_chip_id == 43362) || (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
-    {
-        *sb_mask = 0x0300;
+whd_result_t get_wl_chanspec_ctl_sb_mask(uint16_t wlan_chip_id, uint32_t* sb_mask) {
+    uint32_t val;
+
+    if (whd_is_legacy_chanspec_chip(wlan_chip_id) == WHD_TRUE) {
+        val = 0x0300;
     }
-    else
-    {
-        *sb_mask = 0x0700;
+    else {
+        val = 0x0700;
     }
-    return WHD_SUCCESS;
+
+    *sb_mask = val;
+
+    return (WHD_SUCCESS);
 }
 
-whd_result_t get_nvram_dwnld_start_address(uint16_t wlan_chip_id, uint32_t *addr)
-{
-    switch (wlan_chip_id)
-    {
-        case 43022:
+whd_result_t get_nvram_dwnld_start_address(uint16_t wlan_chip_id, uint32_t* addr) {
+    switch (wlan_chip_id) {
+        case 43022 :
             *addr = 0x80000;
             break;
-        default:
-            return WHD_BADARG;
+
+        default :
+            return (WHD_BADARG);
     }
-    return WHD_SUCCESS;
+
+    return (WHD_SUCCESS);
 }
