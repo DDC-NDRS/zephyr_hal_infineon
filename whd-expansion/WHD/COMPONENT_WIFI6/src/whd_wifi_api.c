@@ -778,6 +778,12 @@ whd_result_t whd_wifi_set_passphrase(whd_interface_t ifp, uint8_t const* securit
     whd_driver_t driver;
     wsec_pmk_t*  psk;
 
+    if ((key_length < KEY_MIN_LEN) || (key_length > KEY_MAX_LEN)) {
+        WPRINT_WHD_ERROR(("Invalid param in func %s at line %d \n",
+                          __func__, __LINE__));
+        return (WHD_WLAN_BADARG);
+    }
+
     driver = ifp->whd_driver;
 
     psk = (wsec_pmk_t*)whd_proto_get_ioctl_buffer(driver, &buffer, sizeof(wsec_pmk_t));
@@ -800,6 +806,12 @@ whd_result_t whd_wifi_sae_password(whd_interface_t ifp, uint8_t const* security_
     whd_buffer_t buffer;
     whd_driver_t driver;
     wsec_sae_password_t* sae_password;
+
+    if ((key_length == 0) || (key_length > WSEC_MAX_SAE_PASSWORD_LEN)) {
+        WPRINT_WHD_ERROR(("Invalid param in func %s at line %d \n",
+                          __func__, __LINE__));
+        return (WHD_WLAN_BADARG);
+    }
 
     driver = ifp->whd_driver;
 
@@ -1131,6 +1143,12 @@ whd_result_t whd_wifi_set_pmk(whd_interface_t ifp, uint8_t const* security_key, 
     whd_buffer_t buffer;
     whd_driver_t driver;
     wsec_pmk_t* pmk;
+
+    if ((key_length != WSEC_PMK_LEN) && (key_length != WSEC_PMK_WPA3_ENT_192_LEN)) {
+        WPRINT_WHD_ERROR(("Invalid param in func %s at line %d key_length: %u\n",
+                          __func__, __LINE__, (unsigned int)key_length));
+        return (WHD_WLAN_BADARG);
+    }
 
     driver = ifp->whd_driver;
 
@@ -2275,6 +2293,11 @@ whd_result_t whd_wifi_join(whd_interface_t ifp, whd_ssid_t const* ssid, whd_secu
     whd_buffer_t buffer;
     wlc_ssid_t* ssid_params;
     whd_driver_t driver;
+
+    if ((ssid->length == 0) || (ssid->length > (size_t)SSID_NAME_SIZE)) {
+        WPRINT_WHD_ERROR(("%s: failure: SSID length error\n", __func__));
+        return (WHD_WLAN_BADSSIDLEN);
+    }
 
     driver = ifp->whd_driver;
 
@@ -3581,6 +3604,12 @@ whd_result_t whd_wifi_register_multicast_address(whd_interface_t ifp, whd_mac_t 
     mcast_list_t* new_mcast_list;
     whd_driver_t driver;
 
+    if (!ETHER_ISMULTI(mac)) {
+        WPRINT_WHD_ERROR(("Invalid param in func %s at line %d \n",
+                          __func__, __LINE__));
+        return (WHD_WLAN_BADARG);
+    }
+
     driver = ifp->whd_driver;
 
     /* Get the current multicast list */
@@ -3626,6 +3655,12 @@ whd_result_t whd_wifi_unregister_multicast_address(whd_interface_t ifp, whd_mac_
     mcast_list_t* orig_mcast_list;
     whd_driver_t driver;
 
+    if (!ETHER_ISMULTI(mac)) {
+        WPRINT_WHD_ERROR(("Invalid param in func %s at line %d \n",
+                          __func__, __LINE__));
+        return (WHD_WLAN_BADARG);
+    }
+
     driver = ifp->whd_driver;
 
     /* Get the current multicast list */
@@ -3646,13 +3681,13 @@ whd_result_t whd_wifi_unregister_multicast_address(whd_interface_t ifp, whd_mac_
         CHECK_IOCTL_BUFFER(new_mcast_list);
 
         for (uint32_t a = 0; a < orig_mcast_list->entry_count; ++a) {
-            whd_mac_t* mac = &orig_mcast_list->macs[a];
+            whd_mac_t const* entry = &orig_mcast_list->macs[a];
 
             WPRINT_WHD_INFO(("MAC: %.2X:%.2X:%.2X:%.2X:%.2X:%.2X\n",
-                             mac->octet[0], mac->octet[1],
-                             mac->octet[2], mac->octet[3],
-                             mac->octet[4], mac->octet[5]));
-            if (memcmp(mac, &orig_mcast_list->macs[a], sizeof(whd_mac_t)) == 0) {
+                             entry->octet[0], entry->octet[1],
+                             entry->octet[2], entry->octet[3],
+                             entry->octet[4], entry->octet[5]));
+            if (memcmp(mac, entry, sizeof(whd_mac_t)) == 0) {
                 /* Copy the existing list up to the matching address */
                 whd_mem_memcpy(new_mcast_list->macs, orig_mcast_list->macs, a * sizeof(whd_mac_t));
 
@@ -3890,6 +3925,12 @@ whd_result_t whd_wifi_send_action_frame(whd_interface_t ifp, whd_af_params_t* af
     whd_buffer_t buffer;
     whd_af_params_t* af_frame;
     whd_driver_t driver;
+
+    if (af_params->action_frame.len > ACTION_FRAME_SIZE) {
+        WPRINT_WHD_ERROR(("Invalid param in func %s at line %d \n",
+                          __func__, __LINE__));
+        return (WHD_WLAN_BADARG);
+    }
 
     driver = ifp->whd_driver;
 
@@ -4590,7 +4631,7 @@ whd_result_t whd_wifi_get_wifi_version(whd_interface_t ifp, char* buf, uint8_t l
     }
 
     /* Ignore the last character as it may be a newline or linefeed */
-    if (ver_len > 1) {
+    if ((ver_len > 1) && (buf[ver_len - 1] == '\n')) {
         buf[ver_len - 1] = '\0';
     }
     CHECK_RETURN(result);
