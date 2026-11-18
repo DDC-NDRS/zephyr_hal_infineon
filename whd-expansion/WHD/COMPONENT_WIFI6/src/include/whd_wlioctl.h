@@ -1273,10 +1273,10 @@ typedef struct eventmsgs_ext
 #define IOVAR_STR_SCANMAC                "scanmac"
 #define IOVAR_STR_NDOE                   "ndoe"
 
-#ifdef BUS_ENC
+#if defined(WHD_BUS_ENC)
 #define IOVAR_BUS_ENC_KEY                "bus_enc_key"
 #define IOVAR_BUS_ENC_IV                 "bus_iv"
-#endif /* BUS_ENC */
+#endif /* WHD_BUS_ENC */
 
 #define IOVAR_STR_ICMP_ECHO_REQ          "icmp_echo_req"
 #define IOVAR_STR_ASSOC_INFO             "assoc_info"

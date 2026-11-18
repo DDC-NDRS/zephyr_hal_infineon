@@ -25,8 +25,8 @@
 extern "C" {
 #endif
 
-#define WHD_BACKPLAIN_BUF_TIMEOUT (0xFFFFFFFF)
-#define WHD_RX_BUF_TIMEOUT        (10)
+#define WHD_BACKPLAIN_BUF_TIMEOUT   (0xFFFFFFFF)
+#define WHD_RX_BUF_TIMEOUT          (10)
 
 typedef enum {
     CHK_BL_INIT = 0,
@@ -57,7 +57,7 @@ whd_result_t whd_bus_write_wifi_nvram_image(whd_driver_t driver);
 void whd_bus_set_resource_download_halt(whd_driver_t driver, whd_bool_t halt);
 
 whd_result_t whd_bus_transfer_backplane_bytes(whd_driver_t driver, whd_bus_transfer_direction_t direction,
-                                                     uint32_t address, uint32_t size, uint8_t* data);
+                                              uint32_t address, uint32_t size, uint8_t* data);
 void whd_bus_init_backplane_window(whd_driver_t driver);
 whd_result_t whd_bus_set_backplane_window(whd_driver_t driver, uint32_t addr);
 

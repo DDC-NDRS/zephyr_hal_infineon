@@ -37,62 +37,55 @@
 #include "whd_proto.h"
 
 /******************************************************
-* @cond       Constants
-******************************************************/
+ *              Constants
+ *****************************************************/
 #define MAC_ADDRESS_LOCALLY_ADMINISTERED_BIT 0x02
 
 /******************************************************
-*             Local Structures
+*               Local Structures
 ******************************************************/
-
 
 
 /******************************************************
-*                   Variables
-******************************************************/
+ *              Variables
+ *****************************************************/
 void (*whd_wifi_link_update_callback)(void) = NULL;
 
 /******************************************************
-*             Function definitions
-******************************************************/
-
-whd_result_t whd_wifi_set_mac_address(whd_interface_t ifp, whd_mac_t mac)
-{
+ *              Function definitions
+ *****************************************************/
+whd_result_t whd_wifi_set_mac_address(whd_interface_t ifp, whd_mac_t mac) {
     whd_buffer_t buffer;
-    uint32_t *data;
-    whd_driver_t whd_driver = ifp->whd_driver;
+    uint32_t* data;
+    whd_driver_t driver = ifp->whd_driver;
 
     /* AP interface needs to come up with MAC different from STA  */
-#ifdef APOLLO_AUDIO
-
+    #ifdef APOLLO_AUDIO
     /* Work around the issue of asking API to set one address and it sets a different address.
      * This will cause any comparison of set and get mac address to fail.  TODO: move twiddling this
      * bit to a higher level.
      */
     if (0)
-#else
+    #else
     if (ifp->role == WHD_AP_ROLE)
-#endif
+    #endif
     {
         whd_mac_t ap_mac_address;
 
         whd_mem_memcpy(&ap_mac_address, &mac, sizeof(whd_mac_t) );
-        if (ap_mac_address.octet[0] & MAC_ADDRESS_LOCALLY_ADMINISTERED_BIT)
-        {
+        if (ap_mac_address.octet[0] & MAC_ADDRESS_LOCALLY_ADMINISTERED_BIT) {
             ap_mac_address.octet[0] &= (uint8_t) ~(MAC_ADDRESS_LOCALLY_ADMINISTERED_BIT);
         }
-        else
-        {
+        else {
             ap_mac_address.octet[0] |= MAC_ADDRESS_LOCALLY_ADMINISTERED_BIT;
         }
 
-        data = (uint32_t *)whd_proto_get_iovar_buffer(whd_driver, &buffer, sizeof(whd_mac_t), IOVAR_STR_CUR_ETHERADDR);
+        data = (uint32_t*)whd_proto_get_iovar_buffer(driver, &buffer, sizeof(whd_mac_t), IOVAR_STR_CUR_ETHERADDR);
         CHECK_IOCTL_BUFFER(data);
         whd_mem_memcpy(data, &ap_mac_address, sizeof(whd_mac_t) );
         CHECK_RETURN(whd_proto_set_iovar(ifp, buffer, NULL) );
 
-        if (memcmp(&mac, &ap_mac_address, sizeof(whd_mac_t) ) != 0)
-        {
+        if (memcmp(&mac, &ap_mac_address, sizeof(whd_mac_t)) != 0) {
             WPRINT_WHD_INFO( (" STA MAC address : %02x:%02x:%02x:%02x:%02x:%02x \n"
                               " AP  MAC address : %02x:%02x:%02x:%02x:%02x:%02x \n",
                               mac.octet[0], mac.octet[1], mac.octet[2],
@@ -101,13 +94,12 @@ whd_result_t whd_wifi_set_mac_address(whd_interface_t ifp, whd_mac_t mac)
                               ap_mac_address.octet[3], ap_mac_address.octet[4], ap_mac_address.octet[3]) );
         }
     }
-    else
-    {
-        data = (uint32_t *)whd_proto_get_iovar_buffer(whd_driver, &buffer, sizeof(whd_mac_t), IOVAR_STR_CUR_ETHERADDR);
+    else {
+        data = (uint32_t*)whd_proto_get_iovar_buffer(driver, &buffer, sizeof(whd_mac_t), IOVAR_STR_CUR_ETHERADDR);
         CHECK_IOCTL_BUFFER(data);
         whd_mem_memcpy(data, &mac, sizeof(whd_mac_t) );
         CHECK_RETURN(whd_proto_set_iovar(ifp, buffer, NULL) );
     }
 
-    return WHD_SUCCESS;
+    return (WHD_SUCCESS);
 }

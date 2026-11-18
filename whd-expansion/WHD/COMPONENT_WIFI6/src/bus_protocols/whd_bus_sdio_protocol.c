@@ -60,9 +60,9 @@
 #include "cy_network_mw_core.h"
 #endif
 
-#ifdef BUS_ENC
+#if defined(WHD_BUS_ENC)
 #include "mbedtls/gcm.h"
-#endif /* BUS_ENC */
+#endif /* WHD_BUS_ENC */
 
 /******************************************************
  *             Constants
@@ -292,9 +292,9 @@ whd_result_t whd_bus_sdio_send_buffer(whd_driver_t driver, whd_buffer_t buffer) 
     return WHD_SUCCESS;
 }
 
-#ifdef BUS_ENC
+#if defined(WHD_BUS_ENC)
 #define GCM_IV_SIZE 12
-#endif /* BUS_ENC */
+#endif /* WHD_BUS_ENC */
 
 whd_result_t whd_bus_sdio_init(whd_driver_t driver) {
     uint8_t byte_data;
@@ -562,7 +562,7 @@ whd_result_t whd_bus_sdio_init(whd_driver_t driver) {
 
     whd_bus_sdio_irq_enable(driver, WHD_TRUE);
 
-    #ifdef BUS_ENC
+    #if defined(WHD_BUS_ENC)
     for (int i = 0; i < GCM_KEY_SIZE_BYTES; i++) {
         driver->key[i] = 0xAA;
     }
@@ -570,7 +570,7 @@ whd_result_t whd_bus_sdio_init(whd_driver_t driver) {
     for (int i = 0; i < GCM_IV_SIZE; i++) {
         driver->iv[i] = 0xBB;
     }
-    #endif /* BUS_ENC*/
+    #endif /* WHD_BUS_ENC*/
 
     UNUSED_PARAMETER(elapsed_time);
 

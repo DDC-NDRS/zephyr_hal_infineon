@@ -98,24 +98,32 @@ void whd_bus_set_state(whd_driver_t driver, whd_bool_t state) {
 }
 
 whd_result_t whd_bus_set_flow_control(whd_driver_t driver, uint8_t value) {
+    struct whd_bus_common_info* bus_common = driver->bus_common_info;
+
     if (value != 0) {
-        driver->bus_common_info->bus_flow_control = WHD_TRUE;
+        bus_common->bus_flow_control = WHD_TRUE;
     }
     else {
-        driver->bus_common_info->bus_flow_control = WHD_FALSE;
+        bus_common->bus_flow_control = WHD_FALSE;
     }
 
-    return WHD_SUCCESS;
+    return (WHD_SUCCESS);
 }
 
 whd_bool_t whd_bus_is_flow_controlled(whd_driver_t driver) {
-    return driver->bus_common_info->bus_flow_control;
+    struct whd_bus_common_info* bus_common = driver->bus_common_info;
+
+    return (bus_common->bus_flow_control);
 }
 
 #ifndef PROTO_MSGBUF
 whd_result_t whd_bus_set_backplane_window(whd_driver_t driver, uint32_t addr) {
     uint32_t* curbase = &driver->bus_common_info->backplane_window_current_base_address;
-    return driver->bus_if->whd_bus_set_backplane_window_fptr(driver, addr, curbase);
+    whd_result_t result;
+
+    result = driver->bus_if->whd_bus_set_backplane_window_fptr(driver, addr, curbase);
+
+    return (result);
 }
 #endif
 
@@ -138,7 +146,8 @@ void whd_bus_common_info_init(whd_driver_t driver) {
         bus_common->resource_download_abort = WHD_FALSE;
     }
     else {
-        WPRINT_WHD_ERROR(("Memory allocation failed for whd_bus_common_info in %s\n", __FUNCTION__));
+        WPRINT_WHD_ERROR(("Memory allocation failed for whd_bus_common_info in %s\n",
+                          __FUNCTION__));
     }
 }
 
@@ -206,11 +215,11 @@ uint32_t whd_bus_handle_delayed_release(whd_driver_t driver) {
         }
     }
 
-    return time_until_release;
+    return (time_until_release);
 }
 
 whd_bool_t whd_bus_platform_mcu_power_save_deep_sleep_enabled(whd_driver_t driver) {
-    return WHD_FALSE;
+    return (WHD_FALSE);
 }
 
 void whd_bus_init_backplane_window(whd_driver_t driver) {
@@ -218,7 +227,7 @@ void whd_bus_init_backplane_window(whd_driver_t driver) {
 }
 
 whd_result_t whd_bus_write_wifi_firmware_image(whd_driver_t driver) {
-    whd_result_t result = WHD_SUCCESS;
+    whd_result_t result;
     uint32_t ram_start_address;
     uint32_t image_size;
 
@@ -261,13 +270,13 @@ whd_result_t whd_bus_write_wifi_firmware_image(whd_driver_t driver) {
     if (result != WHD_SUCCESS) {
         WPRINT_WHD_ERROR(("Fatal error: download_resource doesn't exist, %s failed at line %d \n",
                          __func__, __LINE__));
-        return result;
+        return (result);
     }
 
     if (image_size <= 0) {
         WPRINT_WHD_ERROR(("Fatal error: download_resource cannot load with invalid size, %s failed at line %d \n",
                           __func__, __LINE__));
-        return WHD_BADARG;
+        return (WHD_BADARG);
     }
 
     result = whd_bus_download_resource(driver, WHD_RESOURCE_WLAN_FIRMWARE, WHD_FALSE,
@@ -282,7 +291,7 @@ whd_result_t whd_bus_write_wifi_firmware_image(whd_driver_t driver) {
     CHECK_RETURN(whd_bus_common_blhs(driver, CHK_FW_VALIDATION));
     #endif
 
-    return result;
+    return (result);
 }
 
 void whd_bus_set_resource_download_halt(whd_driver_t driver, whd_bool_t halt) {
@@ -292,7 +301,7 @@ void whd_bus_set_resource_download_halt(whd_driver_t driver, whd_bool_t halt) {
 /* Default implementation of WHD bus resume function, which does nothing */
 whd_result_t whd_bus_resume_after_deep_sleep(whd_driver_t driver) {
     whd_assert("In order to support deep-sleep platform need to implement this function", 0);
-    return WHD_UNSUPPORTED;
+    return (WHD_UNSUPPORTED);
 }
 
 whd_result_t whd_bus_mem_bytes(whd_driver_t driver, uint8_t direct, uint32_t address, uint32_t size,
@@ -323,20 +332,21 @@ whd_result_t whd_bus_transfer_backplane_bytes(whd_driver_t driver, whd_bus_trans
                                             whd_bus_backplane_read_padd_size(driver) + MAX_BUS_HEADER_SIZE),
                                  WHD_BACKPLAIN_BUF_TIMEOUT);
     if (result != WHD_SUCCESS) {
-        WPRINT_WHD_ERROR(("Packet buffer allocation failed in %s at %d \n", __func__, __LINE__));
+        WPRINT_WHD_ERROR(("Packet buffer allocation failed in %s at %d \n",
+                          __func__, __LINE__));
         goto done;
     }
 
     packet = (uint8_t*)whd_buffer_get_current_piece_data_pointer(driver, pkt_buffer);
     CHECK_PACKET_NULL(packet, WHD_NO_REGISTER_FUNCTION_POINTER);
+
     for (remaining_buf_size = size; remaining_buf_size != 0;
          remaining_buf_size -= transfer_size, address += transfer_size) {
         transfer_size = (remaining_buf_size > whd_bus_get_max_transfer_size(driver))
-                            ? whd_bus_get_max_transfer_size(driver)
-                            : remaining_buf_size;
+                        ? whd_bus_get_max_transfer_size(driver) : remaining_buf_size;
 
         /* Check if the transfer crosses the backplane window boundary */
-        window_offset_address = address & BACKPLANE_ADDRESS_MASK;
+        window_offset_address = (address & BACKPLANE_ADDRESS_MASK);
         if ((window_offset_address + transfer_size) > BACKPLANE_ADDRESS_MASK) {
             /* Adjust the transfer size to within current window */
             transfer_size = BACKPLANE_WINDOW_SIZE - window_offset_address;
@@ -351,7 +361,7 @@ whd_result_t whd_bus_transfer_backplane_bytes(whd_driver_t driver, whd_bus_trans
             trans_addr = address;
         }
         else if (result == WHD_SUCCESS) {
-            trans_addr = address & BACKPLANE_ADDRESS_MASK;
+            trans_addr = (address & BACKPLANE_ADDRESS_MASK);
         }
         else {
             goto done;
@@ -385,16 +395,16 @@ whd_result_t whd_bus_transfer_backplane_bytes(whd_driver_t driver, whd_bus_trans
         }
     }
 
-done:
+done :
     #ifndef PROTO_MSGBUF
     whd_bus_set_backplane_window(driver, CHIPCOMMON_BASE_ADDRESS);
     #endif
 
     if (pkt_buffer != NULL) {
-        CHECK_RETURN(
-            whd_buffer_release(driver, pkt_buffer, (direction == BUS_READ) ? WHD_NETWORK_RX : WHD_NETWORK_TX));
+        CHECK_RETURN(whd_buffer_release(driver, pkt_buffer,
+                                        (direction == BUS_READ) ? WHD_NETWORK_RX : WHD_NETWORK_TX));
     }
     CHECK_RETURN(result);
 
-    return WHD_SUCCESS;
+    return (WHD_SUCCESS);
 }

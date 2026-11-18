@@ -45,6 +45,8 @@
 #include "whd_types_int.h"
 #include "whd_proto.h"
 
+#include <zephyr/net/net_ip.h>
+
 #ifdef CYCFG_ULP_SUPPORT_ENABLED
 #include "cy_wcm.h"
 #endif
@@ -4867,7 +4869,7 @@ whd_result_t whd_arp_hostip_list_add_string(whd_interface_t ifp, char const* ip_
     /* convert string to uint32_t */
     uint32_t addr;
 
-    whd_str_to_ip(ip_addr, strlen(ip_addr), &addr);
+    (void) net_addr_pton(NET_AF_INET, ip_addr, &addr);
 
     return whd_arp_hostip_list_add(ifp, &addr, 1);
 }
@@ -4923,7 +4925,7 @@ whd_result_t whd_arp_hostip_list_clear_id_string(whd_interface_t ifp, char const
     /* convert string to uint32_t */
     uint32_t addr;
 
-    whd_str_to_ip(ip_addr, strlen(ip_addr), &addr);
+    (void) net_addr_pton(NET_AF_INET, ip_addr, &addr);
 
     return whd_arp_hostip_list_clear_id(ifp, addr);
 }
@@ -5090,7 +5092,7 @@ whd_result_t whd_arp_stats_print(whd_arp_stats_t* arp_stats, char const* title) 
             uint32_t ipv4_addr = arp_stats->host_ip_list[index];
             char     ipv4_string[32];
             whd_mem_memset(ipv4_string, 0x00, sizeof(ipv4_string));
-            whd_ip4_to_string(&ipv4_addr, ipv4_string);
+            (void) net_addr_ntop(NET_AF_INET, &ipv4_addr, ipv4_string, sizeof(ipv4_string));
             WPRINT_MACRO(("  %d of %d IPV4: 0x%x %s\n", (int)index, (int)arp_stats->stats.host_ip_entries,
                           (int)arp_stats->host_ip_list[index], ipv4_string));
         }

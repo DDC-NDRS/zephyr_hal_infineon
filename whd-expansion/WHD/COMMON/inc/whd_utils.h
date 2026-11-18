@@ -39,56 +39,57 @@
 extern "C" {
 #endif
 
-#define  NBBY  8
-#define  setbit(a, i)   ( ( (uint8_t *)a )[(int)(i) / (int)(NBBY)] |= (uint8_t)(1 << ( (i) % NBBY ) ) )
-#define  clrbit(a, i)   ( ( (uint8_t *)a )[(int)(i) / (int)(NBBY)] &= (uint8_t) ~(1 << ( (i) % NBBY ) ) )
-#define  isset(a, i)    ( ( (const uint8_t *)a )[(int)(i) / (int)(NBBY)]& (1 << ( (i) % NBBY ) ) )
-#define  isclr(a, i)    ( ( ( (const uint8_t *)a )[(int)(i) / (int)(NBBY)]& (1 << ( (i) % NBBY ) ) ) == 0 )
+#define NBBY            8
+#define setbit(a, i)    (((uint8_t*)a)[(int)(i) / (int)(NBBY)] |= (uint8_t)(1 << ((i) % NBBY)))
+#define clrbit(a, i)    (((uint8_t*)a)[(int)(i) / (int)(NBBY)] &= (uint8_t)~(1 << ((i) % NBBY)))
+#define isset(a, i)     (((const uint8_t*)a)[(int)(i) / (int)(NBBY)] & (1 << ((i) % NBBY)))
+#define isclr(a, i)     ((((const uint8_t*)a)[(int)(i) / (int)(NBBY)] & (1 << ((i) % NBBY))) == 0)
 
-#define  CEIL(x, y)     ( ( (x) + ( (y) - 1 ) ) / (y) )
-#define  ROUNDUP(x, y)      ( ( ( (x) + ( (y) - 1 ) ) / (y) ) * (y) )
-#define  ROUNDDN(p, align)  ( (p)& ~( (align) - 1 ) )
+#define CEIL(x, y)      (((x) + ((y) - 1)) / (y))
+#define ROUNDUP(x, y)   ((((x) + ((y) - 1)) / (y)) * (y))
+#define ROUNDDN(p, align) ((p) & ~((align) - 1))
 
-#define ETHER_ISMULTI(ea) ( ( (const uint8_t *)(ea) )[0] & 1 )
+#define ETHER_ISMULTI(ea) (((const uint8_t*)(ea))[0] & 1)
 
-#ifdef BUS_ENC
-#define GCM_KEY_SIZE 128
+#if defined(WHD_BUS_ENC)
+#define GCM_KEY_SIZE       128
 #define GCM_KEY_SIZE_BYTES 16
-#define GCM_IV_SIZE   12
+#define GCM_IV_SIZE        12
 
-
-static const unsigned char aad[20] =  { 0xfe, 0xed, 0xfa, 0xce, 0xde, 0xad, 0xbe, 0xef,
-                                        0xfe, 0xed, 0xfa, 0xce, 0xde, 0xad, 0xbe, 0xef,
-                                        0xab, 0xad, 0xda, 0xd2 };
-#endif /* BUS_ENC */
+static const unsigned char aad[20] = {
+    0xFE, 0xED, 0xFA, 0xCE, 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED,
+    0xFA, 0xCE, 0xDE, 0xAD, 0xBE, 0xEF, 0xAB, 0xAD, 0xDA, 0xD2
+};
+#endif /* WHD_BUS_ENC */
 
 #ifdef CONFIG_WIFI_NM_WPA_SUPPLICANT
 #define WPA_PROTO_WPA3 BIT(4) /* Local define if SAE and RNS support */
 
 /* channel info structure */
 typedef struct {
-    uint    chan;       /* channel number */
-    uint    freq;       /* in Mhz */
-    uint    dfs;        /* dfs channel or not */
-    uint    vht80_flag; /* vht80 flag */
+    uint chan;       /* channel number */
+    uint freq;       /* in Mhz */
+    uint dfs;        /* dfs channel or not */
+    uint vht80_flag; /* vht80 flag */
 } chan_info_t;
 #endif
+
 /**
  * Get the offset (in bytes) of a member within a structure
  */
-#define OFFSET(type, member)                          ( (uint32_t)&( (type *)0 )->member )
+#define OFFSET(type, member) ((uint32_t)&((type*)0)->member)
 
 /**
  * determine size (number of elements) in an array
  */
 #ifndef ARRAY_SIZE
-#define ARRAY_SIZE(a)                                 (sizeof(a) / sizeof(a[0]) )
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif
 
 #ifdef PROTO_MSGBUF
 uint32_t whd_dmapool_init(uint32_t memory_size);
-void* whd_dmapool_alloc( int size);
-void whd_dmapool_reset( void );
+void*    whd_dmapool_alloc(int size);
+void     whd_dmapool_reset(void);
 #endif
 
 /** Searches for a specific WiFi Information Element in a byte array
@@ -100,15 +101,15 @@ void whd_dmapool_reset( void );
  * @note : This function has been copied directly from the standard Broadcom host driver file wl/exe/wlu.c
  *
  *
- * @param tlv_buf : The byte array containing the Information Elements (IEs)
- * @param buflen  : The length of the tlv_buf byte array
- * @param key     : The Information Element tag to search for
+ * @param tlv_buf The byte array containing the Information Elements (IEs)
+ * @param buflen  The length of the tlv_buf byte array
+ * @param key     The Information Element tag to search for
  *
- * @return    NULL : if no matching Information Element was found
- *            Non-Null : Pointer to the start of the matching Information Element
+ * @return NULL : if no matching Information Element was found
+ *         Non-Null : Pointer to the start of the matching Information Element
  */
 
-whd_tlv8_header_t *whd_parse_tlvs(const whd_tlv8_header_t *tlv_buf, uint32_t buflen, dot11_ie_id_t key);
+whd_tlv8_header_t* whd_parse_tlvs(whd_tlv8_header_t const* tlv_buf, uint32_t buflen, dot11_ie_id_t key);
 
 /** Checks if a WiFi Information Element is a WPA entry
  *
@@ -117,14 +118,14 @@ whd_tlv8_header_t *whd_parse_tlvs(const whd_tlv8_header_t *tlv_buf, uint32_t buf
  *
  * @note : This function has been copied directly from the standard Broadcom host driver file wl/exe/wlu.c
  *
- * @param wpaie    : The byte array containing the Information Element (IE)
- * @param tlvs     : The larger IE array to be updated if not a WPA IE
- * @param tlvs_len : The current length of larger IE array
+ * @param wpaie    The byte array containing the Information Element (IE)
+ * @param tlvs     The larger IE array to be updated if not a WPA IE
+ * @param tlvs_len The current length of larger IE array
  *
  * @return    WHD_TRUE  : if IE matches the WPA OUI (Organizationally Unique Identifier) and its type = 1
  *            WHD_FALSE : otherwise
  */
-whd_bool_t whd_is_wpa_ie(vendor_specific_ie_header_t *wpaie, whd_tlv8_header_t **tlvs, uint32_t *tlvs_len);
+whd_bool_t whd_is_wpa_ie(vendor_specific_ie_header_t* wpaie, whd_tlv8_header_t** tlvs, uint32_t* tlvs_len);
 
 /** Searches for a specific WiFi Information Element in a byte array
  *
@@ -135,146 +136,123 @@ whd_bool_t whd_is_wpa_ie(vendor_specific_ie_header_t *wpaie, whd_tlv8_header_t *
  * @note : This function has been copied directly from the standard Broadcom host driver file wl/exe/wlu.c
  *
  *
- * @param tlv_buf : The byte array containing the Information Elements (IEs)
- * @param buflen  : The length of the tlv_buf byte array
- * @param key     : The Information Element tag to search for
+ * @param tlv_buf The byte array containing the Information Elements (IEs)
+ * @param buflen  The length of the tlv_buf byte array
+ * @param key     The Information Element tag to search for
  *
  * @return    NULL : if no matching Information Element was found
  *            Non-Null : Pointer to the start of the matching Information Element
  */
-whd_tlv8_header_t *whd_parse_dot11_tlvs(const whd_tlv8_header_t *tlv_buf, uint32_t buflen, dot11_ie_id_t key);
+whd_tlv8_header_t* whd_parse_dot11_tlvs(whd_tlv8_header_t const* tlv_buf, uint32_t buflen, dot11_ie_id_t key);
 
 /******************************************************
-*             Debug helper functionality
-******************************************************/
+ *             Debug helper functionality
+ ******************************************************/
 #ifdef WPRINT_ENABLE_WHD_DEBUG
-const char *whd_event_to_string(whd_event_num_t var);
-char *whd_ssid_to_string(uint8_t *value, uint8_t length, char *ssid_buf, uint8_t ssid_buf_len);
-const char *whd_status_to_string(whd_event_status_t status);
-const char *whd_reason_to_string(whd_event_reason_t reason);
-const char *whd_ioctl_to_string(uint32_t ioctl);
+const char* whd_event_to_string(whd_event_num_t var);
+char*       whd_ssid_to_string(uint8_t* value, uint8_t length, char* ssid_buf, uint8_t ssid_buf_len);
+char const* whd_status_to_string(whd_event_status_t status);
+char const* whd_reason_to_string(whd_event_reason_t reason);
+char const* whd_ioctl_to_string(uint32_t ioctl);
 #endif /* ifdef WPRINT_ENABLE_WHD_DEBUG */
 
 #if defined(WPRINT_ENABLE_WHD_DEBUG) || defined(COMPONENT_WLANSENSE)
 /**
  * ****************************************************************************
  * Converts whd_mac_t to string and assigns it to buf
- * @param[in] ea :  MAC address in octet array
- * @param[out] buf : character array to store the MAC address after conversion
- * @param[out] buf_len : length of buf char array
+ * @param[in] ea MAC address in octet array
+ * @param[out] buf character array to store the MAC address after conversion
+ * @param[out] buf_len length of buf char array
  *
  * @return output character array which has resultant MAC address in string
  *
  */
-extern char *whd_ether_ntoa(const uint8_t *ea, char *buf, uint8_t buf_len);
+char* whd_ether_ntoa(uint8_t const* ea, char* buf, uint8_t buf_len);
 #endif /* defined(WPRINT_ENABLE_WHD_DEBUG) || defined(COMPONENT_WLANSENSE) */
 
 /**
  ******************************************************************************
  * Prints partial details of a scan result on a single line
- * @param[in] record :  A pointer to the whd_scan_result_t record
+ * @param[in] record  A pointer to the whd_scan_result_t record
  *
  */
-extern void whd_print_scan_result(whd_scan_result_t *record);
+void whd_print_scan_result(whd_scan_result_t* record);
 
 /**
  ******************************************************************************
  * Convert a security bitmap to string
- * @param[in] security :  security of type whd_security_t
- * @param[in] out_str :  a character array to store output
- * @param[in] out_str_len :  length of out_str char array
+ * @param[in] security  security of type whd_security_t
+ * @param[in] out_str  a character array to store output
+ * @param[in] out_str_len  length of out_str char array
  *
  */
-extern void whd_convert_security_type_to_string(whd_security_t security, char *out_str, uint16_t out_str_len);
+void whd_convert_security_type_to_string(whd_security_t security, char* out_str, uint16_t out_str_len);
 
 /*!
  ******************************************************************************
  * Convert an IOCTL to a string.
  *
- * @param[in] cmd  The ioct_log value.
- * @param[out] ioctl_str The string value after conversion.
- * @param[out] ioctl_str_len The string length of the IOCTL string.
+ * @param[in] cmd  The ioct_log value
+ * @param[out] ioctl_str The string value after conversion
+ * @param[out] ioctl_str_len The string length of the IOCTL string
  *
  * @result
  */
-void whd_ioctl_info_to_string(uint32_t cmd, char *ioctl_str, uint16_t ioctl_str_len);
+void whd_ioctl_info_to_string(uint32_t cmd, char* ioctl_str, uint16_t ioctl_str_len);
 
 /*!
  ******************************************************************************
- * Convert event, status and reason value coming from firmware to string.
+ * Convert event, status and reason value coming from firmware to string
  *
- * @param[in] cmd  The event value in numeric form.
- * @param[in] flag  The status value in numeric form.
- * @param[in] reason  The reson value in numeric form.
- * @param[out] ioctl_str  The string representation of event, status and reason.
- * @param[out] ioctl_str_len  The str_len of ioctl_str.
+ * @param[in] cmd  The event value in numeric form
+ * @param[in] flag  The status value in numeric form
+ * @param[in] reason  The reson value in numeric form
+ * @param[out] ioctl_str  The string representation of event, status and reason
+ * @param[out] ioctl_str_len  The str_len of ioctl_str
  *
  * @result
  */
-void whd_event_info_to_string(uint32_t cmd, uint16_t flag, uint32_t reason, char *ioctl_str, uint16_t ioctl_str_len);
+void whd_event_info_to_string(uint32_t cmd, uint16_t flag, uint32_t reason, char* ioctl_str, uint16_t ioctl_str_len);
 
 /*!
  ******************************************************************************
- * Prints Hexdump and ASCII dump for data passed as argument.
+ * Prints Hexdump and ASCII dump for data passed as argument
  *
- * @param[in] data  The data which has to be converted into hex and ascii format.
- * @param[in] data_len The length of data.
+ * @param[in] data  The data which has to be converted into hex and ascii format
+ * @param[in] data_len The length of data
  *
  * @result
  */
-void whd_hexdump(uint8_t *data, uint32_t data_len);
+void whd_hexdump(uint8_t* data, uint32_t data_len);
 
 extern wl_chanspec_t whd_channel_to_wl_band(whd_driver_t whd_driver, uint32_t channel);
 
 /*!
  ******************************************************************************
- * Convert an ipv4 string to a uint32_t.
- *
- * @param[in] ip4addr   : IP address in string format
- * @param[in] len       : length of the ip address string
- * @param[out] dest     : IP address format in uint32
- *
- * @return
- */
-bool whd_str_to_ip(const char *ip4addr, size_t len, void *dest);
-
-/*!
- ******************************************************************************
- * Print binary IPv4 address to a string.
- * String must contain enough room for full address, 16 bytes exact.
- * @param[in] ip4addr     : IPv4 address
- * @param[out] p          : ipv4 address in string format
- *
- * @return
- */
-uint8_t whd_ip4_to_string(const void *ip4addr, char *p);
-
-/*!
- ******************************************************************************
- * The wrapper function for memory allocation.
- * It allocates the requested memory and returns a pointer to it.
+ * The wrapper function for memory copy.
+ * It copies the requested memory from source to destination.
  * In default implementation it uses The C library function memcpy().
  *
  * Use macro WHD_USE_CUSTOM_MALLOC_IMPL (-D) for custom whd_mem_memcpy/
  * whd_mem_calloc/whd_mem_free inplemetation.
  *
- * @param[in] size     :  This is the size of the memory block, in byrtes
+ * @param[in] size This is the size of the memory block, in bytes
  */
-void whd_mem_memcpy (void *dest, const void *src, size_t len);
+void whd_mem_memcpy(void* dest, void const* src, size_t len);
 
 /*!
  ******************************************************************************
- * The wrapper function for memory allocation.
- * It allocates the requested memory and returns a pointer to it.
+ * The wrapper function for memory set.
+ * It sets the requested memory to the specified value.
  * In default implementation it uses The C library function memset().
  *
  * Use macro WHD_USE_CUSTOM_MALLOC_IMPL (-D) for custom whd_mem_memset/
  * whd_mem_calloc/whd_mem_free inplemetation.
  *
- * @param[in] lem     :  This is the size of the memory block, in bytes.
+ * @param[in] len This is the size of the memory block, in bytes.
  *
  */
-void whd_mem_memset (void *buf, int val, size_t len);
+void whd_mem_memset(void* buf, int val, size_t len);
 
 /*!
  ******************************************************************************
@@ -285,13 +263,13 @@ void whd_mem_memset (void *buf, int val, size_t len);
  * Use macro WHD_USE_CUSTOM_MALLOC_IMPL (-D) for custom whd_mem_malloc/
  * whd_mem_calloc/whd_mem_free inplemetation.
  *
- * @param[in] size     :  This is the size of the memory block, in bytes.
+ * @param[in] size This is the size of the memory block, in bytes.
  *
  * @return
  *  This function returns a pointer to the allocated memory, or NULL if the
  *  request fails.
  */
-void *whd_mem_malloc(size_t size);
+void* whd_mem_malloc(size_t size);
 
 /*!
  ******************************************************************************
@@ -302,14 +280,14 @@ void *whd_mem_malloc(size_t size);
  * Use macro WHD_USE_CUSTOM_MALLOC_IMPL (-D) for custom whd_mem_calloc/
  * whd_mem_calloc/whd_mem_free inplemetation.
  *
- * @param[in] nitems   :  This is the number of elements to be allocated.
- * @param[in] size     :  This is the size of elements.
+ * @param[in] nitems This is the number of elements to be allocated.
+ * @param[in] size   This is the size of elements.
  *
  * @return
  *  This function returns a pointer to the allocated memory, or NULL if the
  *  request fails.
  */
-void *whd_mem_calloc(size_t nitems, size_t size);
+void* whd_mem_calloc(size_t nitems, size_t size);
 
 /*!
  ******************************************************************************
@@ -317,20 +295,20 @@ void *whd_mem_calloc(size_t nitems, size_t size);
  * In default implementation it uses The C library function free().
  *
  * Use macro WHD_USE_CUSTOM_MALLOC_IMPL (-D) for custom whd_mem_free/
- * whd_mem_calloc/whd_mem_free inplemetation.
+ * whd_mem_calloc/whd_mem_free implementation.
  *
- * @param[in] ptr     :  pointer to a memory block previously allocated
- *                       with whd_mem_malloc, whd_mem_calloc
+ * @param[in] ptr Pointer to a memory block previously allocated
+ *                with whd_mem_malloc, whd_mem_calloc
  * @return
  */
-void whd_mem_free(void *ptr);
+void whd_mem_free(void* ptr);
 
 /*!
  ******************************************************************************
  * The utility function for returning frequency based on the channel.
  *
- * @param[in] chan     :  This is the channel number
- * @param[in] size     :  This is the size of elements.
+ * @param[in] chan This is the channel number
+ * @param[in] size This is the size of elements in bytes.
  *
  * @return
  *  This function returns the frequency in the form of a uint or zero if the channel

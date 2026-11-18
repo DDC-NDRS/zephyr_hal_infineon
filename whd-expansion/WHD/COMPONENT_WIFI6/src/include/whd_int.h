@@ -171,10 +171,10 @@ struct whd_driver {
     cy_mutex_t whd_hm_tx_lock;
     #endif
 
-    #ifdef BUS_ENC
+    #if defined(WHD_BUS_ENC)
     unsigned char key[16];
     unsigned char iv[12];
-    #endif /* BUS_ENC */
+    #endif /* WHD_BUS_ENC */
 
     #ifdef CYW89530_AUTO
     bool wl_cmd_in_prog;
